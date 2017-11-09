@@ -1,0 +1,19 @@
+﻿<Controls:MetroWindow x:Class="QuickLauncher.SettingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:local="clr-namespace:QuickLauncher"
+        mc:Ignorable="d"
+        Title="Settings" Height="244.478" Width="408.358" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Label x:Name="label" Content="Command View: " HorizontalAlignment="Left" Margin="24,18,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="viewMode" HorizontalAlignment="Left" Margin="170,22,0,0" VerticalAlignment="Top" Width="120">
+            <ComboBoxItem Content="Details" Tag="DV"/>
+            <ComboBoxItem Content="Tiles" Tag="TV"/>
+        </ComboBox>
+        <Button x:Name="save" Content="Save" HorizontalAlignment="Left" Margin="303,166,0,0" VerticalAlignment="Top" Width="75"/>
+
+    </Grid>
+</Controls:MetroWindow>
