@@ -20,6 +20,28 @@ namespace QuickLauncher
 
         public App()
         {
+            if (Utility.Singleton.AppSingleton.Instance.checkIsAppRunning("QuichLauncher--zj"))
+            {
+                if (mainWindow == null)
+                {
+                    var process = Utility.Singleton.AppSingleton.getRunningInstance();
+                    if (process != null)
+                    {
+                        Utility.Singleton.AppSingleton.sendRunningInstanceForeground(process);
+                    }
+                }
+                else
+                {
+                    mainWindow.Visibility = Visibility.Visible;
+                    mainWindow.WindowState = WindowState.Normal;
+
+                    mainWindow.Show();
+                    mainWindow.Activate();
+                }
+
+                Environment.Exit(1);
+            }
+
             nIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Windows.Forms.Application.ExecutablePath);
             
             nIcon.Text = "QuickLancher By MagicWorldZ";
@@ -42,6 +64,7 @@ namespace QuickLauncher
             {
                 if (e.Button == System.Windows.Forms.MouseButtons.Left) show();
             });
+            nIcon.Visible = true;
         }
 
         private void nIcon_Click(object sender, EventArgs e)
@@ -52,8 +75,8 @@ namespace QuickLauncher
 
         private void exit_Click(object sender, EventArgs e)
         {
-            Application.Current.Shutdown();
             nIcon.Visible = false;
+            Application.Current.Shutdown();
         }
 
         private void show()
@@ -68,36 +91,6 @@ namespace QuickLauncher
         {
             base.OnActivated(e);
             mainWindow = MainWindow;
-        }
-
-        protected override void OnStartup(StartupEventArgs e)
-        {
-            if (Utility.Singleton.AppSingleton.Instance.checkIsAppRunning("QuichLauncher--zj"))
-            {
-                if(mainWindow == null)
-                {
-                    var process = Utility.Singleton.AppSingleton.getRunningInstance();
-                    if (process != null)
-                    {
-                        Utility.Singleton.AppSingleton.sendRunningInstanceForeground(process);
-                    }
-                }
-                else
-                {
-                    mainWindow.Visibility = Visibility.Visible;
-                    mainWindow.WindowState = WindowState.Normal;
-                    
-                    mainWindow.Show();
-                    mainWindow.Activate();
-                }
-                
-                Environment.Exit(1);
-            }
-            else
-            {
-                base.OnStartup(e);
-                nIcon.Visible = true;
-            }
         }
     }
 }
