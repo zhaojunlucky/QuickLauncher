@@ -51,12 +51,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_4FA6B89E889825C6A1A5BED6D0D645F7"
-        "OwnerKey" = "8:_411ED708820246C0BEF951B6901606E4"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_5CD0894D43DEF4A4228C33FEB3D23B76"
         "OwnerKey" = "8:_24CDC326E44874ECE916CC4F401F5C38"
         "MsmSig" = "8:_UNDEFINED"
@@ -83,6 +77,12 @@
         {
         "MsmKey" = "8:_867B86C82F9041D8BEBFAFF65CA04890"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8A64409A48249F256E898A509CE596AC"
+        "OwnerKey" = "8:_411ED708820246C0BEF951B6901606E4"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -142,7 +142,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_4FA6B89E889825C6A1A5BED6D0D645F7"
+        "OwnerKey" = "8:_8A64409A48249F256E898A509CE596AC"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -381,37 +381,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_4FA6B89E889825C6A1A5BED6D0D645F7"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Utility, Version=1.0.1.0, Culture=neutral, processorArchitecture=AMD64"
-                "ScatterAssemblies"
-                {
-                    "_4FA6B89E889825C6A1A5BED6D0D645F7"
-                    {
-                    "Name" = "8:Utility.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:Utility.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_F2F0A3E437034BDEBDEED3ECE5A4363D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_5CD0894D43DEF4A4228C33FEB3D23B76"
             {
             "AssemblyRegister" = "3:1"
@@ -525,6 +494,37 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_8A64409A48249F256E898A509CE596AC"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Utility, Version=1.0.1.0, Culture=neutral, processorArchitecture=AMD64"
+                "ScatterAssemblies"
+                {
+                    "_8A64409A48249F256E898A509CE596AC"
+                    {
+                    "Name" = "8:Utility.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:Utility.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_F2F0A3E437034BDEBDEED3ECE5A4363D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_B8BC1FC5EE5AC6E5CAFFBFA5D7879EAA"
             {
             "AssemblyRegister" = "3:1"
@@ -568,7 +568,7 @@
             "ReadOnly" = "11:FALSE"
             "Hidden" = "11:FALSE"
             "System" = "11:FALSE"
-            "Permanent" = "11:TRUE"
+            "Permanent" = "11:FALSE"
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
@@ -674,15 +674,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:QuickLauncher"
-        "ProductCode" = "8:{908A989C-EDCE-4A6A-B366-2EFFBFA7DA98}"
-        "PackageCode" = "8:{ACD515BB-359B-4851-AE8E-BAA7CC67AE5C}"
+        "ProductCode" = "8:{7A5B7383-D194-423C-A8E6-1ABB7D576137}"
+        "PackageCode" = "8:{545E4509-BAAC-4CAD-B25C-5ED2D90DBA1E}"
         "UpgradeCode" = "8:{3D30F738-D331-40EA-9EC2-5C857ED28ACC}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:1.0.2"
+        "ProductVersion" = "8:1.0.3"
         "Manufacturer" = "8:MagicWorldZ"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

@@ -134,10 +134,34 @@ namespace QuickLauncher
                 return qCommand;
             }
         }
+
+        private string getCommandDirectory()
+        {
+            if (QCommand != null && QCommand.Path != null && QCommand.Path != "")
+            {
+                var fileInfo = new FileInfo(qCommand.Path);
+
+                var dirInfo = fileInfo.Directory;
+                while (dirInfo != null && !dirInfo.Exists)
+                {
+                    dirInfo = dirInfo.Parent;
+                }
+
+                if (dirInfo != null)
+                {
+                    return dirInfo.FullName;
+                }
+            }
+
+            return Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+        }
         private void browse_Click(object sender, RoutedEventArgs e)
         {
             System.Windows.Forms.OpenFileDialog fd = new System.Windows.Forms.OpenFileDialog();
             fd.Multiselect = false;
+            fd.InitialDirectory = getCommandDirectory();
+            
+            
             if(fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 path.Text = fd.FileName;
@@ -150,6 +174,7 @@ namespace QuickLauncher
 
                 workDir.Text = FileUtil.getParentDir(path.Text);
             }
+            this.Focus();
         }
 
         private void workDirBtn_Click(object sender, RoutedEventArgs e)
@@ -160,6 +185,7 @@ namespace QuickLauncher
             {
                 workDir.Text = dlg.SelectedPath;
             }
+            this.Focus();
         }
     }
 }

@@ -99,7 +99,8 @@ namespace QuickLauncher.Model
                     if(!isDirectory)
                     {
                         System.Drawing.Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(path);
-                        img = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(icon.Handle, new Int32Rect(0, 0, icon.Width, icon.Height), BitmapSizeOptions.FromEmptyOptions());
+                        Img = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(icon.Handle, new Int32Rect(0, 0, icon.Width, icon.Height), BitmapSizeOptions.FromEmptyOptions());
+                        
                     }
                 }
                 catch (Exception e)
@@ -130,6 +131,11 @@ namespace QuickLauncher.Model
             get
             {
                 return img;
+            }
+            set
+            {
+                img = value;
+                RaisePropertyChanged("Img");
             }
         }
 

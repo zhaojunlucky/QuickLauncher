@@ -7,15 +7,20 @@
         xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
         x:Name="root" 
-        Title="Quick Launcher" Height="608" Width="1080" MaxHeight="608" MaxWidth="1080" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize"
+        Title="Quick Launcher" MinHeight="608" MinWidth="1080" Width="1080" Height="608" WindowStartupLocation="CenterScreen" 
                       ContextMenuOpening="ContextMenu_ContextMenuOpening" Closing="root_Closing" Activated="root_Activated">
     <Grid>
-        <WrapPanel >
-            <WrapPanel Margin="0,0,0,5">
-                <Label Content="Search:"/>
-                <TextBox Width="1000" Name="keyWords" VerticalAlignment="Center" TextChanged="keyWords_TextChanged"/>
-            </WrapPanel>
-            <ListView x:Name="commandsList"  MinHeight="539" MaxHeight="608" Margin="0,0,0,0"  MouseDoubleClick="commandsList_MouseDoubleClick" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="539" Width="1059" SelectionMode="Single"
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        
+            <DockPanel Margin="0,0,0,0" Grid.Row="0">
+                <Label Content="Search:" DockPanel.Dock="Left"/>
+                <TextBox DockPanel.Dock="Right" Width="Auto" MinWidth="990" Name="keyWords" VerticalAlignment="Center" TextChanged="keyWords_TextChanged"/>
+            </DockPanel>
+            <ListView Grid.Row="1" x:Name="commandsList" Margin="0,0,0,5" Width="Auto" Height="Auto" MouseDoubleClick="commandsList_MouseDoubleClick" ScrollViewer.VerticalScrollBarVisibility="Auto" MinHeight="539" MinWidth="1070" SelectionMode="Single"
                       Padding="10,0,10,0" IsSynchronizedWithCurrentItem="True"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" TextSearch.TextPath="Alias" IsTextSearchCaseSensitive="False">
                 <ListView.Resources>
                     <ContextMenu x:Key="ItemContextMenu">
@@ -71,7 +76,7 @@
 
                 </ListView.Style>
             </ListView>
-        </WrapPanel>
+        
     </Grid>
     <Window.InputBindings>
         <!--<KeyBinding Command="{Binding OpenNewEditorCommand}" Key="N" Modifiers="Ctrl"/>-->
