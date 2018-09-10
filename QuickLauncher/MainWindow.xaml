@@ -7,6 +7,9 @@
         xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
         x:Name="root" 
+        BorderThickness="0" 
+        GlowBrush="Black"
+        WindowTransitionsEnabled="False"
         Title="Quick Launcher" MinHeight="608" MinWidth="1080" Width="1080" Height="608" WindowStartupLocation="CenterScreen" 
                       ContextMenuOpening="ContextMenu_ContextMenuOpening" Closing="root_Closing" Activated="root_Activated">
     <Grid>
@@ -18,7 +21,9 @@
         
             <DockPanel Margin="0,0,0,0" Grid.Row="0">
                 <Label Content="Search:" DockPanel.Dock="Left"/>
-                <TextBox DockPanel.Dock="Right" Width="Auto" MinWidth="990" Name="keyWords" VerticalAlignment="Center" TextChanged="keyWords_TextChanged"/>
+                <TextBox DockPanel.Dock="Right" Width="Auto" MinWidth="990" Name="keyWords" VerticalAlignment="Center" TextChanged="keyWords_TextChanged"
+                         Controls:TextBoxHelper.Watermark="Search" Margin="0, 0, 20, 0"
+                         Controls:TextBoxHelper.ClearTextButton="True"/>
             </DockPanel>
             <ListView Grid.Row="1" x:Name="commandsList" Margin="0,0,0,5" Width="Auto" Height="Auto" MouseDoubleClick="commandsList_MouseDoubleClick" ScrollViewer.VerticalScrollBarVisibility="Auto" MinHeight="539" MinWidth="1070" SelectionMode="Single"
                       Padding="10,0,10,0" IsSynchronizedWithCurrentItem="True"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" TextSearch.TextPath="Alias" IsTextSearchCaseSensitive="False">

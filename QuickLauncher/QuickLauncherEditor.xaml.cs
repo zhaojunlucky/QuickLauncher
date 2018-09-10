@@ -1,4 +1,5 @@
 ﻿using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 using QuickLauncher.Model;
 using System;
 using System.Collections.Generic;
@@ -41,7 +42,7 @@ namespace QuickLauncher
             QCommand.WorkDirectory = workDir.Text.Trim();
             if (QCommand.Alias.Length == 0)
             {
-                MessageBox.Show("Alias can't be empty.","Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                DialogUtil.showWarning(this, "Alias can't be empty.");
                 return;
             }
             else
@@ -61,21 +62,21 @@ namespace QuickLauncher
 
                 if (error)
                 {
-                    MessageBox.Show("Alias already exists.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    DialogUtil.showWarning(this, "Alias already exists.");
                     return;
                 }
             }
 
             if(QCommand.Path.Length == 0)
             {
-                MessageBox.Show("Path can't be empty.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                DialogUtil.showWarning(this, "Path can't be empty.");
                 return;
             }
             else
             {
                 if(!File.Exists(QCommand.Path) && !Directory.Exists(QCommand.Path))
                 {
-                    MessageBox.Show("Path doesn't exist.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    DialogUtil.showWarning(this, "Path doesn't exist.");
                     return;
                 }
             }
@@ -85,7 +86,7 @@ namespace QuickLauncher
             }
             if (QCommand.WorkDirectory.Trim().Length == 0)
             {
-                MessageBox.Show("Working directory can't be empty.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                DialogUtil.showWarning(this, "Working directory can't be empty.");
                 return;
             }
             try
@@ -114,7 +115,7 @@ namespace QuickLauncher
             }
             catch(Exception ee)
             {
-                MessageBox.Show(ee.Message);
+                DialogUtil.showError(this, ee.Message);
             }
            
         }

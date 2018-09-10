@@ -33,7 +33,7 @@ namespace QuickLauncher
             QuickCommandObject = qc;
             if (QuickCommandObject == null)
             {
-                MessageBox.Show("Null QuickCommand object.", "Error");
+                DialogUtil.showError(this, "Null QuickCommand object.");
                 return;
             }
             if(QuickCommandObject.QuickCommandEnvConfigs != null)
@@ -71,7 +71,7 @@ namespace QuickLauncher
                 dbContext.SaveChanges();
 
                 QuickCommandObject.QuickCommandEnvConfigs = quickCommands.ToList();
-                MessageBox.Show("Data saved successfully.","Notice");
+                DialogUtil.showInfo(this, "Data saved successfully.");
                 this.Close();
             }
         }
@@ -94,7 +94,7 @@ namespace QuickLauncher
                 if(message.Length > 0)
                 {
                     message = "Item " + (i + 1) + " : " + message;
-                    MessageBox.Show(message, "Error",MessageBoxButton.OK,MessageBoxImage.Error);
+                    DialogUtil.showError(this, message);
                     pass = false;
                     break;
                 }

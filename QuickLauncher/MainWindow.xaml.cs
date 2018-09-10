@@ -1,4 +1,5 @@
 ﻿using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 using QuickLauncher.Model;
 using System;
 using System.Collections.Generic;
@@ -44,7 +45,8 @@ namespace QuickLauncher
             }
             catch(Exception e)
             {
-                MessageBox.Show("Fail to init database:"+e.Message);
+                DialogUtil.showError(this, "Fail to init database:" + e.Message);
+
                 Environment.Exit(-1);
             }
             this.DataContext = this;
@@ -254,11 +256,12 @@ namespace QuickLauncher
             qle.ShowDialog();
         }
 
-        private void delete_Click(object sender, RoutedEventArgs e)
+        private async void delete_Click(object sender, RoutedEventArgs e)
         {
             //QuickCommand qc = ((System.Windows.Controls.Button)sender).Tag as QuickCommand;
             QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
-            if (MessageBox.Show("Are you sure to delete this quick command?","Delete confirmation",MessageBoxButton.YesNo,MessageBoxImage.Question) == MessageBoxResult.Yes)
+            MessageDialogResult result = await DialogUtil.ShowYesNo("Delete confirmation", this, "Are you sure to delete this quick command?");
+            if (result == MessageDialogResult.Affirmative)
             {
                 dbContext.QuickCommands.Remove(qc);
                 dbContext.SaveChanges();

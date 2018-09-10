@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickLauncher", "QuickLaunc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utility", "Utility\Utility.csproj", "{055D3A1F-D6D3-4897-90EF-9D9D530C5F6B}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "QuickLauncherSetup", "QuickLauncherSetup\QuickLauncherSetup.vdproj", "{C2A9DFB8-0C53-4590-A805-D5B67A0E94E4}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "QuickLauncherSetup", "QuickLauncherSetup\QuickLauncherSetup.vdproj", "{FC645272-0DD7-4B25-B3DA-AF542D46911E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,20 +63,22 @@ Global
 		{055D3A1F-D6D3-4897-90EF-9D9D530C5F6B}.SingleImage|Any CPU.Build.0 = Release|Any CPU
 		{055D3A1F-D6D3-4897-90EF-9D9D530C5F6B}.SingleImage|x64.ActiveCfg = Release|x64
 		{055D3A1F-D6D3-4897-90EF-9D9D530C5F6B}.SingleImage|x64.Build.0 = Release|x64
-		{C2A9DFB8-0C53-4590-A805-D5B67A0E94E4}.CD_ROM|Any CPU.ActiveCfg = Release
-		{C2A9DFB8-0C53-4590-A805-D5B67A0E94E4}.CD_ROM|x64.ActiveCfg = Release
-		{C2A9DFB8-0C53-4590-A805-D5B67A0E94E4}.Debug|Any CPU.ActiveCfg = Debug
-		{C2A9DFB8-0C53-4590-A805-D5B67A0E94E4}.Debug|x64.ActiveCfg = Debug
-		{C2A9DFB8-0C53-4590-A805-D5B67A0E94E4}.DVD-5|Any CPU.ActiveCfg = Debug
-		{C2A9DFB8-0C53-4590-A805-D5B67A0E94E4}.DVD-5|x64.ActiveCfg = Debug
-		{C2A9DFB8-0C53-4590-A805-D5B67A0E94E4}.Release|Any CPU.ActiveCfg = Release
-		{C2A9DFB8-0C53-4590-A805-D5B67A0E94E4}.Release|x64.ActiveCfg = Release
-		{C2A9DFB8-0C53-4590-A805-D5B67A0E94E4}.Release|x64.Build.0 = Release
-		{C2A9DFB8-0C53-4590-A805-D5B67A0E94E4}.Release|x64.Deploy.0 = Release
-		{C2A9DFB8-0C53-4590-A805-D5B67A0E94E4}.SingleImage|Any CPU.ActiveCfg = Release
-		{C2A9DFB8-0C53-4590-A805-D5B67A0E94E4}.SingleImage|x64.ActiveCfg = Release
+		{FC645272-0DD7-4B25-B3DA-AF542D46911E}.CD_ROM|Any CPU.ActiveCfg = Release
+		{FC645272-0DD7-4B25-B3DA-AF542D46911E}.CD_ROM|x64.ActiveCfg = Release
+		{FC645272-0DD7-4B25-B3DA-AF542D46911E}.Debug|Any CPU.ActiveCfg = Debug
+		{FC645272-0DD7-4B25-B3DA-AF542D46911E}.Debug|x64.ActiveCfg = Debug
+		{FC645272-0DD7-4B25-B3DA-AF542D46911E}.Debug|x64.Build.0 = Debug
+		{FC645272-0DD7-4B25-B3DA-AF542D46911E}.DVD-5|Any CPU.ActiveCfg = Debug
+		{FC645272-0DD7-4B25-B3DA-AF542D46911E}.DVD-5|x64.ActiveCfg = Debug
+		{FC645272-0DD7-4B25-B3DA-AF542D46911E}.Release|Any CPU.ActiveCfg = Release
+		{FC645272-0DD7-4B25-B3DA-AF542D46911E}.Release|x64.ActiveCfg = Release
+		{FC645272-0DD7-4B25-B3DA-AF542D46911E}.SingleImage|Any CPU.ActiveCfg = Release
+		{FC645272-0DD7-4B25-B3DA-AF542D46911E}.SingleImage|x64.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B4E10FCD-CE70-404F-8E44-F63BBA28C902}
 	EndGlobalSection
 EndGlobal

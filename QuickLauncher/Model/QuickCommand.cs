@@ -96,7 +96,7 @@ namespace QuickLauncher.Model
 
                 try
                 {
-                    if(!isDirectory)
+                    if(!isDirectory && path != "")
                     {
                         System.Drawing.Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(path);
                         Img = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(icon.Handle, new Int32Rect(0, 0, icon.Width, icon.Height), BitmapSizeOptions.FromEmptyOptions());
