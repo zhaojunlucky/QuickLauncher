@@ -263,6 +263,7 @@ namespace QuickLauncher
             MessageDialogResult result = await DialogUtil.ShowYesNo("Delete confirmation", this, "Are you sure to delete this quick command?");
             if (result == MessageDialogResult.Affirmative)
             {
+                var envs = dbContext.QuickCommandEnvConfigs.RemoveRange(qc.QuickCommandEnvConfigs);
                 dbContext.QuickCommands.Remove(qc);
                 dbContext.SaveChanges();
                 quickCommands.Remove(qc);
@@ -370,6 +371,10 @@ namespace QuickLauncher
         private void ContextMenu_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
             ContextMenu menu = (e.Source as Control).ContextMenu;
+            if (menu == null)
+            {
+                return;
+            }
             
             foreach(var item in menu.Items)
             {

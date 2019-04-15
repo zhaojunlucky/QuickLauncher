@@ -18,9 +18,15 @@ namespace QuickLauncher
         System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
         private static Window mainWindow = null;
 
+#if DEBUG
+        private static String SINGLETON = "QuichLauncher--zj-debug";
+#else
+        private static String SINGLETON = "QuichLauncher--zj";
+#endif
+
         public App()
         {
-            if (Utility.Singleton.AppSingleton.Instance.checkIsAppRunning("QuichLauncher--zj"))
+            if (Utility.Singleton.AppSingleton.Instance.checkIsAppRunning(SINGLETON))
             {
                 if (mainWindow == null)
                 {
