@@ -61,6 +61,7 @@ namespace QuickLauncher
             about.Click += new EventHandler((o,e)=>
             {
                 About a = new About();
+                a.Owner = mainWindow;
                 a.ShowDialog();
             });
             System.Windows.Forms.MenuItem[] childen = new System.Windows.Forms.MenuItem[] { about, open, exit};

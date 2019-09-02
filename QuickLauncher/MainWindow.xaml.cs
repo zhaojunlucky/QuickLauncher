@@ -300,8 +300,9 @@ namespace QuickLauncher
                 {
                     case _AboutSysMenuID:
                         handled = true;
-                        About about = new About();
                         
+                        About about = new About();
+                        about.Owner = Application.Current.MainWindow;
                         about.ShowDialog();
                         
                         break;
@@ -322,7 +323,7 @@ namespace QuickLauncher
         private void about_Click(object sender, RoutedEventArgs e)
         {
             About about = new About();
-
+            about.Owner = this;
             about.ShowDialog();
 
         }
@@ -348,7 +349,7 @@ namespace QuickLauncher
             }
             catch (System.ComponentModel.Win32Exception exception)
             {
-
+                MessageBox.Show(exception.Message);
             }
         }
 

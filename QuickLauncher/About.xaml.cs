@@ -34,7 +34,7 @@ namespace QuickLauncher
             var rCopyrightAttribute = (AssemblyCopyrightAttribute)rAssembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), true)[0];
             var rCopyright = rCopyrightAttribute.Copyright;
 
-            var info = rProduct + " " + rVersion + "\r\n\r\n" + rCopyright +"\r\n\r\nhttp://zhaojunlucky.github.io";
+            var info = rProduct + " " + rVersion + "\r\n\r\n" + rCopyright +"\r\n\r\nhttp://zhaojunlucky.ga";
             label.Content = info;
 
         }
