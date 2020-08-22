@@ -1,6 +1,7 @@
 ﻿using MahApps.Metro.Controls;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -28,13 +29,12 @@ namespace QuickLauncher
             var rAssembly = Assembly.GetEntryAssembly();
             var rProductAttribute = (AssemblyProductAttribute)rAssembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false)[0];
             var rProduct = rProductAttribute.Product;
-
             var rVersion = rAssembly.GetName().Version.ToString();
 
             var rCopyrightAttribute = (AssemblyCopyrightAttribute)rAssembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), true)[0];
             var rCopyright = rCopyrightAttribute.Copyright;
 
-            var info = rProduct + " " + rVersion + "\r\n\r\n" + rCopyright +"\r\n\r\nhttp://zhaojunlucky.ga";
+            var info = rProduct + " " + rVersion + "\r\n\r\n" + rCopyright;
             label.Content = info;
 
         }
@@ -42,6 +42,11 @@ namespace QuickLauncher
         private void button_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void Hyperlink_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(link.Text);
         }
     }
 }

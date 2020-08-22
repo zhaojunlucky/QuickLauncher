@@ -1,24 +1,19 @@
-﻿using MahApps.Metro.Controls;
+﻿using ControlzEx.Theming;
+using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using QuickLauncher.Dialogs;
+using QuickLauncher.Miscs;
 using QuickLauncher.Model;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Resources;
 using Utility.Win32.Api;
 
 namespace QuickLauncher
@@ -33,90 +28,50 @@ namespace QuickLauncher
         private QuickCommandContext dbContext = QuickCommandContext.Instance;
         public const Int32 _AboutSysMenuID = 1001;
         private SettingItem viewSetting = null;
+        private MetroDialogSettings dialogSettings = new MetroDialogSettings()
+        {
+            ColorScheme = MetroDialogColorScheme.Accented// win.MetroDialogOptions.ColorScheme
+        };
         public MainWindow()
         {
             InitializeComponent();
-            
+
             this.Loaded += MainWindow_Loaded;
             try
             {
                 DbUtil.prepareTables();
                 loadSettings();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 DialogUtil.showError(this, "Fail to init database:" + e.Message);
 
                 Environment.Exit(-1);
             }
             this.DataContext = this;
-            OpenNewEditorCommand = new OpenEditorCommand(()=>{
-                QuickLancherEditor qle = new QuickLancherEditor();
-                qle.Owner = this;
-                qle.AddedNewQuickCommand += Qle_AddedNewQuickCommand;
-                qle.ShowDialog();
+            OpenNewEditorCommand = new OpenEditorCommand(() =>
+            {
+                newquickcommand_Click(null, null);
             });
-            
-            KeyBinding OpenCmdKeyBinding = new KeyBinding(OpenNewEditorCommand,Key.N,ModifierKeys.Control);
+
+            KeyBinding OpenCmdKeyBinding = new KeyBinding(OpenNewEditorCommand, Key.N, ModifierKeys.Control);
 
             InputBindings.Add(OpenCmdKeyBinding);
             loadQuickCommandsFromDb("");
             commandsList.ItemsSource = quickCommands;
         }
 
-        public bool IsDetailsView
+        public SettingItem ViewMode
         {
             get
             {
-                return viewSetting.Value == "DV";
-            } 
-        }
-
-        public bool IsTilesView
-        {
-            get
-            {
-                return viewSetting.Value == "TV";
+                return viewSetting;
             }
         }
 
         private void loadSettings()
         {
-            viewSetting = getSettingItem("view.viewmode");
-            if (viewSetting == null)
-            {
-                viewSetting = new SettingItem { Key = "view.viewmode", Value="TV"};
-            }
-            this.commandsList.Tag = viewSetting.Value;
-        }
-
-        private void saveSettingItem(SettingItem item)
-        {
-            try
-            {
-                var dbItem = getSettingItem(item.Key);
-                if(dbItem == null)
-                {
-                    dbContext.SettingItems.Add(item);
-                }
-                else
-                {
-                    dbItem.Value = item.Value;
-                }
-                dbContext.SaveChanges();
-            }
-            catch (Exception r)
-            {
-                MessageBox.Show(r.InnerException.Message);
-            }
-        }
-
-        private SettingItem getSettingItem(string key)
-        {
-            var query = from b in dbContext.SettingItems
-                        where b.Key == "view.viewmode"
-                        select b;
-            return query.Count() == 1 ? query.First(): null;
+            viewSetting = SettingItemUtils.GetViewMode();
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -131,6 +86,8 @@ namespace QuickLauncher
             // Attach our WndProc handler to this Window
             HwndSource source = HwndSource.FromHwnd(this.Handle);
             source.AddHook(new HwndSourceHook(WndProc));
+
+            ThemeManager.Current.ChangeThemeColorScheme(Application.Current, "Blue");
         }
 
         private void loadQuickCommandsFromDb(string key)
@@ -138,11 +95,11 @@ namespace QuickLauncher
             quickCommands.Clear();
             IQueryable<QuickCommand> query = null;
             var cleanKey = key.Trim().ToLower();
-            if(cleanKey.Length == 0)
+            if (cleanKey.Length == 0)
             {
                 query = from b in dbContext.QuickCommands.Include("QuickCommandEnvConfigs")
-                            orderby b.Alias.ToLower()
-                            select b;
+                        orderby b.Alias.ToLower()
+                        select b;
             }
             else
             {
@@ -158,11 +115,11 @@ namespace QuickLauncher
                     quickCommands.Add(qc);
                 }
             }
-            catch(Exception r)
+            catch (Exception r)
             {
-                MessageBox.Show(r.InnerException.Message);
+                DialogUtil.showError(this, r.InnerException.Message);
             }
-          
+
         }
 
         private void Qle_AddedNewQuickCommand(Model.QuickCommand command)
@@ -189,33 +146,33 @@ namespace QuickLauncher
             startProcess(qc, true);
         }
 
-       
+
         private void startProcess(QuickCommand qc, bool asAdmin)
         {
-            ProcessStartInfo startInfo = new ProcessStartInfo(qc.Path, qc.Command);
+            ProcessStartInfo startInfo = new ProcessStartInfo(qc.ExpandedPath, qc.Command);
             if (asAdmin)
             {
                 startInfo.Verb = "runas";
             }
-            string workingDir = qc.WorkDirectory;
-            if(workingDir.Length == 0)
+            string workingDir = qc.ExpandedWorkDirectory;
+            if (workingDir.Length == 0)
             {
                 try
                 {
-                    workingDir = FileUtil.getParentDir(qc.Path);
+                    workingDir = FileUtil.getParentDir(qc.ExpandedPath);
                 }
                 catch (UnauthorizedAccessException e)
                 {
-                    MessageBox.Show(e.Message);
+                    DialogUtil.showError(this, e.Message);
                 }
             }
-            
-            startInfo.WorkingDirectory = workingDir; 
-            if(qc.QuickCommandEnvConfigs != null)
+
+            startInfo.WorkingDirectory = workingDir;
+            if (qc.QuickCommandEnvConfigs != null)
             {
-                foreach(var o in qc.QuickCommandEnvConfigs)
+                foreach (var o in qc.QuickCommandEnvConfigs)
                 {
-                    startInfo.EnvironmentVariables[o.EnvKey] = o.EnvValue;
+                    startInfo.EnvironmentVariables[o.EnvKey] = o.ExpandedEnvValue;
                 }
                 if (qc.QuickCommandEnvConfigs.Count > 0)
                 {
@@ -233,27 +190,22 @@ namespace QuickLauncher
                 {
                     this.WindowState = System.Windows.WindowState.Minimized;
                 }
-                
+
             }
-            catch(System.ComponentModel.Win32Exception e)
+            catch (System.ComponentModel.Win32Exception e)
             {
-                MessageBox.Show(e.Message);
+                DialogUtil.showError(this, e.Message);
             }
-            
+
         }
 
-        
-
-
-        private void edit_Click(object sender, RoutedEventArgs e)
+        private async void edit_Click(object sender, RoutedEventArgs e)
         {
-            //QuickCommand qc = ((System.Windows.Controls.Button)sender).Tag as QuickCommand;
             QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
-            QuickLancherEditor qle = new QuickLancherEditor();
-            qle.Owner = this;
-            qle.QCommand = qc;
-            qle.AddedNewQuickCommand += Qle_AddedNewQuickCommand;
-            qle.ShowDialog();
+
+            var dialog = new CmdEditor(this, dialogSettings, qc);
+            dialog.AddedNewQuickCommand += Qle_AddedNewQuickCommand;
+            await this.ShowMetroDialogAsync(dialog);
         }
 
         private async void delete_Click(object sender, RoutedEventArgs e)
@@ -300,11 +252,11 @@ namespace QuickLauncher
                 {
                     case _AboutSysMenuID:
                         handled = true;
-                        
+
                         About about = new About();
                         about.Owner = Application.Current.MainWindow;
                         about.ShowDialog();
-                        
+
                         break;
                 }
             }
@@ -312,12 +264,11 @@ namespace QuickLauncher
             return IntPtr.Zero;
         }
 
-        private void newquickcommand_Click(object sender, RoutedEventArgs e)
+        private async void newquickcommand_Click(object sender, RoutedEventArgs e)
         {
-            QuickLancherEditor qle = new QuickLancherEditor();
-            qle.Owner = this;
-            qle.AddedNewQuickCommand += Qle_AddedNewQuickCommand;
-            qle.ShowDialog();
+            var dialog = new CmdEditor(this, dialogSettings, null);
+            dialog.AddedNewQuickCommand += Qle_AddedNewQuickCommand;
+            await this.ShowMetroDialogAsync(dialog);
         }
 
         private void about_Click(object sender, RoutedEventArgs e)
@@ -325,7 +276,6 @@ namespace QuickLauncher
             About about = new About();
             about.Owner = this;
             about.ShowDialog();
-
         }
 
         private void startMenu_Click(object sender, RoutedEventArgs e)
@@ -349,72 +299,47 @@ namespace QuickLauncher
             }
             catch (System.ComponentModel.Win32Exception exception)
             {
-                MessageBox.Show(exception.Message);
+                DialogUtil.showError(this, exception.Message);
             }
         }
 
-        private void editEnvConfig_Click(object sender, RoutedEventArgs e)
+        private async void editEnvConfig_Click(object sender, RoutedEventArgs e)
         {
             QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
-            EnvironmentVariableEditor evEditor = new EnvironmentVariableEditor(qc);
-            evEditor.QuickCommandObject = qc;
-            evEditor.Owner = this;
-            evEditor.ShowDialog();
+            EnvEditor envEditor = new EnvEditor(this, dialogSettings, qc);
+            await this.ShowMetroDialogAsync(envEditor);
         }
 
-        private void Settings_Click(object sender, RoutedEventArgs e)
+        private async void Settings_Click(object sender, RoutedEventArgs e)
         {
-            SettingWindow win = new SettingWindow();
-            win.Owner = this;
-            win.ShowDialog();
-        }
-
-        private void ContextMenu_ContextMenuOpening(object sender, ContextMenuEventArgs e)
-        {
-            ContextMenu menu = (e.Source as Control).ContextMenu;
-            if (menu == null)
-            {
-                return;
-            }
-            
-            foreach(var item in menu.Items)
-            {
-                var itemMenu = item as MenuItem;
-                if(itemMenu.Header.ToString() == "View")
-                {
-                    var subItem = itemMenu.Items[0] as MenuItem;
-                    subItem.IsChecked = IsDetailsView;
-                    subItem = itemMenu.Items[1] as MenuItem;
-                    subItem.IsChecked = IsTilesView;
-                    break;
-                }
-            }
-        }
-
-        private void ChangeView_Click(object sender, RoutedEventArgs e)
-        {
-            var menuItem = sender as MenuItem;
-            updateView(menuItem.Tag.ToString());
-        }
-
-        private void updateView(string view)
-        {
-            loadQuickCommandsFromDb("");
-            viewSetting.Value = view;
-
-            this.commandsList.Tag = viewSetting.Value;
-            saveSettingItem(viewSetting);
+            Settings settings = new Settings(this, dialogSettings);
+            await this.ShowMetroDialogAsync(settings);
         }
 
         private void root_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+#if DEBUG
+            // do nothing
+#else
             e.Cancel = true;
             this.Visibility = Visibility.Hidden;
+#endif
         }
 
         private void root_Activated(object sender, EventArgs e)
         {
             commandsList.Focus();
+        }
+
+        private void RefreshAll_Click(object sender, RoutedEventArgs e)
+        {
+            loadQuickCommandsFromDb("");
+        }
+
+        private async void Refresh_Click(object sender, RoutedEventArgs e)
+        {
+            QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
+            await dbContext.Entry(qc).ReloadAsync();
         }
     }
 }

@@ -11,7 +11,6 @@ namespace QuickLauncher.Model
     [Table("SETTING")]
     public class SettingItem : AbstractNotifyPropertyChanged
     {
-        private string section = "";
         private string key = "";
         private string value = "";
 

@@ -1,33 +1,42 @@
-﻿using System;
+﻿using QuickLauncher.Converter;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Drawing;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Utility.Model;
+using System.Linq;
 
 namespace QuickLauncher.Model
 {
     [Table("QUICK_COMMAND")]
-    public class QuickCommand : AbstractNotifyPropertyChanged
+    public class QuickCommand : AbstractNotifyPropertyChanged, IDataErrorInfo
     {
         private string uuid = "";
         private string alias = "";
         private string command = "";
         private string path = "";
         private ImageSource img = null;
-        private Boolean isDirectory = true;
         private string workDirectory = "";
+        private byte[] customeIcon = null;
+
+        public QuickCommand(bool isNew)
+        {
+            if (isNew)
+            {
+                uuid = Guid.NewGuid().ToString();
+            }
+            IsNew = isNew;
+        }
+
         public QuickCommand()
         {
-            uuid = Guid.NewGuid().ToString();
+            IsNew = false;
         }
         [Key]
         public string UUID
@@ -79,36 +88,25 @@ namespace QuickLauncher.Model
             set
             {
                 path = value;
-                try
-                {
-                    //FileInfo fInfo = new FileInfo(Path);
-                    isDirectory = Directory.Exists(Path);// (fInfo.Attributes & FileAttributes.Directory) == FileAttributes.Directory;
-                }
-                catch (UnauthorizedAccessException e)
-                {
-
-                }
-                catch (ArgumentException e)
-                { }
-
-
-
-
-                try
-                {
-                    if(!isDirectory && path != "")
-                    {
-                        System.Drawing.Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(path);
-                        Img = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(icon.Handle, new Int32Rect(0, 0, icon.Width, icon.Height), BitmapSizeOptions.FromEmptyOptions());
-                        
-                    }
-                }
-                catch (Exception e)
-                {
-
-                }
-
                 RaisePropertyChanged("Path");
+            }
+        }
+
+        [NotMapped]
+        public string ExpandedPath
+        {
+            get
+            {
+                return Environment.ExpandEnvironmentVariables(Path);
+            }
+        }
+
+        [NotMapped]
+        public string ExpandedWorkDirectory
+        {
+            get
+            {
+                return Environment.ExpandEnvironmentVariables(WorkDirectory);
             }
         }
 
@@ -130,12 +128,32 @@ namespace QuickLauncher.Model
         {
             get
             {
+                if (img == null && File.Exists(ExpandedPath))
+                {
+                    System.Drawing.Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(ExpandedPath);
+                    Img = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(icon.Handle, new Int32Rect(0, 0, icon.Width, icon.Height), BitmapSizeOptions.FromEmptyOptions());
+                }
                 return img;
             }
             set
             {
                 img = value;
+                customeIcon = ByteToImageSourceConverter.ImageSourceToBytes(img);
                 RaisePropertyChanged("Img");
+                RaisePropertyChanged("ImgVisibility");
+            }
+        }
+
+        public byte[] CustomIcon
+        { 
+            get
+            {
+                return customeIcon;
+            }
+            set
+            {
+                customeIcon = value;
+                img = ByteToImageSourceConverter.ConvertByteToImage(customeIcon);
             }
         }
 
@@ -147,6 +165,9 @@ namespace QuickLauncher.Model
                 return img == null ? System.Windows.Visibility.Hidden:System.Windows.Visibility.Visible;
             }
         }
+
+        [NotMapped]
+        public bool IsNew { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -162,21 +183,6 @@ namespace QuickLauncher.Model
         {
             return Alias.GetHashCode();
         }
-        [NotMapped]
-        public System.Windows.Visibility DelVisible
-        {
-            get
-            {
-                if(Alias.Trim().Length > 0)
-                {
-                    return System.Windows.Visibility.Visible;
-                }
-                else
-                {
-                    return System.Windows.Visibility.Hidden;
-                }
-            }
-        }
 
         [NotMapped]
         public bool DelEnabled
@@ -187,29 +193,85 @@ namespace QuickLauncher.Model
             }
         }
 
-        [NotMapped]
-        public System.Windows.Visibility EditVisible
+        private bool CheckAlias(string alias)
+        {
+            var dbContext = QuickCommandContext.Instance;
+            var existingComm = from b in dbContext.QuickCommands
+                               where b.Alias == Alias
+                               select b;
+            int cnt = 0;
+            foreach (var comm in existingComm)
+            {
+                ++cnt;
+            }
+            return IsNew ? cnt > 0 : cnt > 1;
+        }
+
+        public string Error
         {
             get
             {
-                if (!isDirectory)
-                {
-                    return System.Windows.Visibility.Visible;
-                }
-                else
-                {
-                    return System.Windows.Visibility.Hidden;
-                }
+                string error = this["Alias"] + this["Path"] + this["WorkDirectory"];
+                if (!string.IsNullOrEmpty(error))
+                    return "Please check input with red border and correct";
+                return null;
             }
         }
 
-        [NotMapped]
-        public bool EditEnabled
+        public string this[string name]
         {
             get
             {
-                return !isDirectory;
+                if (name == "Alias")
+                {
+                    if (Alias == null || Alias.Trim().Length == 0)
+                    {
+                        return "Alias is required, and can't be all spaces.";
+                    }
+                    else if (CheckAlias(Alias))
+                    {
+                        return "Alias already exists.";
+                    }
+                }
+                else if (name == "Path")
+                {
+                    if (Path == null || Path.Trim().Length == 0)
+                    {
+                        return "Aplication path is required.";
+                    }
+                    else if (!File.Exists(ExpandedPath))
+                    {
+                        return "Aplication path doesn't exist.";
+                    }
+                }
+                else if (name == "WorkDirectory")
+                {
+                    if (WorkDirectory == null || WorkDirectory.Trim().Length == 0)
+                    {
+                        return "Aplication work directory is required.";
+                    }
+                    else if (!Directory.Exists(ExpandedWorkDirectory))
+                    {
+                        return "Aplication  work directory doesn't exist.";
+                    }
+                }
+                return null;
             }
+        }
+
+        public void PathChanged()
+        {
+            if (WorkDirectory == null || WorkDirectory.Trim().Length == 0)
+            {
+                WorkDirectory = FileUtil.getParentDir(path);
+            }
+
+            if (Alias == null || Alias.Trim().Length == 0)
+            {
+                Alias = FileUtil.getFileNameNoExt(path);
+            }
+            // trigger img changed
+            var img = Img;
         }
     }
 }
