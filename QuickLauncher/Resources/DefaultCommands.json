@@ -1,0 +1,33 @@
+﻿{
+	"Version": 1,
+	"QuickCommands": [
+		{
+			"Alias": "Cmd Template",
+			"Path": "%SystemRoot%\\SysWOW64\\cmd.exe"
+		},
+		{
+			"Alias": "Copy IP Address",
+			"Path": "%SystemRoot%\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe",
+			"Command": "-Command \"$ipStr=Get-NetIPAddress | Format-Table | findStr \"Preferred\" | findStr \"Dhcp\";$ipStr = $ipStr -replace '\\s+', ' '; $ip = $ipStr.split(' ')[1];Set-Clipboard -Value $ip\""
+		},
+		{
+			"Alias": "Copy Template",
+			"Path": "%SystemRoot%\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe",
+			"Command": "-Command \"Set-Clipboard -Value '<replace with content>'\""
+		},
+		{
+			"Alias": "EnvEditor",
+			"Path": "%SystemRoot%\\system32\\rundll32.exe",
+			"Command": "sysdm.cpl,EditEnvironmentVariables"
+		},
+		{
+			"Alias": "Powershell Template",
+			"Path": "%SystemRoot%\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe"
+		},
+		{
+			"Alias": "Presenting On",
+			"Path": "%SystemRoot%\\System32\\PresentationSettings.exe",
+			"Command": "/start"
+		}
+	]
+}

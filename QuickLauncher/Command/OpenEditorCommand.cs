@@ -9,12 +9,17 @@ namespace QuickLauncher
 {
     class OpenEditorCommand : ICommand
     {
-        public event EventHandler CanExecuteChanged;
         private readonly Action _action;
 
         public OpenEditorCommand(Action action)
         {
             _action = action;
+        }
+
+        public event EventHandler CanExecuteChanged
+        {
+            add => CommandManager.RequerySuggested += value;
+            remove => CommandManager.RequerySuggested -= value;
         }
 
         public bool CanExecute(object parameter)

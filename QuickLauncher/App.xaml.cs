@@ -15,12 +15,11 @@ namespace QuickLauncher
     /// </summary>
     public partial class App : Application
     {
-        System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
         private static Window mainWindow = null;
-
 #if DEBUG
         private static String SINGLETON = "QuichLauncher--zj-debug";
 #else
+        System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
         private static String SINGLETON = "QuichLauncher--zj";
 #endif
 
@@ -47,7 +46,7 @@ namespace QuickLauncher
 
                 Environment.Exit(1);
             }
-
+#if !DEBUG
             nIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Windows.Forms.Application.ExecutablePath);
             
             nIcon.Text = "QuickLancher By MagicWorldZ";
@@ -73,6 +72,7 @@ namespace QuickLauncher
                 if (e.Button == System.Windows.Forms.MouseButtons.Left) show();
             });
             nIcon.Visible = true;
+#endif
         }
 
         private void nIcon_Click(object sender, EventArgs e)
@@ -83,7 +83,9 @@ namespace QuickLauncher
 
         private void exit_Click(object sender, EventArgs e)
         {
+#if !DEBUG
             nIcon.Visible = false;
+#endif
             Application.Current.Shutdown();
         }
 
