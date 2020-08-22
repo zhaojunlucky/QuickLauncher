@@ -295,7 +295,7 @@ namespace QuickLauncher
             QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
             try
             {
-                System.Diagnostics.Process.Start(qc.WorkDirectory);
+                System.Diagnostics.Process.Start(qc.ExpandedWorkDirectory);
             }
             catch (System.ComponentModel.Win32Exception exception)
             {

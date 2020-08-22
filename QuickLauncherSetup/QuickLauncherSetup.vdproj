@@ -663,18 +663,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_B729F38E36CEA0589F637BB901BC48F3"
-        "OwnerKey" = "8:_14CDFA4E717741DFA99F741F96177F1A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_B729F38E36CEA0589F637BB901BC48F3"
-        "OwnerKey" = "8:_24C2CE3BE06E44C2BDACE97526D2170B"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_BB2A805C1BF4DAB89BB3E94A3E739822"
         "OwnerKey" = "8:_863FCE51D1B38C887285811BD7F1740C"
         "MsmSig" = "8:_UNDEFINED"
@@ -707,6 +695,18 @@
         {
         "MsmKey" = "8:_BB6C987C8750653A26005F3ECB81DC6A"
         "OwnerKey" = "8:_14CDFA4E717741DFA99F741F96177F1A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D03E8C2AA4ECCDEDEA5FD8DAC8C4663A"
+        "OwnerKey" = "8:_14CDFA4E717741DFA99F741F96177F1A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D03E8C2AA4ECCDEDEA5FD8DAC8C4663A"
+        "OwnerKey" = "8:_24C2CE3BE06E44C2BDACE97526D2170B"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -934,7 +934,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_B729F38E36CEA0589F637BB901BC48F3"
+        "OwnerKey" = "8:_D03E8C2AA4ECCDEDEA5FD8DAC8C4663A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -2140,37 +2140,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_B729F38E36CEA0589F637BB901BC48F3"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Utility, Version=1.0.2.1, Culture=neutral, processorArchitecture=AMD64"
-                "ScatterAssemblies"
-                {
-                    "_B729F38E36CEA0589F637BB901BC48F3"
-                    {
-                    "Name" = "8:Utility.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:Utility.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_1F779213C6EA494D8D29704D7BD6E8C3"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_BB2A805C1BF4DAB89BB3E94A3E739822"
             {
             "AssemblyRegister" = "3:1"
@@ -2216,6 +2185,37 @@
                     }
                 }
             "SourcePath" = "8:MahApps.Metro.IconPacks.WeatherIcons.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_1F779213C6EA494D8D29704D7BD6E8C3"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_D03E8C2AA4ECCDEDEA5FD8DAC8C4663A"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Utility, Version=1.0.2.1, Culture=neutral, processorArchitecture=AMD64"
+                "ScatterAssemblies"
+                {
+                    "_D03E8C2AA4ECCDEDEA5FD8DAC8C4663A"
+                    {
+                    "Name" = "8:Utility.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:Utility.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_1F779213C6EA494D8D29704D7BD6E8C3"
@@ -2639,15 +2639,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:QuickLauncher"
-        "ProductCode" = "8:{C5C36DF9-34D7-42B1-A987-1F10E22C1A24}"
-        "PackageCode" = "8:{6CA26B54-C360-482B-9820-59713F4EAEA0}"
+        "ProductCode" = "8:{D5B5B3F2-905B-41EB-98F7-122CC5616FB0}"
+        "PackageCode" = "8:{50468F68-7F46-4253-8CC8-B65C39D76080}"
         "UpgradeCode" = "8:{0505CCE9-5E72-4407-9FE3-A50EE9EEE21B}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:1.0.10"
+        "ProductVersion" = "8:1.0.11"
         "Manufacturer" = "8:MagicWorldZ"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -3217,7 +3217,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_14CDFA4E717741DFA99F741F96177F1A"
             {
-            "SourcePath" = "8:..\\QuickLauncher\\obj\\x64\\Release\\QuickLauncher.exe"
+            "SourcePath" = "8:..\\QuickLauncher\\obj\\x64\\Debug\\QuickLauncher.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_1F779213C6EA494D8D29704D7BD6E8C3"
@@ -3273,7 +3273,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_24C2CE3BE06E44C2BDACE97526D2170B"
             {
-            "SourcePath" = "8:..\\QuickLauncher\\obj\\x64\\Release\\QuickLauncher.exe"
+            "SourcePath" = "8:..\\QuickLauncher\\obj\\x64\\Debug\\QuickLauncher.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_1F779213C6EA494D8D29704D7BD6E8C3"
@@ -3357,7 +3357,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_7C07D3ADF63C4812BB2B13D9A82E4B62"
             {
-            "SourcePath" = "8:..\\Utility\\obj\\x64\\Release\\Utility.dll"
+            "SourcePath" = "8:..\\Utility\\obj\\x64\\Debug\\Utility.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_1F779213C6EA494D8D29704D7BD6E8C3"
