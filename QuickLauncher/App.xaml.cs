@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-
+using System.Windows.Controls;
 
 namespace QuickLauncher
 {
@@ -50,23 +50,23 @@ namespace QuickLauncher
             nIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Windows.Forms.Application.ExecutablePath);
             
             nIcon.Text = "QuickLancher By MagicWorldZ";
-            nIcon.Click += nIcon_Click;
+            //nIcon.Click += nIcon_Click;
 
-            System.Windows.Forms.MenuItem open = new System.Windows.Forms.MenuItem("Open");
+            System.Windows.Forms.ToolStripMenuItem open = new System.Windows.Forms.ToolStripMenuItem("Open");
             open.Click += new EventHandler(nIcon_Click);
-            System.Windows.Forms.MenuItem exit = new System.Windows.Forms.MenuItem("Exit");
+            System.Windows.Forms.ToolStripMenuItem exit = new System.Windows.Forms.ToolStripMenuItem("Exit");
             exit.Click += new EventHandler(exit_Click);
-            System.Windows.Forms.MenuItem about = new System.Windows.Forms.MenuItem("About");
-            about.Click += new EventHandler((o,e)=>
+            System.Windows.Forms.ToolStripMenuItem about = new System.Windows.Forms.ToolStripMenuItem("About");
+            about.Click += new EventHandler((o, e) =>
             {
                 show();
                 About a = new About();
                 a.Owner = mainWindow;
                 a.ShowDialog();
             });
-            System.Windows.Forms.MenuItem[] childen = new System.Windows.Forms.MenuItem[] { about, open, exit};
-            nIcon.ContextMenu = new System.Windows.Forms.ContextMenu(childen);
-
+            System.Windows.Forms.ToolStripMenuItem[] childen = new System.Windows.Forms.ToolStripMenuItem[] { about, open, exit };
+            nIcon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
+            nIcon.ContextMenuStrip.Items.AddRange(childen);
             this.nIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler((o, e) =>
             {
                 if (e.Button == System.Windows.Forms.MouseButtons.Left) show();

@@ -42,7 +42,7 @@ namespace Utility.Singleton
 
         private string getHash(string mutexName)
         {
-            byte[] data = HashAlgorithm.Create().ComputeHash(Encoding.UTF8.GetBytes(mutexName));
+            byte[] data = HashAlgorithm.Create("SHA256").ComputeHash(Encoding.UTF8.GetBytes(mutexName));
             StringBuilder sBuilder = new StringBuilder();
 
             // Loop through each byte of the hashed data  

@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Utility.Model;
 using System.Linq;
+using System.Drawing;
 
 namespace QuickLauncher.Model
 {
@@ -130,7 +131,7 @@ namespace QuickLauncher.Model
             {
                 if (img == null && File.Exists(ExpandedPath))
                 {
-                    System.Drawing.Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(ExpandedPath);
+                    Icon icon = Icon.ExtractAssociatedIcon(ExpandedPath);
                     Img = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(icon.Handle, new Int32Rect(0, 0, icon.Width, icon.Height), BitmapSizeOptions.FromEmptyOptions());
                 }
                 return img;

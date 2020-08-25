@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Microsoft.Data.Sqlite;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -21,13 +21,13 @@ namespace QuickLauncher
 #else
         private static string DbPath = "Data Source =" + DbBaseDir + "\\lancherDb.db";
 #endif
-        public static SQLiteConnection getConnection()
+        public static SqliteConnection getConnection()
         {
             if (!Directory.Exists(DbBaseDir))
             {
                 Directory.CreateDirectory(DbBaseDir);
             }
-            return new SQLiteConnection(DbPath);
+            return new SqliteConnection(DbPath);
         }
 
         public static void prepareTables()
@@ -41,9 +41,9 @@ namespace QuickLauncher
             dbConn.Close();
         }
 
-        private static void prepareTable(SQLiteConnection conn, string sql)
+        private static void prepareTable(SqliteConnection conn, string sql)
         {
-            SQLiteCommand cmdCreateTable = new SQLiteCommand(sql, conn);
+            SqliteCommand cmdCreateTable = new SqliteCommand(sql, conn);
             cmdCreateTable.ExecuteNonQuery();
         }
     }
