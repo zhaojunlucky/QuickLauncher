@@ -1,6 +1,7 @@
 ﻿using ControlzEx.Theming;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.EntityFrameworkCore;
 using QuickLauncher.Dialogs;
 using QuickLauncher.Miscs;
 using QuickLauncher.Model;
@@ -8,6 +9,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -137,19 +139,20 @@ namespace QuickLauncher
         private void start_Click(object sender, RoutedEventArgs e)
         {
             QuickCommand qc = ((System.Windows.Controls.Button)sender).Tag as QuickCommand;
-            startProcess(qc, false);
+            Parallel.Invoke(() => startProcess(qc, false));
         }
-        [STAThread]
+        
         private void startAdmin_Click(object sender, RoutedEventArgs e)
         {
             QuickCommand qc = ((System.Windows.Controls.Button)sender).Tag as QuickCommand;
-            startProcess(qc, true);
+            Parallel.Invoke(() => startProcess(qc, true));
         }
 
 
-        private void startProcess(QuickCommand qc, bool asAdmin)
+        private bool startProcess(QuickCommand qc, bool asAdmin)
         {
             ProcessStartInfo startInfo = new ProcessStartInfo(qc.ExpandedPath, qc.Command);
+            startInfo.UseShellExecute = true;
             if (asAdmin)
             {
                 startInfo.Verb = "runas";
@@ -163,7 +166,7 @@ namespace QuickLauncher
                 }
                 catch (UnauthorizedAccessException e)
                 {
-                    DialogUtil.showError(this, e.Message);
+                    Debug.WriteLine(e);
                 }
             }
 
@@ -190,13 +193,13 @@ namespace QuickLauncher
                 {
                     this.WindowState = System.Windows.WindowState.Minimized;
                 }
-
+                return true;
             }
             catch (System.ComponentModel.Win32Exception e)
             {
                 DialogUtil.showError(this, e.Message);
             }
-
+            return false;
         }
 
         private async void edit_Click(object sender, RoutedEventArgs e)
@@ -215,7 +218,7 @@ namespace QuickLauncher
             MessageDialogResult result = await DialogUtil.ShowYesNo("Delete confirmation", this, "Are you sure to delete this quick command?");
             if (result == MessageDialogResult.Affirmative)
             {
-                var envs = dbContext.QuickCommandEnvConfigs.RemoveRange(qc.QuickCommandEnvConfigs);
+                dbContext.QuickCommandEnvConfigs.RemoveRange(qc.QuickCommandEnvConfigs);
                 dbContext.QuickCommands.Remove(qc);
                 dbContext.SaveChanges();
                 quickCommands.Remove(qc);

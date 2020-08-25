@@ -1,8 +1,8 @@
-﻿using QuickLauncher.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using QuickLauncher.Model;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,10 +18,13 @@ namespace QuickLauncher
         public DbSet<QuickCommandEnvConfig> QuickCommandEnvConfigs { get; set; }
         public DbSet<SettingItem> SettingItems { get; set; }
 
-        private QuickCommandContext(DbConnection dbConn)
-            :base(dbConn,false)
+        private QuickCommandContext()
         {
-            this.Configuration.AutoDetectChangesEnabled = true;
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlite(DbUtil.getConnection());
         }
 
         public static QuickCommandContext Instance
@@ -33,7 +36,7 @@ namespace QuickLauncher
                     lock (syncRoot)
                     {
                         if (instance == null)
-                            instance = new QuickCommandContext(DbUtil.getConnection());
+                            instance = new QuickCommandContext();
                     }
                 }
 

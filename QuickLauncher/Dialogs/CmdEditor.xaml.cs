@@ -1,5 +1,6 @@
 ﻿using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Win32;
 using QuickLauncher.Command;
 using QuickLauncher.Miscs;
 using QuickLauncher.Model;
@@ -94,12 +95,11 @@ namespace QuickLauncher.Dialogs
 
         private void ChooseApplication_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.OpenFileDialog fd = new System.Windows.Forms.OpenFileDialog();
+            OpenFileDialog fd = new OpenFileDialog();
             fd.Multiselect = false;
             fd.InitialDirectory = getCommandDirectory();
 
-
-            if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (fd.ShowDialog() == true)
             {
                 appPath.Text = fd.FileName;
                 QCommand.PathChanged();
@@ -119,12 +119,12 @@ namespace QuickLauncher.Dialogs
 
         private void ChooseIcon_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.OpenFileDialog fd = new System.Windows.Forms.OpenFileDialog();
+            OpenFileDialog fd = new OpenFileDialog();
             fd.Multiselect = false;
             fd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             fd.Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png, *.ico) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png; *.ico";
 
-            if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (fd.ShowDialog() == true)
             {
                 var fileInfo = new FileInfo(fd.FileName);
                 if (fileInfo.Length > 200 * 1024)
