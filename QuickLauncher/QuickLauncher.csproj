@@ -8,12 +8,12 @@
     <Platforms>AnyCPU;x64</Platforms>
     <ApplicationIcon>Resources\launcher.ico</ApplicationIcon>
     <StartupObject>QuickLauncher.App</StartupObject>
-    <Version>2.1.1</Version>
+    <Version>2.1.2</Version>
     <Authors>Jun Zhao</Authors>
     <Copyright>2020 Jun Zhao</Copyright>
     <PackageLicenseFile></PackageLicenseFile>
-    <AssemblyVersion>2.1.1.1</AssemblyVersion>
-    <FileVersion>2.1.1.1</FileVersion>
+    <AssemblyVersion>2.1.2.1</AssemblyVersion>
+    <FileVersion>2.1.2.1</FileVersion>
     <RepositoryUrl>https://github.com/zhaojunlucky/QuickLauncher</RepositoryUrl>
   </PropertyGroup>
 

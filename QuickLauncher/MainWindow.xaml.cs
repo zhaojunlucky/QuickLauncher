@@ -298,7 +298,7 @@ namespace QuickLauncher
             QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
             try
             {
-                System.Diagnostics.Process.Start(qc.ExpandedWorkDirectory);
+                System.Diagnostics.Process.Start("explorer.exe", qc.ExpandedWorkDirectory);
             }
             catch (System.ComponentModel.Win32Exception exception)
             {
