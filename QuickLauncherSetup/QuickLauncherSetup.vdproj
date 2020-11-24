@@ -50,6 +50,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
         "Release"
@@ -104,7 +112,7 @@
                 {
                 "Name" = "8:.NET Core"
                 "Message" = "8:[VSDNETCOREMSG]"
-                "FrameworkVersion" = "8:3.1 "
+                "FrameworkVersion" = "8:3.1  "
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:https://dotnet.microsoft.com/download/dotnet-core/[NetCoreVerMajorDotMinor]"
                 "IsNETCore" = "11:TRUE"
@@ -191,15 +199,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:QuickLauncher"
-        "ProductCode" = "8:{0CD7AB4C-861D-4BC4-B571-8C459840110A}"
-        "PackageCode" = "8:{A1EDDF1E-2F05-49AB-B335-83012B8C363A}"
+        "ProductCode" = "8:{F6E2DA33-C817-438C-AB5F-089FB4162D2A}"
+        "PackageCode" = "8:{680A338E-9271-486B-9489-CC33C3816C0C}"
         "UpgradeCode" = "8:{0505CCE9-5E72-4407-9FE3-A50EE9EEE21B}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:1.0.15"
+        "ProductVersion" = "8:1.0.16"
         "Manufacturer" = "8:MagicWorldZ"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

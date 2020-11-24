@@ -1,0 +1,30 @@
+version: 1.0.{build}
+configuration: Release
+branches:
+  only:
+    - master
+skip_tags: true
+
+build_script:
+- cmd: >-
+    echo %PATH%
+
+    msbuild  ".\QuickLauncher\QuickLauncher.csproj" /t:Restore
+
+
+    "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.com" ".\QuickLauncherSetup\QuickLauncherSetup.vdproj" /clean "Release"
+
+
+    "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.com" ".\QuickLauncherSetup\QuickLauncherSetup.vdproj" /build "Release"
+deploy:
+  release: QuickLauncher-v$(APPVEYOR_BUILD_VERSION)
+  description: 'QuickLauncher'
+  provider: GitHub
+  auth_token:
+    secure: dkuuUUu5SVpAdawNcb7E40lkJvcv+Fuqdc1zd/k0rkRWef3gfMHaOqgMD5VWJVmg # your encrypted token from GitHub
+  artifact: /.*\.msi/            # upload all NuGet packages to release assets
+  draft: true
+  prerelease: false
+  on:
+    branch: master                 # release from master branch only
+    APPVEYOR_REPO_TAG: false        # deploy on tag push only
