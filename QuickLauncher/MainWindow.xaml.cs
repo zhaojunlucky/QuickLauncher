@@ -3,19 +3,17 @@ using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.EntityFrameworkCore;
 using QuickLauncher.Dialogs;
-using QuickLauncher.Miscs;
 using QuickLauncher.Model;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Resources;
+using System.Windows.Threading;
 using Utility.Win32.Api;
 
 namespace QuickLauncher
@@ -34,6 +32,7 @@ namespace QuickLauncher
         {
             ColorScheme = MetroDialogColorScheme.Accented// win.MetroDialogOptions.ColorScheme
         };
+
         public MainWindow()
         {
             InitializeComponent();
@@ -139,13 +138,32 @@ namespace QuickLauncher
         private void start_Click(object sender, RoutedEventArgs e)
         {
             QuickCommand qc = ((System.Windows.Controls.Button)sender).Tag as QuickCommand;
-            Parallel.Invoke(() => startProcess(qc, false));
+            StartProcess(qc, false);
         }
         
         private void startAdmin_Click(object sender, RoutedEventArgs e)
         {
             QuickCommand qc = ((System.Windows.Controls.Button)sender).Tag as QuickCommand;
-            Parallel.Invoke(() => startProcess(qc, true));
+            StartProcess(qc, true);
+        }
+
+
+        private bool StartProcess(QuickCommand qc, bool asAdmin)
+        {
+            statusLabel.Content = "Starting \"" + qc.Alias + "\"";
+
+            bool isCtrlKeyPressed = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
+            ThreadPool.QueueUserWorkItem(delegate { startProcess(qc, asAdmin); });
+            if (isCtrlKeyPressed)
+            {
+
+            }
+            else
+            {
+                this.WindowState = System.Windows.WindowState.Minimized;
+            }
+            
+            return false;
         }
 
 
@@ -184,20 +202,22 @@ namespace QuickLauncher
             }
             try
             {
-                System.Diagnostics.Process.Start(startInfo);
-                if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+                Process.Start(startInfo);
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
+                    statusLabel.Content = "Started \"" + qc.Alias + "\" at " + DateTime.Now.ToString();
+                }), DispatcherPriority.Background);
 
-                }
-                else
-                {
-                    this.WindowState = System.Windows.WindowState.Minimized;
-                }
                 return true;
             }
             catch (System.ComponentModel.Win32Exception e)
             {
-                DialogUtil.showError(this, e.Message);
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    statusLabel.Content = "Started \"" + qc.Alias + "\" failed: \"" + e.Message + "\" at " + DateTime.Now.ToString();
+                    this.WindowState = System.Windows.WindowState.Normal;
+                    DialogUtil.showError(this, e.Message);
+                }), DispatcherPriority.Background);
             }
             return false;
         }
@@ -230,7 +250,7 @@ namespace QuickLauncher
             var item = ((FrameworkElement)e.OriginalSource).DataContext as QuickCommand;
             if (item != null)
             {
-                startProcess(item, false);
+                StartProcess(item, false);
             }
         }
 
@@ -284,13 +304,13 @@ namespace QuickLauncher
         private void startMenu_Click(object sender, RoutedEventArgs e)
         {
             QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
-            startProcess(qc, false);
+            StartProcess(qc, false);
         }
 
         private void startAdminMenu_Click(object sender, RoutedEventArgs e)
         {
             QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
-            startProcess(qc, true);
+            StartProcess(qc, true);
         }
 
         private void openWorkingDir_Click(object sender, RoutedEventArgs e)
