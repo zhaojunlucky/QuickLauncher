@@ -8,22 +8,37 @@
         mc:Ignorable="d"
         x:Name="root" 
         BorderThickness="0" 
-        GlowBrush="Black"
+        GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
+        NonActiveGlowBrush="#CDFF0000"
         WindowTransitionsEnabled="False"
         Title="Quick Launcher" MinHeight="608" MinWidth="1090" Width="1090" Height="608" WindowStartupLocation="CenterScreen" 
-                      Closing="root_Closing" Activated="root_Activated">
-    <Grid>
+                      Closing="root_Closing" Activated="root_Activated" ShowTitleBar="False">
+    <Grid ShowGridLines="False">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="393*"/>
+            <ColumnDefinition Width="82*"/>
+            <ColumnDefinition Width="615*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="50" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="25" />
         </Grid.RowDefinitions>
 
-        
-            <DockPanel Margin="0,0,0,0" Grid.Row="0">
-            <TextBox DockPanel.Dock="Right" Width="Auto" MinWidth="990" Name="keyWords" VerticalAlignment="Center" TextChanged="keyWords_TextChanged"
+
+        <WrapPanel Grid.Row="0" Grid.ColumnSpan="3" VerticalAlignment="Center">
+            <Image Width="32" Height="32" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center" Source="/Resources/launcher.ico" Margin="5,0,0,0">
+            </Image>
+            <Label Content="{Binding Title}" FontSize="14"></Label>
+            <Separator Width="20">
+                <Separator.LayoutTransform>
+                    <RotateTransform Angle="90" />
+                </Separator.LayoutTransform>
+            </Separator>
+            <TextBox Width="200" Name="keyWords" VerticalAlignment="Center" TextChanged="keyWords_TextChanged"
                          Controls:TextBoxHelper.Watermark="Type to Search" Margin="5, 0, 5, 0" Controls:TextBoxHelper.UseFloatingWatermark="True"
                          Controls:TextBoxHelper.IsWaitingForData="True" Controls:TextBoxHelper.WatermarkAlignment="Right"
-                         Controls:TextBoxHelper.ClearTextButton="True">
+                         Controls:TextBoxHelper.ClearTextButton="True" HorizontalAlignment="Left">
                 <TextBox.Style>
                     <Style BasedOn="{StaticResource MahApps.Styles.TextBox.Search}" TargetType="{x:Type TextBox}">
                         <Style.Triggers>
@@ -35,24 +50,24 @@
                     </Style>
                 </TextBox.Style>
             </TextBox>
-            </DockPanel>
-            <ListView Grid.Row="1" x:Name="commandsList" Margin="0,0,0,5" Width="Auto" Height="Auto" MouseDoubleClick="commandsList_MouseDoubleClick" ScrollViewer.VerticalScrollBarVisibility="Auto" MinHeight="539" MinWidth="1070" SelectionMode="Single"
+        </WrapPanel>
+        <ListView Grid.Row="1" x:Name="commandsList" Margin="0,0,0,-50" Width="Auto" Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}}" MouseDoubleClick="commandsList_MouseDoubleClick" ScrollViewer.VerticalScrollBarVisibility="Auto" MinHeight="539" MinWidth="1070" SelectionMode="Single"
                       Padding="10,0,10,0" IsSynchronizedWithCurrentItem="True"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" TextSearch.TextPath="Alias" IsTextSearchCaseSensitive="False"
-                      Tag="{Binding ViewMode.Value}">
-                <ListView.Resources>
-                    <ContextMenu x:Key="ItemContextMenu">
-                        <MenuItem Header="Start" Click="startMenu_Click" />
-                        <MenuItem Header="Start As Administator"  Click="startAdminMenu_Click"/>
-                        <MenuItem Header="Open Working Directory" Click="openWorkingDir_Click"/>
-                        <Separator></Separator>
-                        <MenuItem Header="Edit" Click="edit_Click"/>
-                        <MenuItem Header="Edit Environment Variables" Click="editEnvConfig_Click"/>
-                        <MenuItem Header="Delete" Click="delete_Click" IsEnabled="{Binding Path=DelEnabled}"/>
-                        <MenuItem Header="Refresh" Click="Refresh_Click"/>
-                    </ContextMenu>
+                      Tag="{Binding ViewMode.Value}" Grid.ColumnSpan="3">
+            <ListView.Resources>
+                <ContextMenu x:Key="ItemContextMenu">
+                    <MenuItem Header="Start" Click="startMenu_Click" />
+                    <MenuItem Header="Start As Administator"  Click="startAdminMenu_Click"/>
+                    <MenuItem Header="Open Working Directory" Click="openWorkingDir_Click"/>
+                    <Separator></Separator>
+                    <MenuItem Header="Edit" Click="edit_Click"/>
+                    <MenuItem Header="Edit Environment Variables" Click="editEnvConfig_Click"/>
+                    <MenuItem Header="Delete" Click="delete_Click" IsEnabled="{Binding Path=DelEnabled}"/>
+                    <MenuItem Header="Refresh" Click="Refresh_Click"/>
+                </ContextMenu>
 
-                    <ItemsPanelTemplate x:Key="tileViewCtrl">
-                        <WrapPanel Width="{Binding (FrameworkElement.ActualWidth),
+                <ItemsPanelTemplate x:Key="tileViewCtrl">
+                    <WrapPanel Width="{Binding (FrameworkElement.ActualWidth),
                      RelativeSource={RelativeSource 
                                      AncestorType=ScrollContentPresenter}}"
                      ItemWidth="{Binding (ListView.View).ItemWidth,
@@ -60,42 +75,46 @@
 
                      ItemHeight="{Binding (ListView.View).ItemHeight,
                      RelativeSource={RelativeSource AncestorType=ListView}}"/>
-                        <!--MinWidth="{Binding ItemWidth,
+                    <!--MinWidth="{Binding ItemWidth,
                      RelativeSource={RelativeSource Self}}"-->
-                    </ItemsPanelTemplate>
-                    <ItemsPanelTemplate x:Key="detailViewCtrl">
-                        <VirtualizingStackPanel />
-                    </ItemsPanelTemplate>
-                </ListView.Resources>
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListViewItem}" >
-                        <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
-                    </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.Style>
-                    <Style TargetType="{x:Type ListView}" >
-                        <Setter Property="ContextMenu" Value="{DynamicResource ListViewContextMenu}" />
-                        <Style.Triggers>
-                            <Trigger Property="Tag" Value="TV">
-                                <Setter Property="ItemsPanel"
+                </ItemsPanelTemplate>
+                <ItemsPanelTemplate x:Key="detailViewCtrl">
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ListView.Resources>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}" >
+                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.Style>
+                <Style TargetType="{x:Type ListView}" >
+                    <Setter Property="ContextMenu" Value="{DynamicResource ListViewContextMenu}" />
+                    <Style.Triggers>
+                        <Trigger Property="Tag" Value="TV">
+                            <Setter Property="ItemsPanel"
                         Value="{DynamicResource tileViewCtrl}" />
-                                <Setter Property="ItemTemplate" 
+                            <Setter Property="ItemTemplate" 
                                     Value="{DynamicResource tileView}"/>
-                            </Trigger>
-                            <Trigger Property="Tag" Value="DV">
+                        </Trigger>
+                        <Trigger Property="Tag" Value="DV">
 
-                                <Setter Property="ItemsPanel"
+                            <Setter Property="ItemsPanel"
                         Value="{DynamicResource detailViewCtrl}" />
-                                <Setter Property="ItemTemplate" 
+                            <Setter Property="ItemTemplate" 
                                     Value="{DynamicResource detailView}"/>
 
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
 
-                </ListView.Style>
-            </ListView>
-        
+            </ListView.Style>
+        </ListView>
+        <DockPanel Grid.Row="2" Height="25" Grid.ColumnSpan="3">
+            <StatusBar DockPanel.Dock="Left" Width="Auto" Height="Auto">
+                <StatusBarItem Name="statusLabel" Content="Ready" Height="25" VerticalAlignment="Center"/>
+            </StatusBar>
+        </DockPanel>
     </Grid>
     <Window.InputBindings>
         <!--<KeyBinding Command="{Binding OpenNewEditorCommand}" Key="N" Modifiers="Ctrl"/>-->

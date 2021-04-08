@@ -6,19 +6,26 @@
         xmlns:local="clr-namespace:QuickLauncher"
         mc:Ignorable="d"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
+        NonActiveGlowBrush="#CDFF0000"
+        ShowTitleBar="False"
         Title="About Quick Launcher" Height="272.673" Width="413.515" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
-    <Grid>
+    <Grid ShowGridLines="False">
         <Grid.RowDefinitions>
+            <RowDefinition Height="60"></RowDefinition>
             <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
+            <RowDefinition Height="50"></RowDefinition>
         </Grid.RowDefinitions>
-        <Label Grid.Row="0" x:Name="label" Margin="20, 20, 0, 0" Content="Quick Launcher" HorizontalAlignment="Left" VerticalAlignment="Top" Height="129" Width="327" />
-        <TextBlock Grid.Row="1"  Margin="25, 15, 0, 0">
-            <Hyperlink Click="Hyperlink_Click">
-                <TextBlock x:Name="link" Text="https://zhaojunlucky.ga/quicklauncher"/>
-            </Hyperlink>
-        </TextBlock>
+        <Label Grid.Row="0" Content="About Quick Launcher"/>
+        <StackPanel Grid.Row="1" Margin="25, 15, 0, 0">
+            <Label x:Name="label" Content=""/>
+            <TextBlock Margin="5, 0, 0, 0">
+                <Hyperlink Click="Hyperlink_Click">
+                    <TextBlock x:Name="link" Text="https://zhaojunlucky.ga/quicklauncher"/>
+                </Hyperlink>
+            </TextBlock>
+        </StackPanel>
+        
         <DockPanel Grid.Row="2" Margin="0, 0, 10, 0">
             <Button DockPanel.Dock="Left" x:Name="button" Content="OK" HorizontalAlignment="Right"  VerticalAlignment="Top" Width="75" Click="button_Click"/>
         </DockPanel>
