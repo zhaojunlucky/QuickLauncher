@@ -27,12 +27,12 @@ build_script:
     "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.com" ".\QuickLauncherSetup\QuickLauncherSetup.vdproj" /build "Release"
 
 after_build:
-- cmd: 7z a QuickLauncherSetup-%version%.zip QuickLauncherSetup\Release\*
+- cmd: 7z a QuickLauncherSetup-$(APPVEYOR_BUILD_VERSION).zip QuickLauncherSetup\Release\*
 - cmd: dir
 artifacts:
 
   # pushing a single file
-  - path: QuickLauncherSetup-%version%.zip
+  - path: QuickLauncherSetup-$(APPVEYOR_BUILD_VERSION).zip
 
 deploy:
   release: QuickLauncher-v$(APPVEYOR_BUILD_VERSION)
@@ -40,7 +40,7 @@ deploy:
   provider: GitHub
   auth_token:
     secure: dkuuUUu5SVpAdawNcb7E40lkJvcv+Fuqdc1zd/k0rkRWef3gfMHaOqgMD5VWJVmg # your encrypted token from GitHub
-  artifact: QuickLauncherSetup-%version%.zip # upload all NuGet packages to release assets
+  artifact: QuickLauncherSetup-$(APPVEYOR_BUILD_VERSION).zip # upload all NuGet packages to release assets
   draft: true
   prerelease: false
   on:
