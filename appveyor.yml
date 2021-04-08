@@ -40,7 +40,7 @@ deploy:
   provider: GitHub
   auth_token:
     secure: dkuuUUu5SVpAdawNcb7E40lkJvcv+Fuqdc1zd/k0rkRWef3gfMHaOqgMD5VWJVmg # your encrypted token from GitHub
-  artifact: QuickLauncherSetup.zip # upload all NuGet packages to release assets
+  artifact: QuickLauncherSetup-%version%.zip # upload all NuGet packages to release assets
   draft: true
   prerelease: false
   on:
