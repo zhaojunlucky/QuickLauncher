@@ -22,6 +22,7 @@ namespace QuickLauncher.Model
         private string alias = "";
         private string command = "";
         private string path = "";
+        private int autoStart = 0;
         private ImageSource img = null;
         private string workDirectory = "";
         private byte[] customeIcon = null;
@@ -90,6 +91,19 @@ namespace QuickLauncher.Model
             {
                 path = value;
                 RaisePropertyChanged("Path");
+            }
+        }
+
+        [Column("AUTO_START")]
+        public bool IsAutoStart
+        {
+            get
+            {
+                return autoStart > 0;
+            }
+            set
+            {
+                autoStart = value ? 1 : 0;
             }
         }
 

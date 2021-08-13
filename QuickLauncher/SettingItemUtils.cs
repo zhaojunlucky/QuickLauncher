@@ -59,7 +59,7 @@ namespace QuickLauncher
         {
             var dbContext = QuickCommandContext.Instance;
             var query = from b in dbContext.SettingItems
-                        where b.Key == "view.viewmode"
+                        where b.Key == key
                         select b;
             return query.Count() == 1 ? query.First() : null;
         }
@@ -67,6 +67,11 @@ namespace QuickLauncher
         public static SettingItem GetViewMode()
         {
             return GetByKey("view.viewmode", "TV", true);
+        }
+
+        public static SettingItem GetDbVersion()
+        {
+            return GetByKey("db.version", "0", true);
         }
     }
 }

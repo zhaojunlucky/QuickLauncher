@@ -27,6 +27,7 @@
   <ItemGroup>
     <None Remove="Resources\DefaultCommands.json" />
     <None Remove="Resources\launcher.ico" />
+    <None Remove="Resources\Upgrade.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +36,9 @@
     </Resource>
     <Resource Include="Resources\launcher.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Upgrade.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
 
