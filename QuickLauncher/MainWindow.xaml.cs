@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using QuickLauncher.Dialogs;
 using QuickLauncher.Model;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -32,6 +34,7 @@ namespace QuickLauncher
         {
             ColorScheme = MetroDialogColorScheme.Accented// win.MetroDialogOptions.ColorScheme
         };
+        private HashSet<string> disabledCmdContextMenuItem = new HashSet<string>(new List<string>() { "Open Working Directory", "Edit", "Edit Environment Variables", "Delete" });
 
         public MainWindow()
         {
@@ -40,11 +43,11 @@ namespace QuickLauncher
             this.Loaded += MainWindow_Loaded;
             try
             {
-                DbUtil.prepareTables();
                 loadSettings();
             }
             catch (Exception e)
             {
+                Trace.TraceError(e.StackTrace);
                 DialogUtil.showError(this, "Fail to init database:" + e.Message);
 
                 Environment.Exit(-1);
@@ -118,7 +121,9 @@ namespace QuickLauncher
             }
             catch (Exception r)
             {
-                DialogUtil.showError(this, r.InnerException.Message);
+                Trace.TraceError(r.Message);
+                Trace.TraceError(r.StackTrace);
+                DialogUtil.showError(this, r.Message);
             }
 
         }
@@ -134,13 +139,14 @@ namespace QuickLauncher
             loadQuickCommandsFromDb(key);
         }
 
-
+        // for details view only
         private void start_Click(object sender, RoutedEventArgs e)
         {
             QuickCommand qc = ((System.Windows.Controls.Button)sender).Tag as QuickCommand;
             StartProcess(qc, false);
         }
         
+        // for details view only
         private void startAdmin_Click(object sender, RoutedEventArgs e)
         {
             QuickCommand qc = ((System.Windows.Controls.Button)sender).Tag as QuickCommand;
@@ -163,6 +169,35 @@ namespace QuickLauncher
                 this.WindowState = System.Windows.WindowState.Minimized;
             }
             
+            return false;
+        }
+
+        private bool StartProcess(IList qcList, bool asAdmin)
+        {
+            var names = new List<string>();
+            foreach (QuickCommand qc in qcList)
+            {
+                names.Add(qc.Alias);
+            }
+            var m = "Starting \"" + string.Join(", ", names) + "\", as admin = " + asAdmin;
+            statusLabel.Content = m;
+            Trace.TraceInformation(m);
+
+            bool isCtrlKeyPressed = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
+            foreach (QuickCommand qc in qcList)
+            {
+                ThreadPool.QueueUserWorkItem(delegate { startProcess(qc, asAdmin); });
+            }
+
+            if (isCtrlKeyPressed)
+            {
+
+            }
+            else
+            {
+                this.WindowState = System.Windows.WindowState.Minimized;
+            }
+
             return false;
         }
 
@@ -212,6 +247,7 @@ namespace QuickLauncher
             }
             catch (System.ComponentModel.Win32Exception e)
             {
+                Trace.TraceError(e.StackTrace);
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
                     statusLabel.Content = "Started \"" + qc.Alias + "\" failed: \"" + e.Message + "\" at " + DateTime.Now.ToString();
@@ -233,9 +269,8 @@ namespace QuickLauncher
 
         private async void delete_Click(object sender, RoutedEventArgs e)
         {
-            //QuickCommand qc = ((System.Windows.Controls.Button)sender).Tag as QuickCommand;
             QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
-            MessageDialogResult result = await DialogUtil.ShowYesNo("Delete confirmation", this, "Are you sure to delete this quick command?");
+            MessageDialogResult result = await DialogUtil.ShowYesNo("Delete confirmation", this, "Are you sure to delete the selected quick commands?");
             if (result == MessageDialogResult.Affirmative)
             {
                 dbContext.QuickCommandEnvConfigs.RemoveRange(qc.QuickCommandEnvConfigs);
@@ -303,14 +338,12 @@ namespace QuickLauncher
 
         private void startMenu_Click(object sender, RoutedEventArgs e)
         {
-            QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
-            StartProcess(qc, false);
+            StartProcess(this.commandsList.SelectedItems, false);
         }
 
         private void startAdminMenu_Click(object sender, RoutedEventArgs e)
         {
-            QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
-            StartProcess(qc, true);
+            StartProcess(this.commandsList.SelectedItems, true);
         }
 
         private void openWorkingDir_Click(object sender, RoutedEventArgs e)
@@ -363,6 +396,51 @@ namespace QuickLauncher
         {
             QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
             await dbContext.Entry(qc).ReloadAsync();
+        }
+
+        private void commandsList_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            bool enabled = commandsList.SelectedItems.Count == 1;
+            ListViewItem lvi = sender as ListViewItem;
+            ContextMenu cm = lvi.ContextMenu;
+            foreach (object item in cm.Items)
+            {
+                var mi = item as MenuItem;
+                if (mi == null)
+                {
+                    continue;
+                }
+
+                var header = (String)mi.Header;
+                if (disabledCmdContextMenuItem.Contains(header))
+                {
+                    mi.IsEnabled = enabled;
+                }
+            }
+        }
+
+        private void root_Loaded(object sender, RoutedEventArgs e)
+        {
+            Trace.TraceInformation("start auto start command");
+            IList qcList = new List<QuickCommand>();
+            var query = from b in dbContext.QuickCommands.Include("QuickCommandEnvConfigs")
+                        where b.IsAutoStart == true
+                        select b;
+
+            foreach (QuickCommand qc in query)
+            {
+                Trace.TraceInformation("auto start cmd: {0}", qc.Alias);
+                qcList.Add(qc);
+            }
+            if (qcList.Count > 0)
+            {
+                StartProcess(qcList, false);
+            }
+            else
+            {
+                Trace.TraceInformation("no auto start command found");
+            }
+            
         }
     }
 }

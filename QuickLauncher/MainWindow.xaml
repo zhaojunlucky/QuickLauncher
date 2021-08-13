@@ -12,7 +12,7 @@
         NonActiveGlowBrush="#CDFF0000"
         WindowTransitionsEnabled="False"
         Title="Quick Launcher" MinHeight="608" MinWidth="1090" Width="1090" Height="608" WindowStartupLocation="CenterScreen" 
-                      Closing="root_Closing" Activated="root_Activated" ShowTitleBar="False">
+                      Closing="root_Closing" Activated="root_Activated" ShowTitleBar="False" Loaded="root_Loaded">
     <Grid ShowGridLines="False">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="393*"/>
@@ -51,7 +51,7 @@
                 </TextBox.Style>
             </TextBox>
         </WrapPanel>
-        <ListView Grid.Row="1" x:Name="commandsList" Margin="0,0,0,-50" Width="Auto" Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}}" MouseDoubleClick="commandsList_MouseDoubleClick" ScrollViewer.VerticalScrollBarVisibility="Auto" MinHeight="539" MinWidth="1070" SelectionMode="Single"
+        <ListView Grid.Row="1" x:Name="commandsList" Margin="0,0,0,-50" Width="Auto" Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}}" MouseDoubleClick="commandsList_MouseDoubleClick" ScrollViewer.VerticalScrollBarVisibility="Auto" MinHeight="539" MinWidth="1070" SelectionMode="Extended"
                       Padding="10,0,10,0" IsSynchronizedWithCurrentItem="True"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" TextSearch.TextPath="Alias" IsTextSearchCaseSensitive="False"
                       Tag="{Binding ViewMode.Value}" Grid.ColumnSpan="3">
             <ListView.Resources>
@@ -62,7 +62,7 @@
                     <Separator></Separator>
                     <MenuItem Header="Edit" Click="edit_Click"/>
                     <MenuItem Header="Edit Environment Variables" Click="editEnvConfig_Click"/>
-                    <MenuItem Header="Delete" Click="delete_Click" IsEnabled="{Binding Path=DelEnabled}"/>
+                    <MenuItem Header="Delete" Click="delete_Click"/>
                     <MenuItem Header="Refresh" Click="Refresh_Click"/>
                 </ContextMenu>
 
@@ -85,6 +85,7 @@
             <ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type ListViewItem}" >
                     <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                    <EventSetter Event="ContextMenuOpening" Handler="commandsList_ContextMenuOpening"/>
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.Style>

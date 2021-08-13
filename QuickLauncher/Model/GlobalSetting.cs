@@ -1,4 +1,5 @@
-﻿using QuickLauncher.Miscs;
+﻿using QuickLauncher.Misc;
+using QuickLauncher.Miscs;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -40,6 +41,11 @@ namespace QuickLauncher.Model
             return preDefinedCommand;
         }
 
+        public UpgradeSQL GetUpgradeSQL()
+        {
+            return loadUpgradeSQL();
+        }
+
         private PreDefinedCommand loadDefaultCommands()
         {
             PreDefinedCommand result = null;
@@ -70,6 +76,32 @@ namespace QuickLauncher.Model
                 }
             }
             
+            return result;
+        }
+
+        private UpgradeSQL loadUpgradeSQL()
+        {
+            UpgradeSQL result = null;
+            string fileName = "Upgrade.json";
+            var streamInfo = readAppFile(fileName);
+            if (streamInfo == null)
+            {
+                streamInfo = readAppResource(fileName);
+            }
+
+            if (streamInfo != null)
+            {
+                StreamReader sr = new StreamReader(streamInfo.Stream);
+                try
+                {
+                    result = UpgradeSQL.loadJson(sr.ReadToEnd());
+                }
+                catch (JsonException e)
+                {
+                    Debug.WriteLine(e);
+                }
+            }
+
             return result;
         }
 

@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+
 
 namespace QuickLauncher
 {
@@ -46,6 +48,11 @@ namespace QuickLauncher
 
                 Environment.Exit(1);
             }
+            Trace.Listeners.Add(new TextWriterTraceListener("QuickLauncher.log", "quickLauncher"));
+            Trace.AutoFlush = true;
+            Trace.TraceInformation("checking db");
+            DbUtil.CheckDb();
+            Trace.TraceInformation("checking db end");
 #if !DEBUG
             nIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Windows.Forms.Application.ExecutablePath);
             
@@ -101,6 +108,26 @@ namespace QuickLauncher
         {
             base.OnActivated(e);
             mainWindow = MainWindow;
+        }
+
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            if (e.Args.Length > 0 && e.Args[0].Trim() == "/Commit")
+            {
+                try
+                {
+                    Trace.TraceInformation("do database upgrade");
+
+                    DbUtil.DoUpgradeDb();
+                } 
+                catch(Exception ex)
+                {
+                    Trace.TraceError(ex.StackTrace);
+                    MessageBox.Show("Failed to upgrade db, please delete the db or do manually upgrade. " + ex.Message);
+                }
+                
+                Environment.Exit(0);
+            }
         }
     }
 }

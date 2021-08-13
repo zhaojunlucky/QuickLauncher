@@ -21,7 +21,7 @@
             <Label x:Name="label" Content=""/>
             <TextBlock Margin="5, 0, 0, 0">
                 <Hyperlink Click="Hyperlink_Click">
-                    <TextBlock x:Name="link" Text="https://zhaojunlucky.ga/quicklauncher"/>
+                    <TextBlock x:Name="link" Text="https://blog.magicworldz.de/quicklauncher"/>
                 </Hyperlink>
             </TextBlock>
         </StackPanel>

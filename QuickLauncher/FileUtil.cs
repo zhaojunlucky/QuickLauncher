@@ -16,8 +16,12 @@ namespace QuickLauncher
             return isDir ? path : fInfo.Directory.FullName;
         }
 
-        public static string getFileNameNoExt(string fileName)
+        public static string getFileNameNoExt(string filePath)
         {
+
+            FileInfo fInfo = new FileInfo(filePath);
+            var fileName = fInfo.Name;
+
             if (fileName.Contains("."))
             {
                 return fileName.Substring(0, fileName.IndexOf("."));
