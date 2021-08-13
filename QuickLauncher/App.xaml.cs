@@ -48,7 +48,8 @@ namespace QuickLauncher
 
                 Environment.Exit(1);
             }
-            Trace.Listeners.Add(new TextWriterTraceListener("QuickLauncher.log", "quickLauncher"));
+
+            Trace.Listeners.Add(new TextWriterTraceListener(DbUtil.DbBaseDir + "\\QuickLauncher.log", "quickLauncher"));
             Trace.AutoFlush = true;
             Trace.TraceInformation("checking db");
             DbUtil.CheckDb();

@@ -15,7 +15,7 @@ namespace QuickLauncher
 {
     class DbUtil
     {
-        private static string DbBaseDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Unicorn\\QuickLancher";
+        internal static string DbBaseDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Unicorn\\QuickLancher";
         private static string QUICK_COMMAND_TABLE = "CREATE TABLE IF NOT EXISTS QUICK_COMMAND(UUID TEXT PRIMARY KEY,ALIAS TEXT UNIQUE,PATH TEXT, WORKDIRECTORY TEXT,COMMAND TEXT, CustomIcon BLOB, AUTO_START INTEGER);";
         private static string QUICK_COMMAND_EVN_CONFIG_TABLE = "CREATE TABLE IF NOT EXISTS QUICK_COMMAND_ENV_CONFIG(Id INTEGER PRIMARY KEY, PARENT_ID TEXT NOT NULL, ENV_KEY TEXT, ENV_VALUE TEXT, FOREIGN KEY(PARENT_ID) REFERENCES QUICK_COMMAND(UUID))";
         private static string SETTING_TABLE = "CREATE TABLE IF NOT EXISTS SETTING(KEY TEXT, VALUE TEXT, PRIMARY KEY(KEY))";
