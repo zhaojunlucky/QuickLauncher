@@ -20,9 +20,11 @@ namespace QuickLauncher
         private static string QUICK_COMMAND_EVN_CONFIG_TABLE = "CREATE TABLE IF NOT EXISTS QUICK_COMMAND_ENV_CONFIG(Id INTEGER PRIMARY KEY, PARENT_ID TEXT NOT NULL, ENV_KEY TEXT, ENV_VALUE TEXT, FOREIGN KEY(PARENT_ID) REFERENCES QUICK_COMMAND(UUID))";
         private static string SETTING_TABLE = "CREATE TABLE IF NOT EXISTS SETTING(KEY TEXT, VALUE TEXT, PRIMARY KEY(KEY))";
 #if DEBUG
-        private static string DbPath = "Data Source =" + DbBaseDir + "\\lancherDb-debug.db";
+        private static string DbFilePath = DbBaseDir + "\\lancherDb-debug.db";
+        private static string DbPath = "Data Source =" + DbFilePath;
 #else
-        private static string DbPath = "Data Source =" + DbBaseDir + "\\lancherDb.db";
+        private static string DbFilePath = DbBaseDir + "\\lancherDb.db";
+        private static string DbPath = "Data Source =" + DbFilePath;
 #endif
         public static SqliteConnection getConnection()
         {
@@ -37,7 +39,7 @@ namespace QuickLauncher
                 Trace.TraceInformation("create db folder");
             }
 
-            if (!File.Exists(DbPath))
+            if (!File.Exists(DbFilePath))
             {
                 Trace.TraceInformation("initialize a new db");
                 prepareTables();

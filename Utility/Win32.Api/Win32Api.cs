@@ -14,6 +14,9 @@ namespace Utility.Win32.Api
         [DllImport("User32.dll")]
         public static extern bool SetForegroundWindow(System.IntPtr hWnd);
 
+        [DllImport("User32.dll", SetLastError = true)]
+        public static extern void SwitchToThisWindow(IntPtr hWnd, bool fAltTab);
+
         [DllImport("user32.dll")]
         public static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
 
@@ -41,7 +44,7 @@ namespace Utility.Win32.Api
         [DllImport("user32.dll")]
         static extern int GetWindowLong(IntPtr hWnd, int nIndex);
         [DllImport("user32.dll")]
-        private static extern bool EnumDesktopWindows(IntPtr hDesktop, EnumWindowsProc ewp, int lParam);
+        static extern bool EnumDesktopWindows(IntPtr hDesktop, EnumWindowsProc ewp, int lParam);
 
         public static IntPtr GetWindowHandle(int pid, string title)
         {

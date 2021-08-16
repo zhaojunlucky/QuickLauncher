@@ -49,7 +49,13 @@ namespace QuickLauncher
                 Environment.Exit(1);
             }
 
-            Trace.Listeners.Add(new TextWriterTraceListener(DbUtil.DbBaseDir + "\\QuickLauncher.log", "quickLauncher"));
+#if DEBUG
+            var listener = new TextWriterTraceListener(DbUtil.DbBaseDir + "\\QuickLauncher-debug.log", "quickLauncher");
+#else
+            var listener = new TextWriterTraceListener(DbUtil.DbBaseDir + "\\QuickLauncher.log", "quickLauncher");
+#endif
+            listener.TraceOutputOptions = TraceOptions.DateTime;
+            Trace.Listeners.Add(listener);
             Trace.AutoFlush = true;
             Trace.TraceInformation("checking db");
             DbUtil.CheckDb();
