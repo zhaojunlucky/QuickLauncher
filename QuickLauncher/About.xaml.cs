@@ -1,5 +1,6 @@
 ﻿using MahApps.Metro.Controls;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
 
 namespace QuickLauncher
@@ -15,7 +16,6 @@ namespace QuickLauncher
 
             var rAssembly = Assembly.GetEntryAssembly();
             var rProductAttribute = (AssemblyProductAttribute)rAssembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false)[0];
-            var rProduct = rProductAttribute.Product;
             var rVersion = rAssembly.GetName().Version.ToString();
             rVersion = rVersion.Substring(0, rVersion.LastIndexOf("."));
 
@@ -34,7 +34,8 @@ namespace QuickLauncher
 
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Process.Start(link.Text);
+            string url = link.Text;
+            ThreadPool.QueueUserWorkItem(delegate { System.Diagnostics.Process.Start("explorer.exe", url); });
         }
     }
 }

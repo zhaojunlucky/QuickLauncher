@@ -48,7 +48,7 @@ namespace QuickLauncher
             catch (Exception e)
             {
                 Trace.TraceError(e.StackTrace);
-                DialogUtil.showError(this, "Fail to init database:" + e.Message);
+                DialogUtil.showError(this, "Fail to query database:" + e.Message);
 
                 Environment.Exit(-1);
             }
