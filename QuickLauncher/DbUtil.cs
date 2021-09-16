@@ -1,47 +1,39 @@
 ﻿using Microsoft.Data.Sqlite;
+using QuickLauncher.Config;
 using QuickLauncher.Misc;
 using QuickLauncher.Model;
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace QuickLauncher
 {
     class DbUtil
     {
-        internal static string DbBaseDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Unicorn\\QuickLancher";
+        
         private static string QUICK_COMMAND_TABLE = "CREATE TABLE IF NOT EXISTS QUICK_COMMAND(UUID TEXT PRIMARY KEY,ALIAS TEXT UNIQUE,PATH TEXT, WORKDIRECTORY TEXT,COMMAND TEXT, CustomIcon BLOB, AUTO_START INTEGER);";
         private static string QUICK_COMMAND_EVN_CONFIG_TABLE = "CREATE TABLE IF NOT EXISTS QUICK_COMMAND_ENV_CONFIG(Id INTEGER PRIMARY KEY, PARENT_ID TEXT NOT NULL, ENV_KEY TEXT, ENV_VALUE TEXT, FOREIGN KEY(PARENT_ID) REFERENCES QUICK_COMMAND(UUID))";
         private static string SETTING_TABLE = "CREATE TABLE IF NOT EXISTS SETTING(KEY TEXT, VALUE TEXT, PRIMARY KEY(KEY))";
-#if DEBUG
-        private static string DbPath = "Data Source =" + DbBaseDir + "\\lancherDb-debug.db";
-#else
-        private static string DbPath = "Data Source =" + DbBaseDir + "\\lancherDb.db";
-#endif
+
         public static SqliteConnection getConnection()
         {
-            return new SqliteConnection(DbPath);
+            return new SqliteConnection(QLConfig.DbConnStr);
         }
 
         public static void CheckDb()
         {
-            if (!Directory.Exists(DbBaseDir))
+            if (!Directory.Exists(QLConfig.AppConfigBaseDir))
             {
-                Directory.CreateDirectory(DbBaseDir);
+                Directory.CreateDirectory(QLConfig.AppConfigBaseDir);
                 Trace.TraceInformation("create db folder");
             }
 
-            if (!File.Exists(DbPath))
+            if (!File.Exists(QLConfig.DbFilePath))
             {
                 Trace.TraceInformation("initialize a new db");
                 prepareTables();
-                Trace.TraceInformation("create tables");
+                Trace.TraceInformation("created tables");
             }
         }
 

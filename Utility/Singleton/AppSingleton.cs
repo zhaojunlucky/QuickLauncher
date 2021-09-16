@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -69,10 +70,18 @@ namespace Utility.Singleton
                 {
                     //保证要打开的进程同已经存在的进程来自同一文件路径
                     //if (Assembly.GetExecutingAssembly().Location.Replace("/", "\\") == current.MainModule.FileName)
-                    if(process.MainModule.FileName == current.MainModule.FileName)
+                    try
                     {
-                        //返回已经存在的进程
-                        return process;
+                        if (process.MainModule.FileName == current.MainModule.FileName)
+                        {
+                            //返回已经存在的进程
+                            return process;
+                        }
+                    }
+                    catch(Win32Exception e)
+                    {
+                        Trace.TraceInformation(e.Message);
+                        Trace.TraceInformation(e.StackTrace);
                     }
                 }
             }
@@ -81,10 +90,8 @@ namespace Utility.Singleton
 
         public static void sendRunningInstanceForeground(Process instance)
         {
-            var handle = Win32Api.GetWindowHandle(instance.Id, "Quick Launcher");
-            Win32Api.ShowWindowAsync(handle, 5);  //调用api函数，正常显示窗口
-            Win32Api.SetForegroundWindow(handle); //将窗口放置最前端
-            Win32Api.SendMessage(handle, Win32Api.WM_SHOWWINDOW, IntPtr.Zero, new IntPtr(Win32Api.SW_PARENTOPENING));
+            var hn = instance.MainWindowHandle;
+            Win32Api.SwitchToThisWindow(hn, true);
         }
     }
 }

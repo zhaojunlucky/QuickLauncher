@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
+﻿using QuickLauncher.Config;
+using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 
 
 namespace QuickLauncher
@@ -18,16 +12,13 @@ namespace QuickLauncher
     public partial class App : Application
     {
         private static Window mainWindow = null;
-#if DEBUG
-        private static String SINGLETON = "QuichLauncher--zj-debug";
-#else
+#if !DEBUG
         System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
-        private static String SINGLETON = "QuichLauncher--zj";
 #endif
 
         public App()
         {
-            if (Utility.Singleton.AppSingleton.Instance.checkIsAppRunning(SINGLETON))
+            if (Utility.Singleton.AppSingleton.Instance.checkIsAppRunning(QLConfig.Singleton))
             {
                 if (mainWindow == null)
                 {
@@ -49,11 +40,8 @@ namespace QuickLauncher
                 Environment.Exit(1);
             }
 
-            Trace.Listeners.Add(new TextWriterTraceListener(DbUtil.DbBaseDir + "\\QuickLauncher.log", "quickLauncher"));
-            Trace.AutoFlush = true;
-            Trace.TraceInformation("checking db");
-            DbUtil.CheckDb();
-            Trace.TraceInformation("checking db end");
+            InitTraceLogger();
+            InitDb();
 #if !DEBUG
             nIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Windows.Forms.Application.ExecutablePath);
             
@@ -81,6 +69,23 @@ namespace QuickLauncher
             });
             nIcon.Visible = true;
 #endif
+        }
+
+        private static void InitDb()
+        {
+            Trace.TraceInformation("checking db");
+            DbUtil.CheckDb();
+            Trace.TraceInformation("checking db end");
+        }
+
+        private static void InitTraceLogger()
+        {
+            var listener = new TextWriterTraceListener(QLConfig.LogFile, "quickLauncher")
+            {
+                TraceOutputOptions = TraceOptions.DateTime,
+            };
+            Trace.Listeners.Add(listener);
+            Trace.AutoFlush = true;
         }
 
         private void nIcon_Click(object sender, EventArgs e)
