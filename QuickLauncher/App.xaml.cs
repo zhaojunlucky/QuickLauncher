@@ -12,6 +12,9 @@ namespace QuickLauncher
     public partial class App : Application
     {
         private static Window mainWindow = null;
+#if !DEBUG
+        System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
+#endif
 
         public App()
         {
@@ -40,7 +43,6 @@ namespace QuickLauncher
             InitTraceLogger();
             InitDb();
 #if !DEBUG
-            System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
             nIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Windows.Forms.Application.ExecutablePath);
             
             nIcon.Text = "QuickLancher By MagicWorldZ";

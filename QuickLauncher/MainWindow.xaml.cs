@@ -41,6 +41,11 @@ namespace QuickLauncher
             InitializeComponent();
 
             this.Loaded += MainWindow_Loaded;
+        }
+
+        private void LoadQuickLaunchers()
+        {
+            Trace.TraceInformation("loading from database");
             try
             {
                 loadSettings();
@@ -52,6 +57,10 @@ namespace QuickLauncher
 
                 Environment.Exit(-1);
             }
+ 
+            loadQuickCommandsFromDb("");
+            Trace.TraceInformation("loading from database - done");
+
             this.DataContext = this;
             OpenNewEditorCommand = new OpenEditorCommand(() =>
             {
@@ -61,7 +70,7 @@ namespace QuickLauncher
             KeyBinding OpenCmdKeyBinding = new KeyBinding(OpenNewEditorCommand, Key.N, ModifierKeys.Control);
 
             InputBindings.Add(OpenCmdKeyBinding);
-            loadQuickCommandsFromDb("");
+
             commandsList.ItemsSource = quickCommands;
         }
 
@@ -80,6 +89,8 @@ namespace QuickLauncher
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            LoadQuickLaunchers();
+
             /// Get the Handle for the Forms System Menu
             IntPtr systemMenuHandle = Win32Api.GetSystemMenu(this.Handle, false);
 
