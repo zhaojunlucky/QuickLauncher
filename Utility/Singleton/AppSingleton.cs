@@ -91,7 +91,11 @@ namespace Utility.Singleton
         public static void sendRunningInstanceForeground(Process instance)
         {
             var hn = instance.MainWindowHandle;
-            Win32Api.SwitchToThisWindow(hn, true);
+            var handle = Win32Api.GetWindowHandle(instance.Id, "Quick Launcher");
+            Win32Api.ShowWindowAsync(handle, 5);  //调用api函数，正常显示窗口
+            Win32Api.SetForegroundWindow(handle); //将窗口放置最前端
+            Win32Api.SwitchToThisWindow(handle, true);
+            Win32Api.SendMessage(handle, Win32Api.WM_SHOWWINDOW, IntPtr.Zero, new IntPtr(Win32Api.SW_PARENTOPENING));
         }
     }
 }

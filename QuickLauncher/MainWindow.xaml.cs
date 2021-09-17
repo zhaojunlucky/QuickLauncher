@@ -313,6 +313,7 @@ namespace QuickLauncher
 
         private static IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
+
             // Check if a System Command has been executed
             if (msg == Win32Api.WM_SYSCOMMAND)
             {
@@ -389,7 +390,8 @@ namespace QuickLauncher
             // do nothing
 #else
             e.Cancel = true;
-            this.Visibility = Visibility.Hidden;
+            this.WindowState = WindowState.Minimized;
+            this.ShowInTaskbar = false;
 #endif
         }
 

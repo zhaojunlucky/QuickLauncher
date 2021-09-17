@@ -46,6 +46,10 @@ namespace Utility.Win32.Api
         [DllImport("user32.dll")]
         static extern bool EnumDesktopWindows(IntPtr hDesktop, EnumWindowsProc ewp, int lParam);
 
+        [DllImport("shell32.dll")]
+        public static extern bool IsUserAnAdmin();
+
+
         public static IntPtr GetWindowHandle(int pid, string title)
         {
             var result = IntPtr.Zero;
