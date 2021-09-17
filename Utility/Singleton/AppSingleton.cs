@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
+using System.IO;
+using System.IO.Pipes;
 using System.Reflection;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Utility.Win32.Api;
 
 namespace Utility.Singleton
 {
@@ -16,6 +15,11 @@ namespace Utility.Singleton
         private System.Threading.Mutex mutex = null;
         private Object obj = new object();
         private static AppSingleton instance = new AppSingleton();
+        private static string _AppName =
+          Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().GetName().Name);
+        private NamedPipeServerStream namedPipeServerStream;
+        private AsyncCallback asyncCallback;
+
         public static AppSingleton Instance
         {
             get { return instance; }
@@ -57,45 +61,59 @@ namespace Utility.Singleton
             return sBuilder.ToString();
         }
 
-
-        public static Process getRunningInstance()
+        public void StartPipeServer(AsyncCallback asyncCallback)
         {
-            Process current = Process.GetCurrentProcess();
-            Process[] processes = Process.GetProcessesByName(current.ProcessName);
-            //遍历与当前进程名称相同的进程列表 
-            foreach (Process process in processes)
-            {
-                //如果实例已经存在则忽略当前进程 
-                if (process.Id != current.Id)
-                {
-                    //保证要打开的进程同已经存在的进程来自同一文件路径
-                    //if (Assembly.GetExecutingAssembly().Location.Replace("/", "\\") == current.MainModule.FileName)
-                    try
-                    {
-                        if (process.MainModule.FileName == current.MainModule.FileName)
-                        {
-                            //返回已经存在的进程
-                            return process;
-                        }
-                    }
-                    catch(Win32Exception e)
-                    {
-                        Trace.TraceInformation(e.Message);
-                        Trace.TraceInformation(e.StackTrace);
-                    }
-                }
-            }
-            return null;
+            this.asyncCallback = asyncCallback;
+            namedPipeServerStream = new NamedPipeServerStream(_AppName + "IPC",
+               PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+            // it's easier to use the AsyncCallback than it is to use Tasks here:
+            // this can't block, so some form of async is a must
+
+            namedPipeServerStream.BeginWaitForConnection(asyncCallback, namedPipeServerStream);
+
         }
 
-        public static void sendRunningInstanceForeground(Process instance)
+        public void ReListen()
         {
-            var hn = instance.MainWindowHandle;
-            var handle = Win32Api.GetWindowHandle(instance.Id, "Quick Launcher");
-            Win32Api.ShowWindowAsync(handle, 5);  //调用api函数，正常显示窗口
-            Win32Api.SetForegroundWindow(handle); //将窗口放置最前端
-            Win32Api.SwitchToThisWindow(handle, true);
-            Win32Api.SendMessage(handle, Win32Api.WM_SHOWWINDOW, IntPtr.Zero, new IntPtr(Win32Api.SW_PARENTOPENING));
+            if (namedPipeServerStream != null && namedPipeServerStream.IsConnected)
+            {
+                namedPipeServerStream.Disconnect();
+            }
+            namedPipeServerStream.BeginWaitForConnection(asyncCallback, namedPipeServerStream);
+        }
+
+        public async Task StopPipeServerAsync()
+        {
+            if (namedPipeServerStream != null)
+            {
+                // let the pipe server to exit
+                SendMsgToRunningServer("");
+
+                await Task.Delay(500);
+                if (namedPipeServerStream.IsConnected)
+                {
+                    namedPipeServerStream.Disconnect();
+                }
+                namedPipeServerStream.Close();
+            }
+        }
+
+        public void SendMsgToRunningServer(string message)
+        {
+            try
+            {
+                var cli = new NamedPipeClientStream(".", _AppName + "IPC", PipeDirection.InOut);
+                cli.Connect(2000);
+                var bf = new BinaryFormatter();
+                // serialize and send the command line
+                bf.Serialize(cli, message);
+                cli.Close();
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError(e.Message);
+                Trace.TraceError(e.StackTrace);
+            }
         }
     }
 }
