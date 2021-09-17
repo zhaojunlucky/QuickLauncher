@@ -11,42 +11,25 @@ namespace QuickLauncher
     /// </summary>
     public partial class App : Application
     {
-        private static Window mainWindow = null;
 #if !DEBUG
         System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
 #endif
 
         public App()
         {
+            InitTraceLogger();
             if (Utility.Singleton.AppSingleton.Instance.checkIsAppRunning(QLConfig.Singleton))
             {
-                if (mainWindow == null)
-                {
-                    var process = Utility.Singleton.AppSingleton.getRunningInstance();
-                    if (process != null)
-                    {
-                        Utility.Singleton.AppSingleton.sendRunningInstanceForeground(process);
-                    }
-                }
-                else
-                {
-                    mainWindow.Visibility = Visibility.Visible;
-                    mainWindow.WindowState = WindowState.Normal;
 
-                    mainWindow.Show();
-                    mainWindow.Activate();
-                }
-
+                Utility.Singleton.AppSingleton.Instance.SendMsgToRunningServer(QLConfig.Singleton);
                 Environment.Exit(1);
             }
 
-            InitTraceLogger();
             InitDb();
 #if !DEBUG
             nIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Windows.Forms.Application.ExecutablePath);
             
             nIcon.Text = "QuickLancher By MagicWorldZ";
-            //nIcon.Click += nIcon_Click;
 
             System.Windows.Forms.ToolStripMenuItem open = new System.Windows.Forms.ToolStripMenuItem("Open");
             open.Click += new EventHandler(nIcon_Click);
@@ -57,7 +40,7 @@ namespace QuickLauncher
             {
                 show();
                 About a = new About();
-                a.Owner = mainWindow;
+                a.Owner = MainWindow;
                 a.ShowDialog();
             });
             System.Windows.Forms.ToolStripMenuItem[] childen = new System.Windows.Forms.ToolStripMenuItem[] { about, open, exit };
@@ -77,7 +60,6 @@ namespace QuickLauncher
             DbUtil.CheckDb();
             Trace.TraceInformation("checking db end");
         }
-
         private static void InitTraceLogger()
         {
             var listener = new TextWriterTraceListener(QLConfig.LogFile, "quickLauncher")
@@ -110,12 +92,6 @@ namespace QuickLauncher
             MainWindow.Activate();
         }
 
-        protected override void OnActivated(EventArgs e)
-        {
-            base.OnActivated(e);
-            mainWindow = MainWindow;
-        }
-
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             if (e.Args.Length > 0 && e.Args[0].Trim() == "/Commit")
@@ -134,6 +110,11 @@ namespace QuickLauncher
                 
                 Environment.Exit(0);
             }
+        }
+
+        private async void Application_ExitAsync(object sender, ExitEventArgs e)
+        {
+            await Utility.Singleton.AppSingleton.Instance.StopPipeServerAsync();
         }
     }
 }

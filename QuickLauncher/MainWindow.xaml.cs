@@ -2,6 +2,7 @@
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.EntityFrameworkCore;
+using QuickLauncher.Config;
 using QuickLauncher.Dialogs;
 using QuickLauncher.Model;
 using System;
@@ -9,13 +10,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO.Pipes;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
+using Utility;
 using Utility.Win32.Api;
 
 namespace QuickLauncher
@@ -36,9 +40,14 @@ namespace QuickLauncher
         };
         private HashSet<string> disabledCmdContextMenuItem = new HashSet<string>(new List<string>() { "Open Working Directory", "Edit", "Edit Environment Variables", "Delete" });
 
+        private bool isAdmin = AppUtil.IsRunAsAdmin();
+        private string menuStartAsAdmin = "Start As Administator";
+
         public MainWindow()
         {
             InitializeComponent();
+
+            Utility.Singleton.AppSingleton.Instance.StartPipeServer(new AsyncCallback(_ConnectionHandler));
 
             this.Loaded += MainWindow_Loaded;
         }
@@ -85,6 +94,32 @@ namespace QuickLauncher
         private void loadSettings()
         {
             viewSetting = SettingItemUtils.GetViewMode();
+        }
+
+        private void _ConnectionHandler(IAsyncResult result)
+        {
+            var srv = result.AsyncState as NamedPipeServerStream;
+            srv.EndWaitForConnection(result);
+
+            // we're connected, now deserialize the incoming command line
+            var bf = new BinaryFormatter();
+            var msg = bf.Deserialize(srv) as string;
+
+            if (msg != "")
+            {
+                this.BeginInvoke((Action)(() => ShowFromProcReq(msg)));
+                Utility.Singleton.AppSingleton.Instance.ReListen();
+            }
+        }
+
+        private void ShowFromProcReq(string messgae)
+        {
+            if (messgae == QLConfig.Singleton)
+            {
+                this.Visibility = Visibility.Visible;
+                this.WindowState = WindowState.Normal;
+                this.Activate();
+            }
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -313,6 +348,7 @@ namespace QuickLauncher
 
         private static IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
+
             // Check if a System Command has been executed
             if (msg == Win32Api.WM_SYSCOMMAND)
             {
@@ -426,6 +462,9 @@ namespace QuickLauncher
                 if (disabledCmdContextMenuItem.Contains(header))
                 {
                     mi.IsEnabled = enabled;
+                } else if (!isAdmin && header == menuStartAsAdmin)
+                {
+                    mi.IsEnabled = false;
                 }
             }
         }
