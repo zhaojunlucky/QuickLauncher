@@ -98,6 +98,8 @@ namespace QuickLauncher.Model
                 }
                 catch (JsonException e)
                 {
+                    Trace.TraceError(e.Message);
+                    Trace.TraceError(e.StackTrace);
                     Debug.WriteLine(e);
                 }
             }

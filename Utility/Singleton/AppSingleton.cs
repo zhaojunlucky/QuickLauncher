@@ -15,8 +15,13 @@ namespace Utility.Singleton
         private System.Threading.Mutex mutex = null;
         private Object obj = new object();
         private static AppSingleton instance = new AppSingleton();
+#if DEBUG
         private static string _AppName =
-          Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().GetName().Name);
+          Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().GetName().Name) + "_DEBUG";
+#else
+        private static string _AppName =
+          Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().GetName().Name)";
+#endif
         private NamedPipeServerStream namedPipeServerStream;
         private AsyncCallback asyncCallback;
 

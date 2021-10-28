@@ -10,7 +10,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
@@ -181,6 +180,8 @@ namespace QuickLauncher.Dialogs
                 }
                 catch (Exception ee)
                 {
+                    Trace.TraceError(ee.Message);
+                    Trace.TraceError(ee.StackTrace);
                     DialogUtil.showError(parent, ee.Message);
                 }
             }

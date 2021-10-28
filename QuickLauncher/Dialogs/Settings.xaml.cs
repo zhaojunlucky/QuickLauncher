@@ -2,6 +2,7 @@
 using MahApps.Metro.Controls.Dialogs;
 using QuickLauncher.Model;
 using System;
+using System.Diagnostics;
 using System.Windows;
 using Utility;
 
@@ -31,6 +32,8 @@ namespace QuickLauncher.Dialogs
                 }
                 catch (Exception r)
                 {
+                    Trace.TraceError(r.Message);
+                    Trace.TraceError(r.StackTrace);
                     DialogUtil.showError(OwningWindow, r.Message);
                     return false;
                 }
@@ -43,6 +46,8 @@ namespace QuickLauncher.Dialogs
                 }
                 catch (Exception r)
                 {
+                    Trace.TraceError(r.Message);
+                    Trace.TraceError(r.StackTrace);
                     DialogUtil.showError(OwningWindow, r.InnerException.Message);
                 }
 
@@ -64,6 +69,8 @@ namespace QuickLauncher.Dialogs
                 }
                 catch (Exception r)
                 {
+                    Trace.TraceError(r.Message);
+                    Trace.TraceError(r.StackTrace);
                     DialogUtil.showError(OwningWindow, r.InnerException.Message);
                 }
 

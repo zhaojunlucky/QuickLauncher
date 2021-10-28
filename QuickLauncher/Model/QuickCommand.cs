@@ -36,6 +36,17 @@ namespace QuickLauncher.Model
             IsNew = isNew;
         }
 
+        public QuickCommand(QuickCommand quickCommand)
+            :this(true)
+        {
+            alias = quickCommand.alias + "_Copy";
+            command = quickCommand.command;
+            path = quickCommand.path;
+            autoStart = 0;
+            workDirectory = quickCommand.workDirectory;
+            customeIcon = quickCommand.customeIcon;
+        }
+
         public QuickCommand()
         {
             IsNew = false;
@@ -228,7 +239,10 @@ namespace QuickLauncher.Model
             {
                 string error = this["Alias"] + this["Path"] + this["WorkDirectory"];
                 if (!string.IsNullOrEmpty(error))
+                {
+                    Trace.TraceWarning(error);
                     return "Please check input with red border and correct";
+                }
                 return null;
             }
         }

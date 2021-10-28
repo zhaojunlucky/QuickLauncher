@@ -62,6 +62,7 @@
                     <Separator></Separator>
                     <MenuItem Header="Edit" Click="edit_Click"/>
                     <MenuItem Header="Edit Environment Variables" Click="editEnvConfig_Click"/>
+                    <MenuItem Header="Copy" Click="Copy_Click"/>
                     <MenuItem Header="Delete" Click="delete_Click"/>
                     <MenuItem Header="Refresh" Click="Refresh_Click"/>
                 </ContextMenu>

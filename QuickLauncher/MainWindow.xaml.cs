@@ -38,7 +38,7 @@ namespace QuickLauncher
         {
             ColorScheme = MetroDialogColorScheme.Accented// win.MetroDialogOptions.ColorScheme
         };
-        private HashSet<string> disabledCmdContextMenuItem = new HashSet<string>(new List<string>() { "Open Working Directory", "Edit", "Edit Environment Variables", "Delete" });
+        private HashSet<string> disabledCmdContextMenuItem = new HashSet<string>(new List<string>() { "Open Working Directory", "Edit", "Edit Environment Variables", "Delete", "Copy" });
 
         private bool isAdmin = AppUtil.IsRunAsAdmin();
         private string menuStartAsAdmin = "Start As Administator";
@@ -491,6 +491,16 @@ namespace QuickLauncher
                 Trace.TraceInformation("no auto start command found");
             }
             
+        }
+
+        private async void Copy_Click(object sender, RoutedEventArgs e)
+        {
+            QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
+            QuickCommand copy = new QuickCommand(qc);
+
+            var dialog = new CmdEditor(this, dialogSettings, copy);
+            dialog.AddedNewQuickCommand += Qle_AddedNewQuickCommand;
+            await this.ShowMetroDialogAsync(dialog);
         }
     }
 }
