@@ -12,7 +12,7 @@
         NonActiveGlowBrush="#CDFF0000"
         WindowTransitionsEnabled="False"
         Title="Quick Launcher" MinHeight="608" MinWidth="1090" Width="1090" Height="608" WindowStartupLocation="CenterScreen" 
-                      Closing="root_Closing" Activated="root_Activated" ShowTitleBar="False" Loaded="root_Loaded">
+                      Closing="root_Closing" Activated="root_Activated" ShowTitleBar="False" Loaded="root_Loaded" Closed="root_Closed">
     <Grid ShowGridLines="False">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="393*"/>

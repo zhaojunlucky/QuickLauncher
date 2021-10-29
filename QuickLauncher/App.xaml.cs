@@ -1,4 +1,5 @@
-﻿using QuickLauncher.Config;
+﻿using MahApps.Metro.Controls.Dialogs;
+using QuickLauncher.Config;
 using System;
 using System.Diagnostics;
 using System.Windows;

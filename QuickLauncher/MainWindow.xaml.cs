@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using QuickLauncher.Config;
 using QuickLauncher.Dialogs;
 using QuickLauncher.Model;
+using QuickLauncher.Notification;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,6 +21,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using Utility;
+using Utility.HotKey;
 using Utility.Win32.Api;
 
 namespace QuickLauncher
@@ -116,9 +118,7 @@ namespace QuickLauncher
         {
             if (messgae == QLConfig.Singleton)
             {
-                this.Visibility = Visibility.Visible;
-                this.WindowState = WindowState.Normal;
-                this.Activate();
+                ShowWindowNormal();
             }
         }
 
@@ -138,6 +138,41 @@ namespace QuickLauncher
             source.AddHook(new HwndSourceHook(WndProc));
 
             ThemeManager.Current.ChangeThemeColorScheme(Application.Current, "Blue");
+
+            RegisterHotKeys();
+        }
+
+        private void RegisterHotKeys()
+        {
+            try
+            {
+                HotkeyManager.Current.RegisterHotKey("open main window", HotKeyModifiers.Control | HotKeyModifiers.Alt, KeyInterop.VirtualKeyFromKey(Key.Q), OnOpenWindowHotKey);
+            }
+            catch(Exception e)
+            {
+                Trace.TraceError(e.Message);
+                ToastNotificationUtil.SendNotification("Failed to register HotKey", e.Message);
+            }
+        }
+
+        private void OnOpenWindowHotKey(object sender, HotkeyEventArgs e)
+        {
+            ShowWindowNormal();
+        }
+
+        private void ShowWindowNormal()
+        {
+            if (WindowState == WindowState.Minimized)
+            {
+                WindowState = WindowState.Normal;
+            }
+
+            if (Visibility != Visibility.Visible)
+            {
+                Visibility = Visibility.Visible;
+            }
+
+            Activate();
         }
 
         private void loadQuickCommandsFromDb(string key)
@@ -297,7 +332,7 @@ namespace QuickLauncher
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
                     statusLabel.Content = "Started \"" + qc.Alias + "\" failed: \"" + e.Message + "\" at " + DateTime.Now.ToString();
-                    this.WindowState = System.Windows.WindowState.Normal;
+                    ShowWindowNormal();
                     DialogUtil.showError(this, e.Message);
                 }), DispatcherPriority.Background);
             }
@@ -501,6 +536,19 @@ namespace QuickLauncher
             var dialog = new CmdEditor(this, dialogSettings, copy);
             dialog.AddedNewQuickCommand += Qle_AddedNewQuickCommand;
             await this.ShowMetroDialogAsync(dialog);
+        }
+
+        private void root_Closed(object sender, EventArgs e)
+        {
+            try
+            {
+                HotkeyManager.Current.UnRegisterHotKeys();
+            }
+            catch(Exception ex)
+            {
+                Trace.TraceError(ex.Message);
+            }
+            
         }
     }
 }

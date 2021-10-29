@@ -20,7 +20,7 @@ namespace Utility.Singleton
           Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().GetName().Name) + "_DEBUG";
 #else
         private static string _AppName =
-          Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().GetName().Name)";
+          Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().GetName().Name);
 #endif
         private NamedPipeServerStream namedPipeServerStream;
         private AsyncCallback asyncCallback;
