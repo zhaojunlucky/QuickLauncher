@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Utility.HotKey
 {
     [Serializable]
-    internal class HotkeyAlreadyRegisteredException : Exception
+    public class HotkeyAlreadyRegisteredException : Exception
     {
         private object name;
         private Exception ex;

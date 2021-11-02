@@ -29,7 +29,6 @@ namespace QuickLauncher
             InitDb();
 #if !DEBUG
             nIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Windows.Forms.Application.ExecutablePath);
-            
             nIcon.Text = "QuickLancher By MagicWorldZ";
 
             System.Windows.Forms.ToolStripMenuItem open = new System.Windows.Forms.ToolStripMenuItem("Open");
@@ -77,20 +76,22 @@ namespace QuickLauncher
             show();
         }
 
-        private void exit_Click(object sender, EventArgs e)
+        private async void exit_Click(object sender, EventArgs e)
         {
+            show();
+            var result = await DialogUtil.ShowYesNo("Confirm exit", (MahApps.Metro.Controls.MetroWindow)MainWindow, "Are you sure to exit?");
+            if (result == MessageDialogResult.Affirmative)
+            {
 #if !DEBUG
-            nIcon.Visible = false;
+                nIcon.Visible = false;
 #endif
-            Application.Current.Shutdown();
+                Application.Current.Shutdown();
+            }
         }
 
         private void show()
         {
-            MainWindow.Visibility = Visibility.Visible;
-            MainWindow.WindowState = WindowState.Normal;
-            MainWindow.ShowInTaskbar = true;
-            MainWindow.Activate();
+            ((MainWindow)MainWindow).ShowWindowNormal();
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)

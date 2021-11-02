@@ -54,7 +54,7 @@ namespace Utility.HotKey
                 var hr = Marshal.GetHRForLastWin32Error();
                 var ex = Marshal.GetExceptionForHR(hr);
                 if ((uint)hr == 0x80070581)
-                    throw new HotkeyAlreadyRegisteredException(name, ex);
+                    throw new HotkeyAlreadyRegisteredException(name + " is already registered.", ex);
                 throw ex;
             }
         }

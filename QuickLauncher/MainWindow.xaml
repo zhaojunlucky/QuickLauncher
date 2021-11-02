@@ -115,6 +115,14 @@
         <DockPanel Grid.Row="2" Height="25" Grid.ColumnSpan="3">
             <StatusBar DockPanel.Dock="Left" Width="Auto" Height="Auto">
                 <StatusBarItem Name="statusLabel" Content="Ready" Height="25" VerticalAlignment="Center"/>
+                <StatusBarItem
+                    Content="{Binding QuickCommands.Count, Mode=OneWay}"
+                    Height="25"
+                    ContentStringFormat="Total Commands: {0}"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"
+                    Padding="0, 0, 5, 0"
+                    />
             </StatusBar>
         </DockPanel>
     </Grid>

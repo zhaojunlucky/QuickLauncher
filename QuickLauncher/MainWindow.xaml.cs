@@ -4,6 +4,7 @@ using MahApps.Metro.Controls.Dialogs;
 using Microsoft.EntityFrameworkCore;
 using QuickLauncher.Config;
 using QuickLauncher.Dialogs;
+using QuickLauncher.Misc;
 using QuickLauncher.Model;
 using QuickLauncher.Notification;
 using System;
@@ -93,6 +94,14 @@ namespace QuickLauncher
             }
         }
 
+        public ObservableCollection<QuickCommand> QuickCommands
+        {
+            get
+            {
+                return quickCommands;
+            }
+        }
+
         private void loadSettings()
         {
             viewSetting = SettingItemUtils.GetViewMode();
@@ -139,20 +148,16 @@ namespace QuickLauncher
 
             ThemeManager.Current.ChangeThemeColorScheme(Application.Current, "Blue");
 
-            RegisterHotKeys();
+            RegisterHotKeys(false);
         }
 
-        private void RegisterHotKeys()
+        public void RegisterHotKeys(bool reload)
         {
-            try
+            if (reload)
             {
-                HotkeyManager.Current.RegisterHotKey("open main window", HotKeyModifiers.Control | HotKeyModifiers.Alt, KeyInterop.VirtualKeyFromKey(Key.Q), OnOpenWindowHotKey);
+                HotKeyUtil.UnRegisterHotKeys();
             }
-            catch(Exception e)
-            {
-                Trace.TraceError(e.Message);
-                ToastNotificationUtil.SendNotification("Failed to register HotKey", e.Message);
-            }
+            HotKeyUtil.RegisterHotKey(SettingItemUtils.GetMainWindowOpenHotkey(), OnOpenWindowHotKey);
         }
 
         private void OnOpenWindowHotKey(object sender, HotkeyEventArgs e)
@@ -160,7 +165,7 @@ namespace QuickLauncher
             ShowWindowNormal();
         }
 
-        private void ShowWindowNormal()
+        public void ShowWindowNormal()
         {
             if (WindowState == WindowState.Minimized)
             {
@@ -540,15 +545,7 @@ namespace QuickLauncher
 
         private void root_Closed(object sender, EventArgs e)
         {
-            try
-            {
-                HotkeyManager.Current.UnRegisterHotKeys();
-            }
-            catch(Exception ex)
-            {
-                Trace.TraceError(ex.Message);
-            }
-            
+            HotKeyUtil.UnRegisterHotKeys();
         }
     }
 }

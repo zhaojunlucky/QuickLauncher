@@ -4,19 +4,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Utility.Win32.Api;
 using System.Windows.Interop;
+using System.Windows.Input;
 
 namespace Utility.HotKey
 {
-    [Flags]
-    public enum HotKeyModifiers
-    {
-        None = 0,
-        Alt = 1,            // MOD_ALT
-        Control = 2,        // MOD_CONTROL
-        Shift = 4,          // MOD_SHIFT
-        WindowsKey = 8,     // MOD_WIN
-    }
-
     public class HotkeyManager
     {
         
@@ -58,9 +49,18 @@ namespace Utility.HotKey
             }
         }
 
-        public void RegisterHotKey(string name, HotKeyModifiers fsModifiers, int vk, EventHandler<HotkeyEventArgs> handler)
+        public void RegisterHotKey(string name, ModifierKeys fsModifiers, int vk, EventHandler<HotkeyEventArgs> handler)
         {
             RegisterHotKey(name, (uint)fsModifiers, (uint)vk, handler);
+        }
+
+        public void RegisterHotKey(string name, string combineKeys, EventHandler<HotkeyEventArgs> handler)
+        {
+            var rawHotKey = RawHotKey.Parse(combineKeys);
+            if (rawHotKey.Key != Key.None || rawHotKey.HotKeyModifiers != ModifierKeys.None)
+            {
+                RegisterHotKey(name, rawHotKey.HotKeyModifiers, KeyInterop.VirtualKeyFromKey(rawHotKey.Key), handler);
+            }
         }
 
         public void UnRegisterHotKey(string name)
@@ -69,6 +69,8 @@ namespace Utility.HotKey
             if (nameHotKey.TryGetValue(name, out hotKey))
             {
                 hotKey.UnRegisterHotKey();
+                nameHotKey.Remove(name);
+                idHotkeyName.Remove(hotKey.Id);
             }
         }
 
