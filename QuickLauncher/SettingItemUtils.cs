@@ -73,5 +73,10 @@ namespace QuickLauncher
         {
             return GetByKey("db.version", "0", true);
         }
+
+        public static SettingItem GetMainWindowOpenHotkey()
+        {
+            return GetByKey("hotkey.main.window", "", true);
+        }
     }
 }

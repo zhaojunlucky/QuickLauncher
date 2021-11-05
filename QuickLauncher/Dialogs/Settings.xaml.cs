@@ -2,8 +2,11 @@
 using MahApps.Metro.Controls.Dialogs;
 using QuickLauncher.Model;
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using Utility;
+using Utility.HotKey;
 
 namespace QuickLauncher.Dialogs
 {
@@ -12,67 +15,26 @@ namespace QuickLauncher.Dialogs
     /// </summary>
     public partial class Settings : CustomDialog
     {
-        private SettingItem viewMode;
+        private SettingDialogModel settingDialogModel;
         public Settings(MetroWindow parent, MetroDialogSettings mySettings)
             :base(parent, mySettings)
         {
             InitializeComponent();
-            viewMode = SettingItemUtils.GetViewMode();
-            DataContext = this;
-        }
 
-        public bool IsAutoStart
-        {
-            get
-            {
-                try
-                {
-                    return AutoStartUtil.IsAutoStart();
-                }
-                catch (Exception r)
-                {
-                    DialogUtil.showError(OwningWindow, r.Message);
-                    return false;
-                }
-            }
-            set
-            {
-                try
-                {
-                    AutoStartUtil.SetAutoStart(value);
-                }
-                catch (Exception r)
-                {
-                    DialogUtil.showError(OwningWindow, r.InnerException.Message);
-                }
-
-            }
-        }
-
-        public bool ViewMode
-        {
-            get
-            {
-                return viewMode.Value == "TV";
-            }
-            set
-            {
-                viewMode.Value = value ? "TV" : "DV";
-                try
-                {
-                    SettingItemUtils.SaveSettingItem(viewMode);
-                }
-                catch (Exception r)
-                {
-                    DialogUtil.showError(OwningWindow, r.InnerException.Message);
-                }
-
-            }
+            settingDialogModel = new SettingDialogModel(OwningWindow);
+            DataContext = settingDialogModel;
         }
 
         private async void Cancel_Click(object sender, RoutedEventArgs e)
         {
+            SettingDialogModel settingDialogModel = (SettingDialogModel)DataContext;
+            settingDialogModel.Save();
             await OwningWindow.HideMetroDialogAsync(this);
+        }
+
+        private void ResetOrClear_Click(object sender, RoutedEventArgs e)
+        {
+            settingDialogModel.ResetOrClear();
         }
     }
 }

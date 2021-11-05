@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 using Utility.Model;
 
 namespace QuickLauncher.Model
@@ -91,7 +92,11 @@ namespace QuickLauncher.Model
             {
                 string error = this["EnvKey"];
                 if (!string.IsNullOrEmpty(error))
+                {
+                    Trace.TraceWarning(error);
                     return "Please check input with red border and correct";
+                }
+                    
                 return null;
             }
         }

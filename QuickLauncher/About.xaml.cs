@@ -1,6 +1,9 @@
 ﻿using MahApps.Metro.Controls;
+using QuickLauncher.Model;
+using System;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace QuickLauncher
@@ -10,21 +13,12 @@ namespace QuickLauncher
     /// </summary>
     public partial class About : MetroWindow
     {
+        private AboutDialogModel aboutDialogModel;
         public About()
         {
             InitializeComponent();
-
-            var rAssembly = Assembly.GetEntryAssembly();
-            var rProductAttribute = (AssemblyProductAttribute)rAssembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false)[0];
-            var rVersion = rAssembly.GetName().Version.ToString();
-            rVersion = rVersion.Substring(0, rVersion.LastIndexOf("."));
-
-            var rCopyrightAttribute = (AssemblyCopyrightAttribute)rAssembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), true)[0];
-            var rCopyright = rCopyrightAttribute.Copyright;
-
-            var info = "Version " + rVersion + "\r\n\r\n" + rCopyright + "\r\n";
-            label.Content = info;
-
+            aboutDialogModel = new AboutDialogModel();
+            DataContext = aboutDialogModel;
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
@@ -36,6 +30,19 @@ namespace QuickLauncher
         {
             string url = link.Text;
             ThreadPool.QueueUserWorkItem(delegate { System.Diagnostics.Process.Start("explorer.exe", url); });
+        }
+
+        private void DownloadNew_Click(object sender, RoutedEventArgs e)
+        {
+            if (aboutDialogModel.LatestRelease != null)
+            {
+                ThreadPool.QueueUserWorkItem(delegate { System.Diagnostics.Process.Start("explorer.exe", aboutDialogModel.LatestRelease.HtmlUrl); });
+            }
+        }
+        
+        private async void MetroWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            await aboutDialogModel.CheckUpdates();
         }
     }
 }

@@ -4,7 +4,9 @@ using MahApps.Metro.Controls.Dialogs;
 using Microsoft.EntityFrameworkCore;
 using QuickLauncher.Config;
 using QuickLauncher.Dialogs;
+using QuickLauncher.Misc;
 using QuickLauncher.Model;
+using QuickLauncher.Notification;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,6 +22,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using Utility;
+using Utility.HotKey;
 using Utility.Win32.Api;
 
 namespace QuickLauncher
@@ -38,7 +41,7 @@ namespace QuickLauncher
         {
             ColorScheme = MetroDialogColorScheme.Accented// win.MetroDialogOptions.ColorScheme
         };
-        private HashSet<string> disabledCmdContextMenuItem = new HashSet<string>(new List<string>() { "Open Working Directory", "Edit", "Edit Environment Variables", "Delete" });
+        private HashSet<string> disabledCmdContextMenuItem = new HashSet<string>(new List<string>() { "Open Working Directory", "Edit", "Edit Environment Variables", "Delete", "Copy" });
 
         private bool isAdmin = AppUtil.IsRunAsAdmin();
         private string menuStartAsAdmin = "Start As Administator";
@@ -91,6 +94,14 @@ namespace QuickLauncher
             }
         }
 
+        public ObservableCollection<QuickCommand> QuickCommands
+        {
+            get
+            {
+                return quickCommands;
+            }
+        }
+
         private void loadSettings()
         {
             viewSetting = SettingItemUtils.GetViewMode();
@@ -116,9 +127,7 @@ namespace QuickLauncher
         {
             if (messgae == QLConfig.Singleton)
             {
-                this.Visibility = Visibility.Visible;
-                this.WindowState = WindowState.Normal;
-                this.Activate();
+                ShowWindowNormal();
             }
         }
 
@@ -138,6 +147,37 @@ namespace QuickLauncher
             source.AddHook(new HwndSourceHook(WndProc));
 
             ThemeManager.Current.ChangeThemeColorScheme(Application.Current, "Blue");
+
+            RegisterHotKeys(false);
+        }
+
+        public void RegisterHotKeys(bool reload)
+        {
+            if (reload)
+            {
+                HotKeyUtil.UnRegisterHotKeys();
+            }
+            HotKeyUtil.RegisterHotKey(SettingItemUtils.GetMainWindowOpenHotkey(), OnOpenWindowHotKey);
+        }
+
+        private void OnOpenWindowHotKey(object sender, HotkeyEventArgs e)
+        {
+            ShowWindowNormal();
+        }
+
+        public void ShowWindowNormal()
+        {
+            if (WindowState == WindowState.Minimized)
+            {
+                WindowState = WindowState.Normal;
+            }
+
+            if (Visibility != Visibility.Visible)
+            {
+                Visibility = Visibility.Visible;
+            }
+
+            Activate();
         }
 
         private void loadQuickCommandsFromDb(string key)
@@ -297,7 +337,7 @@ namespace QuickLauncher
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
                     statusLabel.Content = "Started \"" + qc.Alias + "\" failed: \"" + e.Message + "\" at " + DateTime.Now.ToString();
-                    this.WindowState = System.Windows.WindowState.Normal;
+                    ShowWindowNormal();
                     DialogUtil.showError(this, e.Message);
                 }), DispatcherPriority.Background);
             }
@@ -491,6 +531,21 @@ namespace QuickLauncher
                 Trace.TraceInformation("no auto start command found");
             }
             
+        }
+
+        private async void Copy_Click(object sender, RoutedEventArgs e)
+        {
+            QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
+            QuickCommand copy = new QuickCommand(qc);
+
+            var dialog = new CmdEditor(this, dialogSettings, copy);
+            dialog.AddedNewQuickCommand += Qle_AddedNewQuickCommand;
+            await this.ShowMetroDialogAsync(dialog);
+        }
+
+        private void root_Closed(object sender, EventArgs e)
+        {
+            HotKeyUtil.UnRegisterHotKeys();
         }
     }
 }

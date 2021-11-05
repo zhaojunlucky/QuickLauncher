@@ -8,12 +8,12 @@
     <Platforms>AnyCPU;x64</Platforms>
     <ApplicationIcon>Resources\launcher.ico</ApplicationIcon>
     <StartupObject>QuickLauncher.App</StartupObject>
-    <Version>2.2.0</Version>
+    <Version>2.3.0</Version>
     <Authors>Jun Zhao</Authors>
     <Copyright>Copyright 2021 of Jun Zhao</Copyright>
     <PackageLicenseFile></PackageLicenseFile>
-    <AssemblyVersion>2.2.0.1</AssemblyVersion>
-    <FileVersion>2.2.0.1</FileVersion>
+    <AssemblyVersion>2.3.0.1</AssemblyVersion>
+    <FileVersion>2.3.0.1</FileVersion>
     <RepositoryUrl>https://github.com/zhaojunlucky/QuickLauncher</RepositoryUrl>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -43,11 +43,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MahApps.Metro" Version="2.4.7" />
-    <PackageReference Include="MahApps.Metro.IconPacks" Version="4.8.0" />
-    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="5.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.9" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.9" />
+    <PackageReference Include="MahApps.Metro.IconPacks" Version="4.11.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="5.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.11" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.1" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
   </ItemGroup>
 

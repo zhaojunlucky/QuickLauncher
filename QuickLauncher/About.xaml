@@ -9,7 +9,7 @@
         GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
         NonActiveGlowBrush="#CDFF0000"
         ShowTitleBar="False"
-        Title="About Quick Launcher" Height="272.673" Width="413.515" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
+        Title="About Quick Launcher" Height="272.673" Width="413.515" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Loaded="MetroWindow_Loaded">
     <Grid ShowGridLines="False">
         <Grid.RowDefinitions>
             <RowDefinition Height="60"></RowDefinition>
@@ -17,11 +17,20 @@
             <RowDefinition Height="50"></RowDefinition>
         </Grid.RowDefinitions>
         <Label Grid.Row="0" Content="About Quick Launcher"/>
-        <StackPanel Grid.Row="1" Margin="25, 15, 0, 0">
-            <Label x:Name="label" Content=""/>
-            <TextBlock Margin="5, 0, 0, 0">
+        <StackPanel Grid.Row="1" Margin="25, 0, 0, 0">
+            <WrapPanel Margin="0, 5, 0, 0">
+                <Label Content="{Binding FullVersion}" FontSize="14"/>
+                <Controls:ProgressRing Width="20" Height="20" ToolTip="Checking for updates" Visibility="{Binding ProgressRingVisibility}"/>
+                <TextBlock Margin="5, 6, 0, 0">
+                    <Hyperlink Click="DownloadNew_Click" IsEnabled="{Binding AllowNavigateToNewVer}" TextDecorations="None" ToolTip="{Binding AllowNavigateToolTip}">
+                        <TextBlock Text="{Binding NewVersionResult}" FontSize="12" Visibility="{Binding NewVersionUIVisibility}"/>
+                    </Hyperlink>
+                </TextBlock>
+            </WrapPanel>
+            <Label Content="{Binding Copyright}" Margin="0, 15, 0, 0" FontSize="14"/>
+            <TextBlock Margin="5, 15, 0, 0">
                 <Hyperlink Click="Hyperlink_Click">
-                    <TextBlock x:Name="link" Text="https://blog.magicworldz.de/quicklauncher"/>
+                    <TextBlock x:Name="link" Text="https://blog.magicworldz.de/quicklauncher" FontSize="14"/>
                 </Hyperlink>
             </TextBlock>
         </StackPanel>
