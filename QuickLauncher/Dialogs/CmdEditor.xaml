@@ -9,10 +9,7 @@
              xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
                      mc:Ignorable="d" 
              d:DesignHeight="460" d:DesignWidth="800"
-             Title="Create Quick Command"
-                     MouseRightButtonDown="CustomDialog_MouseRightButtonDown"
-                     MouseRightButtonUp="CustomDialog_MouseRightButtonDown"
-             >
+             Title="Create Quick Command">
     <Grid Margin="0 5 0 0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" MinHeight="20" />
@@ -30,7 +27,7 @@
                  ToolTip="Application path"
                  Controls:TextBoxHelper.Watermark="Choose or type applciation"
                  Text="{Binding Path=QCommand.Path, Mode=TwoWay,NotifyOnValidationError=True,ValidatesOnDataErrors=True,UpdateSourceTrigger=PropertyChanged}"
-                 Style="{DynamicResource MahApps.Styles.TextBox.Button}">
+                 Style="{DynamicResource MahApps.Styles.TextBox.Button}" TextChanged="appPath_TextChanged">
             <Controls:TextBoxHelper.ButtonContent>
                 <Controls:DropDownButton DisplayMemberPath="Alias" Visibility="{Binding DefaultCMDDropDownVisibility}"
                                          ItemsSource="{Binding DefaultQuickCommand}" ToolTip="Choose Predefined Command">
@@ -51,11 +48,30 @@
             </Button.Content>
         </Button>
         <TextBox x:Name="appAlias" Height="30" Grid.Row="1" Grid.Column="0" Margin="0 5 0 0" Controls:TextBoxHelper.Watermark="Type alias" ToolTip="Type Alias"
-                 Text="{Binding Path=QCommand.Alias, Mode=TwoWay,NotifyOnValidationError=True,ValidatesOnDataErrors=True,UpdateSourceTrigger=PropertyChanged}"               
+                 Text="{Binding Path=QCommand.Alias, Mode=TwoWay,NotifyOnValidationError=True,ValidatesOnDataErrors=True,UpdateSourceTrigger=PropertyChanged}"
+                 Controls:TextBoxHelper.ButtonContent="aa"
                  >
+            <TextBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Auto Set" Click="AutoSetAlias_Click" />
+                    <Separator />
+                    <MenuItem Command="ApplicationCommands.Cut" Style="{DynamicResource MahApps.Styles.MenuItem}" />
+                    <MenuItem Command="ApplicationCommands.Copy" Style="{DynamicResource MahApps.Styles.MenuItem}" />
+                    <MenuItem Command="ApplicationCommands.Paste" Style="{DynamicResource MahApps.Styles.MenuItem}" />
+                </ContextMenu>
+            </TextBox.ContextMenu>
         </TextBox>
         <TextBox x:Name="appWorkDir" Height="30" Grid.Row="2" Grid.Column="0" Margin="0 5 0 0" Controls:TextBoxHelper.Watermark="Choose or type working directory" ToolTip="Application working directory"
                  Text="{Binding Path=QCommand.WorkDirectory, Mode=TwoWay,NotifyOnValidationError=True,ValidatesOnDataErrors=True,UpdateSourceTrigger=PropertyChanged}">
+            <TextBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Auto Set" Click="AutoSetWorkingDir_Click" />
+                    <Separator />
+                    <MenuItem Command="ApplicationCommands.Cut" Style="{DynamicResource MahApps.Styles.MenuItem}" />
+                    <MenuItem Command="ApplicationCommands.Copy" Style="{DynamicResource MahApps.Styles.MenuItem}" />
+                    <MenuItem Command="ApplicationCommands.Paste" Style="{DynamicResource MahApps.Styles.MenuItem}" />
+                </ContextMenu>
+            </TextBox.ContextMenu>
         </TextBox>
         <Button Grid.Row="2" Grid.Column="1" Margin="5 5 0 0" BorderThickness="0" ToolTip="Click to choose application working directory"
                 Click="ChooseWD_Click">

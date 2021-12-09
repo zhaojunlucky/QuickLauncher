@@ -47,6 +47,19 @@ namespace QuickLauncher.Model
             customeIcon = quickCommand.customeIcon;
         }
 
+        public static QuickCommand Copy(QuickCommand quickCommand)
+        {
+            var cmd = new QuickCommand();
+            cmd.alias = quickCommand.alias;
+            cmd.command = quickCommand.command;
+            cmd.path = quickCommand.path;
+            cmd.autoStart = 0;
+            cmd.uuid = quickCommand.uuid;
+            cmd.workDirectory = quickCommand.workDirectory;
+            cmd.customeIcon = quickCommand.customeIcon;
+            return cmd;
+        }
+
         public QuickCommand()
         {
             IsNew = false;
@@ -154,10 +167,9 @@ namespace QuickLauncher.Model
         {
             get
             {
-                if (img == null && File.Exists(ExpandedPath))
+                if (img == null)
                 {
-                    Icon icon = Icon.ExtractAssociatedIcon(ExpandedPath);
-                    Img = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(icon.Handle, new Int32Rect(0, 0, icon.Width, icon.Height), BitmapSizeOptions.FromEmptyOptions());
+                    LoadImgFromPath();
                 }
                 return img;
             }
@@ -290,17 +302,32 @@ namespace QuickLauncher.Model
 
         public void PathChanged()
         {
-            if (WorkDirectory == null || WorkDirectory.Trim().Length == 0)
+            if (string.IsNullOrEmpty(WorkDirectory) || !Directory.Exists(WorkDirectory))
             {
-                WorkDirectory = FileUtil.getParentDir(path);
+                WorkDirectory = FileUtil.getDirectoryOfFile(Path);
             }
 
-            if (Alias == null || Alias.Trim().Length == 0)
+            if (string.IsNullOrEmpty(Alias))
             {
                 Alias = FileUtil.getFileNameNoExt(path);
             }
-            // trigger img changed
-            var img = Img;
+
+            // if user didn't custom the icon, then load from path
+            if (CustomIcon == null)
+            {
+                LoadImgFromPath();
+            }
+        }
+
+        private void LoadImgFromPath()
+        {
+            if (File.Exists(ExpandedPath))
+            {
+                Icon icon = Icon.ExtractAssociatedIcon(ExpandedPath);
+                img = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(icon.Handle, new Int32Rect(0, 0, icon.Width, icon.Height), BitmapSizeOptions.FromEmptyOptions());
+                RaisePropertyChanged("Img");
+                RaisePropertyChanged("ImgVisibility");
+            }
         }
     }
 }

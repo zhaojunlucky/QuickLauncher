@@ -68,12 +68,6 @@ namespace QuickLauncher.Dialogs
             }
         }
 
-        private void CustomDialog_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            // disable show main window context menu
-            e.Handled = true;
-        }
-
         private async void Cancel_Click(object sender, RoutedEventArgs e)
         {
             await parent.HideMetroDialogAsync(this);

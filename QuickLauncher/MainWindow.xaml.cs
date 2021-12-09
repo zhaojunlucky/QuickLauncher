@@ -43,9 +43,6 @@ namespace QuickLauncher
         };
         private HashSet<string> disabledCmdContextMenuItem = new HashSet<string>(new List<string>() { "Open Working Directory", "Edit", "Edit Environment Variables", "Delete", "Copy" });
 
-        private bool isAdmin = AppUtil.IsRunAsAdmin();
-        private string menuStartAsAdmin = "Start As Administator";
-
         public MainWindow()
         {
             InitializeComponent();
@@ -246,15 +243,11 @@ namespace QuickLauncher
 
             bool isCtrlKeyPressed = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
             ThreadPool.QueueUserWorkItem(delegate { startProcess(qc, asAdmin); });
-            if (isCtrlKeyPressed)
-            {
-
-            }
-            else
+            if (!isCtrlKeyPressed)
             {
                 this.WindowState = System.Windows.WindowState.Minimized;
             }
-            
+
             return false;
         }
 
@@ -275,11 +268,7 @@ namespace QuickLauncher
                 ThreadPool.QueueUserWorkItem(delegate { startProcess(qc, asAdmin); });
             }
 
-            if (isCtrlKeyPressed)
-            {
-
-            }
-            else
+            if (!isCtrlKeyPressed)
             {
                 this.WindowState = System.Windows.WindowState.Minimized;
             }
@@ -299,14 +288,7 @@ namespace QuickLauncher
             string workingDir = qc.ExpandedWorkDirectory;
             if (workingDir.Length == 0)
             {
-                try
-                {
-                    workingDir = FileUtil.getParentDir(qc.ExpandedPath);
-                }
-                catch (UnauthorizedAccessException e)
-                {
-                    Debug.WriteLine(e);
-                }
+                workingDir = FileUtil.getDirectoryOfFile(qc.ExpandedPath);
             }
 
             startInfo.WorkingDirectory = workingDir;
@@ -334,12 +316,17 @@ namespace QuickLauncher
             catch (System.ComponentModel.Win32Exception e)
             {
                 Trace.TraceError(e.StackTrace);
-                Dispatcher.BeginInvoke(new Action(() =>
+                if(e.NativeErrorCode != 1223) // if it is not canceled by the user
+                                              // see https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes--1000-1299-
                 {
-                    statusLabel.Content = "Started \"" + qc.Alias + "\" failed: \"" + e.Message + "\" at " + DateTime.Now.ToString();
-                    ShowWindowNormal();
-                    DialogUtil.showError(this, e.Message);
-                }), DispatcherPriority.Background);
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        statusLabel.Content = "Started \"" + qc.Alias + "\" failed: \"" + e.Message + "\" at " + DateTime.Now.ToString();
+                        ShowWindowNormal();
+                        DialogUtil.showError(this, e.Message);
+                    }), DispatcherPriority.Background);
+                }
+                
             }
             return false;
         }
@@ -502,9 +489,6 @@ namespace QuickLauncher
                 if (disabledCmdContextMenuItem.Contains(header))
                 {
                     mi.IsEnabled = enabled;
-                } else if (!isAdmin && header == menuStartAsAdmin)
-                {
-                    mi.IsEnabled = false;
                 }
             }
         }

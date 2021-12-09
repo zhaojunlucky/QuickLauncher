@@ -11,9 +11,15 @@ namespace QuickLauncher
     {
         public static string getDirectoryOfFile(string path)
         {
-            FileInfo fInfo = new FileInfo(path);
-            var isDir = (fInfo.Attributes&FileAttributes.Directory) == FileAttributes.Directory;
-            return isDir ? path : fInfo.Directory.FullName;
+            int i;
+            for (i = path.Length - 1; i > 0; i--)
+            {
+                if (path[i] == '/' || path[i] == '\\')
+                {
+                    return path.Substring(0, i);
+                }
+            }
+            return path;
         }
 
         public static string getFileNameNoExt(string filePath)
@@ -27,23 +33,6 @@ namespace QuickLauncher
                 return fileName.Substring(0, fileName.IndexOf("."));
             }
             return fileName;
-        }
-
-        public static int findLastSep(string path)
-        {
-            for (int i = path.Length - 1; i >= 0; i--)
-            {
-                if (path[i] == '/' || path[i] == '\\')
-                {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
-        public static string getParentDir(string path)
-        {
-            return path.Substring(0, findLastSep(path));
         }
     }
 }
