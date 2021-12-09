@@ -9,8 +9,6 @@
              xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
                      mc:Ignorable="d"
                      Title="Environment Variable Editor"
-                     MouseRightButtonDown="CustomDialog_MouseRightButtonDown"
-                     MouseRightButtonUp="CustomDialog_MouseRightButtonDown"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>

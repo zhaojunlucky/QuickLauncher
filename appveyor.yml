@@ -1,5 +1,6 @@
 version: 2.3.{build}
 configuration: Release
+image: Visual Studio 2022
 branches:
   only:
     - master
@@ -21,10 +22,10 @@ build_script:
     msbuild  ".\QuickLauncher\QuickLauncher.csproj" /t:Restore
 
 
-    "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.com" ".\QuickLauncherSetup\QuickLauncherSetup.vdproj" /clean "Release"
+    "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\devenv.com" ".\QuickLauncherSetup\QuickLauncherSetup.vdproj" /clean "Release"
 
 
-    "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.com" ".\QuickLauncherSetup\QuickLauncherSetup.vdproj" /build "Release"
+    "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\devenv.com" ".\QuickLauncherSetup\QuickLauncherSetup.vdproj" /build "Release"
 
 after_build:
 - ps: 7z a QuickLauncherSetup-${env:APPVEYOR_BUILD_VERSION}.zip QuickLauncherSetup\Release\*

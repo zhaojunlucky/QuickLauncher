@@ -13,7 +13,7 @@
         WindowTransitionsEnabled="False"
         Title="Quick Launcher" MinHeight="608" MinWidth="1090" Width="1090" Height="608" WindowStartupLocation="CenterScreen" 
                       Closing="root_Closing" Activated="root_Activated" ShowTitleBar="False" Loaded="root_Loaded" Closed="root_Closed">
-    <Grid ShowGridLines="False">
+    <Grid ShowGridLines="False" ContextMenu="{DynamicResource ListViewContextMenu}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="393*"/>
             <ColumnDefinition Width="82*"/>
@@ -126,9 +126,6 @@
             </StatusBar>
         </DockPanel>
     </Grid>
-    <Window.InputBindings>
-        <!--<KeyBinding Command="{Binding OpenNewEditorCommand}" Key="N" Modifiers="Ctrl"/>-->
-    </Window.InputBindings>
     <Window.Resources>
         <ContextMenu x:Key="ListViewContextMenu" >
             <MenuItem Header="New Quick Command" Click="newquickcommand_Click"/>
@@ -173,9 +170,4 @@
             </Grid>
         </DataTemplate>
     </Window.Resources>
-    <Window.Style>
-        <Style TargetType="{x:Type Window}" >
-            <Setter Property="ContextMenu" Value="{DynamicResource ListViewContextMenu}" />
-        </Style>
-    </Window.Style>
 </Controls:MetroWindow>

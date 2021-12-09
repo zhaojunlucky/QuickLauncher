@@ -32,14 +32,14 @@ namespace QuickLauncher.Dialogs
             this.parent = parent;
             if (command == null)
             {
-                command = new QuickCommand(true);
+                QCommand = new QuickCommand(true);
                 Title = "Create Quick Command";
             }
             else
             {
+                QCommand = QuickCommand.Copy(command);
                 Title = "Edit Quick Command";
             }
-            QCommand = command;
             DataContext = this;
             DefaultCMDDropDownMenuItemCommand = new SimpleCommand(o => true, x => {
                 DefaultQuickCommandSelected(x);
@@ -70,7 +70,7 @@ namespace QuickLauncher.Dialogs
         {
             if (QCommand != null && QCommand.Path != null && QCommand.Path != "")
             {
-                var fileInfo = new FileInfo(QCommand.Path);
+                var fileInfo = new FileInfo(QCommand.ExpandedPath);
 
                 var dirInfo = fileInfo.Directory;
                 while (dirInfo != null && !dirInfo.Exists)
@@ -101,9 +101,7 @@ namespace QuickLauncher.Dialogs
             if (fd.ShowDialog() == true)
             {
                 appPath.Text = fd.FileName;
-                QCommand.PathChanged();
             }
-            
         }
 
         private void ChooseWD_Click(object sender, RoutedEventArgs e)
@@ -187,21 +185,36 @@ namespace QuickLauncher.Dialogs
             }
         }
 
-        private void CustomDialog_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            // disable show main window context menu
-            e.Handled = true;
-        }
-
         private void DefaultQuickCommandSelected(object o)
         {
             var defaultCmd = o as QuickCommand;
             if (defaultCmd != null)
             {
-                appAlias.Text = defaultCmd.Alias ?? "";
-                appPath.Text = defaultCmd.Path ?? "";
-                appArgs.Text = defaultCmd.Command ?? "";
-                QCommand.PathChanged();
+                QCommand.Path = defaultCmd.Path ?? "";
+                QCommand.Alias = defaultCmd.Alias ?? "";
+                QCommand.Command = defaultCmd.Command ?? "";
+                QCommand.WorkDirectory = FileUtil.getDirectoryOfFile(QCommand.Path);
+            }
+        }
+
+        private void appPath_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            QCommand.PathChanged();
+        }
+
+        private void AutoSetAlias_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(QCommand.Path))
+            {
+                QCommand.Alias = FileUtil.getFileNameNoExt(QCommand.Path);
+            }
+        }
+
+        private void AutoSetWorkingDir_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(QCommand.Path))
+            {
+                QCommand.WorkDirectory = FileUtil.getDirectoryOfFile(QCommand.Path);
             }
         }
     }
