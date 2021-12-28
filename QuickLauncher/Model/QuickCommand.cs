@@ -26,6 +26,7 @@ namespace QuickLauncher.Model
         private ImageSource img = null;
         private string workDirectory = "";
         private byte[] customeIcon = null;
+        private static System.Windows.Media.Brush ErrorBgBrush = (System.Windows.Media.Brush) Application.Current.FindResource("MahApps.Brushes.ValidationSummary4");
 
         public QuickCommand(bool isNew)
         {
@@ -228,6 +229,22 @@ namespace QuickLauncher.Model
             get
             {
                 return Alias.Trim().Length > 0;
+            }
+        }
+
+        [NotMapped]
+        public System.Windows.Media.Brush ErrorBackground
+        {
+            get
+            {
+                if (!File.Exists(ExpandedPath) || !Directory.Exists(ExpandedWorkDirectory))
+                {
+                    return ErrorBgBrush;
+                }
+                else
+                {
+                    return System.Windows.Media.Brushes.Transparent;
+                }
             }
         }
 

@@ -116,39 +116,14 @@
             <MenuItem Header="About" Click="about_Click"/>
         </ContextMenu>
         <DataTemplate x:Key="tileView">
-            <Grid Height="72" Width="72">
+            <Grid Height="72" Width="72" Background="{Binding ErrorBackground}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
                 <Image Grid.Row="0" Source="{Binding Img}" ToolTip="{Binding Alias}" Visibility="{Binding ImgVisibility}" Width="40" Height="40" HorizontalAlignment="Center"/>
-                <TextBlock Grid.Row="1" Text="{Binding Alias}" ToolTip="{Binding Alias}" TextWrapping="Wrap" TextAlignment="Center" TextTrimming="WordEllipsis" />
+                <TextBlock Grid.Row="1" Text="{Binding Alias}" ToolTip="{Binding Alias}" TextWrapping="Wrap" TextAlignment="Center" TextTrimming="WordEllipsis"/>
             </Grid>
         </DataTemplate>
-        <!--<DataTemplate x:Key="detailView">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="120"/>
-                    <ColumnDefinition Width="815"/>
-                    <ColumnDefinition Width="85"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Row="0" Grid.Column="0">
-                    <Image Source="{Binding Img}" Visibility="{Binding ImgVisibility}" Width="32" Height="32" HorizontalAlignment="Left"/>
-                    <TextBlock Text="{Binding Alias}" ToolTip="{Binding Alias}" TextWrapping="Wrap" TextAlignment="Left" TextTrimming="WordEllipsis" />
-                </StackPanel>
-                <StackPanel Grid.Row="0" Grid.Column="1">
-                    <TextBlock Text="{Binding Path}" TextWrapping="Wrap"/>
-                    <TextBlock Text="{Binding WorkDirectory}"/>
-                    <TextBlock Text="{Binding Command}"/>
-                </StackPanel>
-                <WrapPanel Grid.Row="0" Grid.Column="2" VerticalAlignment="Center">
-                    <Button Content="S" ToolTip="Start" Width="20" Margin="10,0,5,0" Click="start_Click" Tag="{Binding}"/>
-                    <Button Content="A" ToolTip="Start As Administrator" Width="20" Margin="5,0,5,0" Click="startAdmin_Click" Tag="{Binding}"/>
-                </WrapPanel>
-            </Grid>
-        </DataTemplate>-->
     </Window.Resources>
 </Controls:MetroWindow>
