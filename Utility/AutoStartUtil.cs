@@ -16,7 +16,7 @@ namespace Utility
             if (on)
             {
                 string name = Process.GetCurrentProcess().MainModule.ModuleName;
-                name = name.Substring(0, name.LastIndexOf("."));
+                name = name[..name.LastIndexOf(".")];
                 SetAutoStart(GetAutoStartShortCutDir(), name, GetAppFullPath());
             }
             else

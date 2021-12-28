@@ -15,7 +15,6 @@ namespace QuickLauncher.Model
 {
     class SettingDialogModel : AbstractNotifyPropertyChanged, IDataErrorInfo
     {
-        private SettingItem viewMode;
         private SettingItem mainWindowHotKey;
         private HotKey hotKey;
         private MetroWindow owningWindow;

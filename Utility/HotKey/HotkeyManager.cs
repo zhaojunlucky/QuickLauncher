@@ -11,10 +11,10 @@ namespace Utility.HotKey
     public class HotkeyManager
     {
         
-        private Dictionary<string, HotKey> nameHotKey = new Dictionary<string, HotKey>();
-        private Dictionary<int, string> idHotkeyName = new Dictionary<int, string>();
+        private readonly Dictionary<string, HotKey> nameHotKey = new Dictionary<string, HotKey>();
+        private readonly Dictionary<int, string> idHotkeyName = new Dictionary<int, string>();
         internal static readonly IntPtr HwndMessage = (IntPtr)(-3);
-        private HwndSource hwndSource;
+        private readonly HwndSource hwndSource;
 
         public bool IsEnabled { get; set; } = true;
 
@@ -65,8 +65,7 @@ namespace Utility.HotKey
 
         public void UnRegisterHotKey(string name)
         {
-            HotKey hotKey;
-            if (nameHotKey.TryGetValue(name, out hotKey))
+            if (nameHotKey.TryGetValue(name, out HotKey hotKey))
             {
                 hotKey.UnRegisterHotKey();
                 nameHotKey.Remove(name);
@@ -82,8 +81,7 @@ namespace Utility.HotKey
             }
 
             int id = wParam.ToInt32();
-            string name;
-            if (idHotkeyName.TryGetValue(id, out name))
+            if (idHotkeyName.TryGetValue(id, out string name))
             {
                 var hotkey = nameHotKey[name];
                 var handler = hotkey.Handler;

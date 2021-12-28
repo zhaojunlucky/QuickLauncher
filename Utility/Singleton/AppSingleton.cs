@@ -13,10 +13,10 @@ namespace Utility.Singleton
     public class AppSingleton
     {
         private System.Threading.Mutex mutex = null;
-        private Object obj = new object();
-        private static AppSingleton instance = new AppSingleton();
+        private readonly Object obj = new object();
+        private static readonly AppSingleton instance = new AppSingleton();
 #if DEBUG
-        private static string _AppName =
+        private static readonly string _AppName =
           Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().GetName().Name) + "_DEBUG";
 #else
         private static string _AppName =
@@ -35,22 +35,21 @@ namespace Utility.Singleton
 
         }
 
-        public bool checkIsAppRunning(string mutexName)
+        public bool CheckIsAppRunning(string mutexName)
         {
             bool isRunning = false;
             lock (obj)
             {
                 if (mutex == null)
                 {
-                    bool createdNew = false;
-                    mutex = new System.Threading.Mutex(true, getHash(mutexName), out createdNew);
+                    mutex = new System.Threading.Mutex(true, GetHash(mutexName), out bool createdNew);
                     isRunning = !createdNew;
                 }
             }
             return isRunning;
         }
 
-        private string getHash(string mutexName)
+        private string GetHash(string mutexName)
         {
             byte[] data = HashAlgorithm.Create("SHA256").ComputeHash(Encoding.UTF8.GetBytes(mutexName));
             StringBuilder sBuilder = new StringBuilder();

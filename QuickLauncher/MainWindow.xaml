@@ -12,7 +12,7 @@
         NonActiveGlowBrush="#CDFF0000"
         WindowTransitionsEnabled="False"
         Title="Quick Launcher" MinHeight="608" MinWidth="1090" Width="1090" Height="608" WindowStartupLocation="CenterScreen" 
-                      Closing="root_Closing" Activated="root_Activated" ShowTitleBar="False" Loaded="root_Loaded" Closed="root_Closed">
+                      Closing="Root_Closing" Activated="Root_Activated" ShowTitleBar="False" Loaded="Root_Loaded" Closed="Root_Closed">
     <Grid ShowGridLines="False" ContextMenu="{DynamicResource ListViewContextMenu}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="393*"/>
@@ -35,7 +35,7 @@
                     <RotateTransform Angle="90" />
                 </Separator.LayoutTransform>
             </Separator>
-            <TextBox Width="200" Name="keyWords" VerticalAlignment="Center" TextChanged="keyWords_TextChanged"
+            <TextBox Width="200" Name="keyWords" VerticalAlignment="Center" TextChanged="KeyWords_TextChanged"
                          Controls:TextBoxHelper.Watermark="Type to Search" Margin="5, 0, 5, 0" Controls:TextBoxHelper.UseFloatingWatermark="True"
                          Controls:TextBoxHelper.IsWaitingForData="True" Controls:TextBoxHelper.WatermarkAlignment="Right"
                          Controls:TextBoxHelper.ClearTextButton="True" HorizontalAlignment="Left">
@@ -51,19 +51,19 @@
                 </TextBox.Style>
             </TextBox>
         </WrapPanel>
-        <ListView Grid.Row="1" x:Name="commandsList" Margin="0,0,0,-50" Width="Auto" Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}}" MouseDoubleClick="commandsList_MouseDoubleClick" ScrollViewer.VerticalScrollBarVisibility="Auto" MinHeight="539" MinWidth="1070" SelectionMode="Extended"
+        <ListView Grid.Row="1" x:Name="commandsList" Margin="0,0,0,-50" Width="Auto" Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}}" MouseDoubleClick="CommandsList_MouseDoubleClick" ScrollViewer.VerticalScrollBarVisibility="Auto" MinHeight="539" MinWidth="1070" SelectionMode="Extended"
                       Padding="10,0,10,0" IsSynchronizedWithCurrentItem="True"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" TextSearch.TextPath="Alias" IsTextSearchCaseSensitive="False"
                       Grid.ColumnSpan="3" >
             <ListView.Resources>
                 <ContextMenu x:Key="ItemContextMenu">
-                    <MenuItem Header="Start" Click="startMenu_Click" />
-                    <MenuItem Header="Start As Administator"  Click="startAdminMenu_Click"/>
-                    <MenuItem Header="Open Working Directory" Click="openWorkingDir_Click"/>
+                    <MenuItem Header="Start" Click="StartMenu_Click" />
+                    <MenuItem Header="Start As Administator"  Click="StartAdminMenu_Click"/>
+                    <MenuItem Header="Open Working Directory" Click="OpenWorkingDir_Click"/>
                     <Separator></Separator>
-                    <MenuItem Header="Edit" Click="edit_Click"/>
-                    <MenuItem Header="Edit Environment Variables" Click="editEnvConfig_Click"/>
+                    <MenuItem Header="Edit" Click="Edit_Click"/>
+                    <MenuItem Header="Edit Environment Variables" Click="EditEnvConfig_Click"/>
                     <MenuItem Header="Copy" Click="Copy_Click"/>
-                    <MenuItem Header="Delete" Click="delete_Click"/>
+                    <MenuItem Header="Delete" Click="Delete_Click"/>
                     <MenuItem Header="Refresh" Click="Refresh_Click"/>
                 </ContextMenu>
 
@@ -81,7 +81,7 @@
             <ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type ListViewItem}" >
                     <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
-                    <EventSetter Event="ContextMenuOpening" Handler="commandsList_ContextMenuOpening"/>
+                    <EventSetter Event="ContextMenuOpening" Handler="CommandsList_ContextMenuOpening"/>
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.Style>
@@ -109,11 +109,11 @@
     </Grid>
     <Window.Resources>
         <ContextMenu x:Key="ListViewContextMenu" >
-            <MenuItem Header="New Quick Command" Click="newquickcommand_Click"/>
+            <MenuItem Header="New Quick Command" Click="Newquickcommand_Click"/>
             <MenuItem Header="Refresh All" Click="RefreshAll_Click"></MenuItem>
             <Separator></Separator>
             <MenuItem Header="Settings" Click="Settings_Click"/>
-            <MenuItem Header="About" Click="about_Click"/>
+            <MenuItem Header="About" Click="About_Click"/>
         </ContextMenu>
         <DataTemplate x:Key="tileView">
             <Grid Height="72" Width="72" Background="{Binding ErrorBackground}">

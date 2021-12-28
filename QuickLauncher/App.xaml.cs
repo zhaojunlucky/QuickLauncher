@@ -19,7 +19,7 @@ namespace QuickLauncher
         public App()
         {
             InitTraceLogger();
-            if (Utility.Singleton.AppSingleton.Instance.checkIsAppRunning(QLConfig.Singleton))
+            if (Utility.Singleton.AppSingleton.Instance.CheckIsAppRunning(QLConfig.Singleton))
             {
 
                 Utility.Singleton.AppSingleton.Instance.SendMsgToRunningServer(QLConfig.Singleton);
@@ -70,15 +70,15 @@ namespace QuickLauncher
             Trace.AutoFlush = true;
         }
 
-        private void nIcon_Click(object sender, EventArgs e)
+        private void NIcon_Click(object sender, EventArgs e)
         {
             //events comes here
-            show();
+            Show();
         }
 
-        private async void exit_Click(object sender, EventArgs e)
+        private async void Exit_Click(object sender, EventArgs e)
         {
-            show();
+            Show();
             var result = await DialogUtil.ShowYesNo("Confirm exit", (MahApps.Metro.Controls.MetroWindow)MainWindow, "Are you sure to exit?");
             if (result == MessageDialogResult.Affirmative)
             {
@@ -89,7 +89,7 @@ namespace QuickLauncher
             }
         }
 
-        private void show()
+        private void Show()
         {
             ((MainWindow)MainWindow).ShowWindowNormal();
         }

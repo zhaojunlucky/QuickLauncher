@@ -7,8 +7,8 @@ namespace Utility.HotKey
 {
     public class RawHotKey
     {
-        private List<ModifierKeys> hotKeyModifiers;
-        private Key key;
+        private readonly List<ModifierKeys> hotKeyModifiers;
+        private readonly Key key;
 
         private RawHotKey(List<ModifierKeys> modifiers, Key k)
         {
@@ -75,12 +75,11 @@ namespace Utility.HotKey
 
             foreach (string k in keys)
             {
-                ModifierKeys hkm;
-                if (ParseHotKeyModifiers(k, out hkm))
+                if (ParseHotKeyModifiers(k, out ModifierKeys hkm))
                 {
                     hotKeyModifiers.Add(hkm);
-                } 
-                else if(key != Key.None)
+                }
+                else if (key != Key.None)
                 {
                     throw new InvalidHotKeyStringException("Invalid hotkey string: " + hotKeyStr + ". Mutilple key found.");
                 }

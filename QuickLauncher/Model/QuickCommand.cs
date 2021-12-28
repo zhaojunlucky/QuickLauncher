@@ -26,7 +26,7 @@ namespace QuickLauncher.Model
         private ImageSource img = null;
         private string workDirectory = "";
         private byte[] customeIcon = null;
-        private static System.Windows.Media.Brush ErrorBgBrush = (System.Windows.Media.Brush) Application.Current.FindResource("MahApps.Brushes.ValidationSummary4");
+        private static readonly System.Windows.Media.Brush ErrorBgBrush = (System.Windows.Media.Brush) Application.Current.FindResource("MahApps.Brushes.ValidationSummary4");
 
         public QuickCommand(bool isNew)
         {
@@ -50,14 +50,16 @@ namespace QuickLauncher.Model
 
         public static QuickCommand Copy(QuickCommand quickCommand)
         {
-            var cmd = new QuickCommand();
-            cmd.alias = quickCommand.alias;
-            cmd.command = quickCommand.command;
-            cmd.path = quickCommand.path;
-            cmd.autoStart = 0;
-            cmd.uuid = quickCommand.uuid;
-            cmd.workDirectory = quickCommand.workDirectory;
-            cmd.customeIcon = quickCommand.customeIcon;
+            var cmd = new QuickCommand
+            {
+                alias = quickCommand.alias,
+                command = quickCommand.command,
+                path = quickCommand.path,
+                autoStart = 0,
+                uuid = quickCommand.uuid,
+                workDirectory = quickCommand.workDirectory,
+                customeIcon = quickCommand.customeIcon
+            };
             return cmd;
         }
 
@@ -210,8 +212,7 @@ namespace QuickLauncher.Model
 
         public override bool Equals(object obj)
         {
-            var other = obj as QuickCommand;
-            if(other != null)
+            if(obj is QuickCommand other)
             {
                 return Alias == other.Alias;
             }
@@ -252,7 +253,7 @@ namespace QuickLauncher.Model
         {
             var dbContext = QuickCommandContext.Instance;
             var existingComm = from b in dbContext.QuickCommands
-                               where b.Alias == Alias
+                               where b.Alias == alias
                                select b;
             int cnt = 0;
             foreach (var comm in existingComm)
@@ -319,21 +320,22 @@ namespace QuickLauncher.Model
 
         public void PathChanged()
         {
-            if (string.IsNullOrEmpty(WorkDirectory) || !Directory.Exists(WorkDirectory))
-            {
-                WorkDirectory = FileUtil.getDirectoryOfFile(Path);
-            }
+            //if (string.IsNullOrEmpty(WorkDirectory) || !Directory.Exists(WorkDirectory))
+            //{
+            //    WorkDirectory = FileUtil.getDirectoryOfFile(Path);
+            //}
 
-            if (string.IsNullOrEmpty(Alias))
-            {
-                Alias = FileUtil.getFileNameNoExt(path);
-            }
+            //if (string.IsNullOrEmpty(Alias))
+            //{
+            //    Alias = FileUtil.getFileNameNoExt(path);
+            //}
 
             // if user didn't custom the icon, then load from path
             if (CustomIcon == null)
             {
                 LoadImgFromPath();
             }
+            RaisePropertyChanged("ErrorBackground");
         }
 
         private void LoadImgFromPath()
