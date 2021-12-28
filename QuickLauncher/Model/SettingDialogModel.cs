@@ -24,7 +24,6 @@ namespace QuickLauncher.Model
         public SettingDialogModel(MetroWindow window)
         {
             owningWindow = window;
-            viewMode = SettingItemUtils.GetViewMode();
             mainWindowHotKey = SettingItemUtils.GetMainWindowOpenHotkey();
             currentHotKey = mainWindowHotKey.Value;
             InitHotKey();
@@ -133,20 +132,6 @@ namespace QuickLauncher.Model
                 Trace.TraceError(r.Message);
                 Trace.TraceError(r.StackTrace);
                 DialogUtil.showError(owningWindow, r.InnerException.Message);
-            }
-        }
-
-        public bool ViewMode
-        {
-            get
-            {
-                return viewMode.Value == "TV";
-            }
-            set
-            {
-                viewMode.Value = value ? "TV" : "DV";
-
-                SafeSave(viewMode);
             }
         }
 

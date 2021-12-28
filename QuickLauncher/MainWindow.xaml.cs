@@ -36,7 +36,6 @@ namespace QuickLauncher
         private ObservableCollection<QuickCommand> quickCommands = new ObservableCollection<QuickCommand>();
         private QuickCommandContext dbContext = QuickCommandContext.Instance;
         public const Int32 _AboutSysMenuID = 1001;
-        private SettingItem viewSetting = null;
         private MetroDialogSettings dialogSettings = new MetroDialogSettings()
         {
             ColorScheme = MetroDialogColorScheme.Accented// win.MetroDialogOptions.ColorScheme
@@ -55,17 +54,6 @@ namespace QuickLauncher
         private void LoadQuickLaunchers()
         {
             Trace.TraceInformation("loading from database");
-            try
-            {
-                loadSettings();
-            }
-            catch (Exception e)
-            {
-                Trace.TraceError(e.StackTrace);
-                DialogUtil.showError(this, "Fail to query database:" + e.Message);
-
-                Environment.Exit(-1);
-            }
  
             loadQuickCommandsFromDb("");
             Trace.TraceInformation("loading from database - done");
@@ -83,25 +71,12 @@ namespace QuickLauncher
             commandsList.ItemsSource = quickCommands;
         }
 
-        public SettingItem ViewMode
-        {
-            get
-            {
-                return viewSetting;
-            }
-        }
-
         public ObservableCollection<QuickCommand> QuickCommands
         {
             get
             {
                 return quickCommands;
             }
-        }
-
-        private void loadSettings()
-        {
-            viewSetting = SettingItemUtils.GetViewMode();
         }
 
         private void _ConnectionHandler(IAsyncResult result)
@@ -510,11 +485,6 @@ namespace QuickLauncher
             {
                 StartProcess(qcList, false);
             }
-            else
-            {
-                Trace.TraceInformation("no auto start command found");
-            }
-            
         }
 
         private async void Copy_Click(object sender, RoutedEventArgs e)

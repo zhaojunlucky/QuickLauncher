@@ -53,7 +53,7 @@
         </WrapPanel>
         <ListView Grid.Row="1" x:Name="commandsList" Margin="0,0,0,-50" Width="Auto" Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}}" MouseDoubleClick="commandsList_MouseDoubleClick" ScrollViewer.VerticalScrollBarVisibility="Auto" MinHeight="539" MinWidth="1070" SelectionMode="Extended"
                       Padding="10,0,10,0" IsSynchronizedWithCurrentItem="True"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" TextSearch.TextPath="Alias" IsTextSearchCaseSensitive="False"
-                      Tag="{Binding ViewMode.Value}" Grid.ColumnSpan="3">
+                      Grid.ColumnSpan="3" >
             <ListView.Resources>
                 <ContextMenu x:Key="ItemContextMenu">
                     <MenuItem Header="Start" Click="startMenu_Click" />
@@ -76,11 +76,6 @@
 
                      ItemHeight="{Binding (ListView.View).ItemHeight,
                      RelativeSource={RelativeSource AncestorType=ListView}}"/>
-                    <!--MinWidth="{Binding ItemWidth,
-                     RelativeSource={RelativeSource Self}}"-->
-                </ItemsPanelTemplate>
-                <ItemsPanelTemplate x:Key="detailViewCtrl">
-                    <VirtualizingStackPanel />
                 </ItemsPanelTemplate>
             </ListView.Resources>
             <ListView.ItemContainerStyle>
@@ -92,22 +87,8 @@
             <ListView.Style>
                 <Style TargetType="{x:Type ListView}" >
                     <Setter Property="ContextMenu" Value="{DynamicResource ListViewContextMenu}" />
-                    <Style.Triggers>
-                        <Trigger Property="Tag" Value="TV">
-                            <Setter Property="ItemsPanel"
-                        Value="{DynamicResource tileViewCtrl}" />
-                            <Setter Property="ItemTemplate" 
-                                    Value="{DynamicResource tileView}"/>
-                        </Trigger>
-                        <Trigger Property="Tag" Value="DV">
-
-                            <Setter Property="ItemsPanel"
-                        Value="{DynamicResource detailViewCtrl}" />
-                            <Setter Property="ItemTemplate" 
-                                    Value="{DynamicResource detailView}"/>
-
-                        </Trigger>
-                    </Style.Triggers>
+                    <Setter Property="ItemsPanel" Value="{DynamicResource tileViewCtrl}" />
+                    <Setter Property="ItemTemplate" Value="{DynamicResource tileView}" />
                 </Style>
 
             </ListView.Style>
@@ -144,7 +125,7 @@
                 <TextBlock Grid.Row="1" Text="{Binding Alias}" ToolTip="{Binding Alias}" TextWrapping="Wrap" TextAlignment="Center" TextTrimming="WordEllipsis" />
             </Grid>
         </DataTemplate>
-        <DataTemplate x:Key="detailView">
+        <!--<DataTemplate x:Key="detailView">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
@@ -168,6 +149,6 @@
                     <Button Content="A" ToolTip="Start As Administrator" Width="20" Margin="5,0,5,0" Click="startAdmin_Click" Tag="{Binding}"/>
                 </WrapPanel>
             </Grid>
-        </DataTemplate>
+        </DataTemplate>-->
     </Window.Resources>
 </Controls:MetroWindow>

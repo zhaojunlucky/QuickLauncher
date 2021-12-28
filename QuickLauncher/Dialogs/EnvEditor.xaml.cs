@@ -14,7 +14,7 @@ namespace QuickLauncher.Dialogs
     /// </summary>
     public partial class EnvEditor : CustomDialog
     {
-        private ObservableCollection<QuickCommandEnvConfig> quickCommands = new ObservableCollection<QuickCommandEnvConfig>();
+        private ObservableCollection<QuickCommandEnvConfig> quickCommandEnvs = new ObservableCollection<QuickCommandEnvConfig>();
         private MetroWindow parent;
         private QuickCommand quickCommand;
         private List<QuickCommandEnvConfig> removed = new List<QuickCommandEnvConfig>();
@@ -23,21 +23,21 @@ namespace QuickLauncher.Dialogs
             base(parent, mySettings)
         {
             InitializeComponent();
-            quickCommands.Clear();
-            quickCommands.CollectionChanged += QuickCommands_CollectionChanged;
+            this.quickCommand = quickCommand;
+            quickCommandEnvs.Clear();
+            quickCommandEnvs.CollectionChanged += QuickCommands_CollectionChanged;
 
             if (quickCommand.QuickCommandEnvConfigs != null)
             {
                 foreach (var o in quickCommand.QuickCommandEnvConfigs)
                 {
-                    o.BindingEnvs = quickCommands;
-                    quickCommands.Add(o);
+                    o.BindingEnvs = quickCommandEnvs;
+                    quickCommandEnvs.Add(o);
                 }
             }
 
             this.envGrid.DataContext = this;
             this.parent = parent;
-            this.quickCommand = quickCommand;
         }
 
         private void QuickCommands_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -47,7 +47,8 @@ namespace QuickLauncher.Dialogs
                 foreach (var o in e.NewItems)
                 {
                     var item = o as QuickCommandEnvConfig;
-                    item.BindingEnvs = quickCommands;
+                    item.BindingEnvs = quickCommandEnvs;
+                    item.ParentId = quickCommand.UUID;
                 }
             }
            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
@@ -64,14 +65,14 @@ namespace QuickLauncher.Dialogs
         {
             get
             {
-                return quickCommands;
+                return quickCommandEnvs;
             }
         }
 
         private async void Cancel_Click(object sender, RoutedEventArgs e)
         {
             await parent.HideMetroDialogAsync(this);
-            quickCommands.CollectionChanged -= QuickCommands_CollectionChanged;
+            quickCommandEnvs.CollectionChanged -= QuickCommands_CollectionChanged;
         }
 
         private async void Save_Click(object sender, RoutedEventArgs e)
@@ -84,7 +85,7 @@ namespace QuickLauncher.Dialogs
             else
             {
                 doSave();
-                quickCommands.CollectionChanged -= QuickCommands_CollectionChanged;
+                quickCommandEnvs.CollectionChanged -= QuickCommands_CollectionChanged;
                 await parent.HideMetroDialogAsync(this);
             }
         }
@@ -96,12 +97,12 @@ namespace QuickLauncher.Dialogs
             var toAdd = new List<QuickCommandEnvConfig>();
             foreach (var r in removed)
             {
-                if (!quickCommands.Contains(r))
+                if (!quickCommandEnvs.Contains(r))
                 {
                     toRemove.Add(r);
                 }
             }
-            foreach (var o in quickCommands)
+            foreach (var o in quickCommandEnvs)
             {
                 o.EnvKey = o.EnvKey.Trim();
                 if (o.Id <= 0)
@@ -118,7 +119,7 @@ namespace QuickLauncher.Dialogs
 
         private string HasError()
         {
-            foreach (var o in quickCommands)
+            foreach (var o in quickCommandEnvs)
             {
                 if (o.Error != null)
                 {

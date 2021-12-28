@@ -64,11 +64,6 @@ namespace QuickLauncher
             return query.Count() == 1 ? query.First() : null;
         }
 
-        public static SettingItem GetViewMode()
-        {
-            return GetByKey("view.viewmode", "TV", true);
-        }
-
         public static SettingItem GetDbVersion()
         {
             return GetByKey("db.version", "0", true);

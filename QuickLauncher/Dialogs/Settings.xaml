@@ -43,7 +43,6 @@
                 <Controls:HotKeyBox Height="30"
                                  Controls:TextBoxHelper.ClearTextButton="False"
                                  Controls:TextBoxHelper.Watermark="Enter Main Window open hot key"
-                                 Controls:TextBoxHelper.ButtonCommand="{Binding ClearButtonCommand, Mode=OneWay}"
                                  AreModifierKeysRequired="True"
                                  Name="hotKeyInput"
                                  HorizontalAlignment="Stretch"
@@ -61,7 +60,7 @@
                 <iconPacks:PackIconModern Width="20" Height="20" Kind="Close" />
             </Button>
         </Grid>
-        <Controls:ToggleSwitch Grid.Row="1" Grid.Column="0"
+        <!--<Controls:ToggleSwitch Grid.Row="1" Grid.Column="0"
                                IsOn="{Binding ViewMode}"
                                Margin="0 5, 0, 0"
                                Foreground="{DynamicResource MahApps.Brushes.Control.Background}"
@@ -70,7 +69,7 @@
             <Controls:ToggleSwitch.Header>
                 <Label Margin="-5, 0, 0, 0" Content="View Mode" Foreground="{DynamicResource MahApps.Brushes.Control.Background}"/>
             </Controls:ToggleSwitch.Header>
-        </Controls:ToggleSwitch>
+        </Controls:ToggleSwitch>-->
         <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Width="50" Margin="0 5 0 5" Click="Cancel_Click" Content="Close" Style="{DynamicResource MahApps.Styles.Button.Dialogs.AccentHighlight}"/>
     </Grid>
 </Dialog:CustomDialog>
