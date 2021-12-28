@@ -67,7 +67,7 @@ namespace QuickLauncher.Model
                 {
                     Debug.WriteLine(e);
                 }
-                
+
                 if (result == null)
                 {
                     result = new PreDefinedCommand();
@@ -75,7 +75,7 @@ namespace QuickLauncher.Model
                     result.QuickCommands = new System.Collections.Generic.List<QuickCommand>();
                 }
             }
-            
+
             return result;
         }
 

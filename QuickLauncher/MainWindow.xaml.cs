@@ -6,7 +6,6 @@ using QuickLauncher.Config;
 using QuickLauncher.Dialogs;
 using QuickLauncher.Misc;
 using QuickLauncher.Model;
-using QuickLauncher.Notification;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,7 +20,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using Utility;
 using Utility.HotKey;
 using Utility.Win32.Api;
 
@@ -54,7 +52,7 @@ namespace QuickLauncher
         private void LoadQuickLaunchers()
         {
             Trace.TraceInformation("loading from database");
- 
+
             LoadQuickCommandsFromDb("");
             Trace.TraceInformation("loading from database - done");
 
@@ -203,7 +201,7 @@ namespace QuickLauncher
             QuickCommand qc = ((System.Windows.Controls.Button)sender).Tag as QuickCommand;
             StartProcess(qc, false);
         }
-        
+
         // for details view only
         private void StartAdmin_Click(object sender, RoutedEventArgs e)
         {
@@ -293,8 +291,8 @@ namespace QuickLauncher
             catch (System.ComponentModel.Win32Exception e)
             {
                 Trace.TraceError(e.StackTrace);
-                if(e.NativeErrorCode != 1223) // if it is not canceled by the user
-                                              // see https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes--1000-1299-
+                if (e.NativeErrorCode != 1223) // if it is not canceled by the user
+                                               // see https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes--1000-1299-
                 {
                     Dispatcher.BeginInvoke(new Action(() =>
                     {
@@ -303,7 +301,7 @@ namespace QuickLauncher
                         DialogUtil.showError(this, e.Message);
                     }), DispatcherPriority.Background);
                 }
-                
+
             }
             return false;
         }
@@ -467,7 +465,7 @@ namespace QuickLauncher
                         mi.IsEnabled = enabled;
                     }
                 }
-                
+
             }
         }
 

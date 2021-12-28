@@ -1,10 +1,7 @@
 ﻿using MahApps.Metro.Controls;
-using QuickLauncher.Command;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using Utility;
@@ -115,7 +112,7 @@ namespace QuickLauncher.Model
             {
                 Trace.TraceError(e.ToString());
                 return String.Format("{0} is already registered", hotKey.ToString());
-                
+
             }
             return null;
         }
@@ -144,7 +141,7 @@ namespace QuickLauncher.Model
             {
                 hotKey = value;
                 var hotKeyStr = value != null ? value.ToString() : "";
-                mainWindowHotKey.Value = hotKeyStr.Equals("None", StringComparison.OrdinalIgnoreCase)? "" : hotKeyStr;
+                mainWindowHotKey.Value = hotKeyStr.Equals("None", StringComparison.OrdinalIgnoreCase) ? "" : hotKeyStr;
                 RaisePropertyChanged("MainWindowOpenHotkey");
             }
         }

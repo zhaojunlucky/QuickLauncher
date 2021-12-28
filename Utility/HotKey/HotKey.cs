@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
 using Utility.Win32.Api;
 
 namespace Utility.HotKey
@@ -24,7 +22,7 @@ namespace Utility.HotKey
             this.fsModifiers = fsModifiers;
             vk = virtualKey;
             this.handler = handler;
-            
+
         }
 
         public int Id
@@ -66,7 +64,7 @@ namespace Utility.HotKey
                 var hr = Marshal.GetHRForLastWin32Error();
                 throw Marshal.GetExceptionForHR(hr);
             }
-            
+
         }
     }
 }

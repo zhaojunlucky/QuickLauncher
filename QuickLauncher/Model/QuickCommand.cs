@@ -5,13 +5,13 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Utility.Model;
-using System.Linq;
-using System.Drawing;
 
 namespace QuickLauncher.Model
 {
@@ -26,7 +26,7 @@ namespace QuickLauncher.Model
         private ImageSource img = null;
         private string workDirectory = "";
         private byte[] customeIcon = null;
-        private static readonly System.Windows.Media.Brush ErrorBgBrush = (System.Windows.Media.Brush) Application.Current.FindResource("MahApps.Brushes.ValidationSummary4");
+        private static readonly System.Windows.Media.Brush ErrorBgBrush = (System.Windows.Media.Brush)Application.Current.FindResource("MahApps.Brushes.ValidationSummary4");
 
         public QuickCommand(bool isNew)
         {
@@ -38,7 +38,7 @@ namespace QuickLauncher.Model
         }
 
         public QuickCommand(QuickCommand quickCommand)
-            :this(true)
+            : this(true)
         {
             alias = quickCommand.alias + "_Copy";
             command = quickCommand.command;
@@ -79,7 +79,7 @@ namespace QuickLauncher.Model
                 uuid = value;
             }
         }
-        
+
         public string Alias
         {
             get
@@ -186,7 +186,7 @@ namespace QuickLauncher.Model
         }
 
         public byte[] CustomIcon
-        { 
+        {
             get
             {
                 return customeIcon;
@@ -203,7 +203,7 @@ namespace QuickLauncher.Model
         {
             get
             {
-                return img == null ? System.Windows.Visibility.Hidden:System.Windows.Visibility.Visible;
+                return img == null ? System.Windows.Visibility.Hidden : System.Windows.Visibility.Visible;
             }
         }
 
@@ -212,7 +212,7 @@ namespace QuickLauncher.Model
 
         public override bool Equals(object obj)
         {
-            if(obj is QuickCommand other)
+            if (obj is QuickCommand other)
             {
                 return Alias == other.Alias;
             }

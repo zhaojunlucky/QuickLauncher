@@ -25,7 +25,7 @@ namespace QuickLauncher.Dialogs
         private MetroWindow parent;
         private PreDefinedCommand preDefinedCommand = GlobalSetting.Instance.GetPreDefinedCommand();
 
-        public CmdEditor(MetroWindow parent, MetroDialogSettings mySettings, QuickCommand command):
+        public CmdEditor(MetroWindow parent, MetroDialogSettings mySettings, QuickCommand command) :
             base(parent, mySettings)
         {
             InitializeComponent();
@@ -41,7 +41,8 @@ namespace QuickLauncher.Dialogs
                 Title = "Edit Quick Command";
             }
             DataContext = this;
-            DefaultCMDDropDownMenuItemCommand = new SimpleCommand(o => true, x => {
+            DefaultCMDDropDownMenuItemCommand = new SimpleCommand(o => true, x =>
+            {
                 DefaultQuickCommandSelected(x);
             });
         }

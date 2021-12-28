@@ -1,9 +1,6 @@
 ﻿using QuickLauncher.Model;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 
 namespace QuickLauncher
@@ -11,7 +8,7 @@ namespace QuickLauncher
     public class SettingItemUtils
     {
         private static Dictionary<string, SettingItem> cache = new Dictionary<string, SettingItem>();
-        public static SettingItem GetByKey(string key, string defaulValue, bool cacheAble=false)
+        public static SettingItem GetByKey(string key, string defaulValue, bool cacheAble = false)
         {
             SettingItem item = null;
             if (cacheAble && cache.ContainsKey(key))
@@ -26,7 +23,7 @@ namespace QuickLauncher
                     cache[key] = item;
                 }
             }
-            
+
             if (item == null && defaulValue != null)
             {
                 item = new SettingItem { Key = key, Value = defaulValue };
@@ -36,7 +33,7 @@ namespace QuickLauncher
                     cache[key] = item;
                 }
             }
-            
+
             return item;
         }
 

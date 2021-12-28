@@ -14,7 +14,7 @@ namespace Utility.HotKey
         {
         }
 
-        public HotkeyAlreadyRegisteredException(object name, Exception ex): base(name.ToString(), ex)
+        public HotkeyAlreadyRegisteredException(object name, Exception ex) : base(name.ToString(), ex)
         {
 
         }

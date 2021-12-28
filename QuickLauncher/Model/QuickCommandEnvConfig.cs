@@ -1,5 +1,4 @@
-﻿using QuickLauncher.Dialogs;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -96,7 +95,7 @@ namespace QuickLauncher.Model
                     Trace.TraceWarning(error);
                     return "Please check input with red border and correct";
                 }
-                    
+
                 return null;
             }
         }

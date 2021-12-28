@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-using System.Windows.Input;
 
 namespace QuickLauncher.Dialogs
 {
@@ -19,7 +18,7 @@ namespace QuickLauncher.Dialogs
         private QuickCommand quickCommand;
         private List<QuickCommandEnvConfig> removed = new List<QuickCommandEnvConfig>();
 
-        public EnvEditor(MetroWindow parent, MetroDialogSettings mySettings, QuickCommand quickCommand):
+        public EnvEditor(MetroWindow parent, MetroDialogSettings mySettings, QuickCommand quickCommand) :
             base(parent, mySettings)
         {
             InitializeComponent();
@@ -42,7 +41,7 @@ namespace QuickLauncher.Dialogs
 
         private void QuickCommands_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-           if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
             {
                 foreach (var o in e.NewItems)
                 {
@@ -51,7 +50,7 @@ namespace QuickLauncher.Dialogs
                     item.ParentId = quickCommand.UUID;
                 }
             }
-           else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
             {
                 foreach (var o in e.OldItems)
                 {

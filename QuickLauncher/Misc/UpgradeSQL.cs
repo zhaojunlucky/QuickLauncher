@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace QuickLauncher.Misc
 {
     public class UpgradeSQL
-    { 
+    {
         [JsonConverter(typeof(JsonListConverter<List<string>>))]
         public List<List<string>> SQLS { get; set; }
 

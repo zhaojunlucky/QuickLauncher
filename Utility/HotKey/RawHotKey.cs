@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Windows.Input;
 
 namespace Utility.HotKey
@@ -29,7 +28,7 @@ namespace Utility.HotKey
             get
             {
                 ModifierKeys hotKeyModifier = ModifierKeys.None;
-                foreach(ModifierKeys modifier in hotKeyModifiers)
+                foreach (ModifierKeys modifier in hotKeyModifiers)
                 {
                     hotKeyModifier |= modifier;
                 }
@@ -39,7 +38,7 @@ namespace Utility.HotKey
 
         private static bool ParseHotKeyModifiers(string keyStr, out ModifierKeys hotKeyModifiers)
         {
-            switch(keyStr.ToLower())
+            switch (keyStr.ToLower())
             {
                 case "ctrl":
                     hotKeyModifiers = ModifierKeys.Control; return true;

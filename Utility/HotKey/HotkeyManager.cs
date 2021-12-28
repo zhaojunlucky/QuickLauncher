@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
-using Utility.Win32.Api;
-using System.Windows.Interop;
 using System.Windows.Input;
+using System.Windows.Interop;
+using Utility.Win32.Api;
 
 namespace Utility.HotKey
 {
     public class HotkeyManager
     {
-        
+
         private readonly Dictionary<string, HotKey> nameHotKey = new Dictionary<string, HotKey>();
         private readonly Dictionary<int, string> idHotkeyName = new Dictionary<int, string>();
         internal static readonly IntPtr HwndMessage = (IntPtr)(-3);
@@ -34,13 +32,13 @@ namespace Utility.HotKey
                 ParentWindow = HwndMessage
             };
             hwndSource = new HwndSource(parameters);
-            
+
         }
 
         public void RegisterHotKey(string name, uint fsModifiers, uint vk, EventHandler<HotkeyEventArgs> handler)
         {
             var hotKey = new HotKey(hwndSource.Handle, name, fsModifiers, vk, handler);
-            lock(nameHotKey)
+            lock (nameHotKey)
             {
                 UnRegisterHotKey(name);
                 nameHotKey.Add(name, hotKey);
@@ -73,6 +71,7 @@ namespace Utility.HotKey
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
         public bool HandleHotKey(IntPtr wParam, IntPtr lParam)
         {
             if (!IsEnabled)
@@ -96,9 +95,9 @@ namespace Utility.HotKey
 
         public void UnRegisterHotKeys()
         {
-            lock(nameHotKey)
+            lock (nameHotKey)
             {
-                foreach(var kv in nameHotKey)
+                foreach (var kv in nameHotKey)
                 {
                     kv.Value.UnRegisterHotKey();
                     idHotkeyName.Remove(kv.Value.Id);

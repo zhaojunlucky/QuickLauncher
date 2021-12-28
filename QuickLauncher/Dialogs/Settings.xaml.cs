@@ -1,12 +1,7 @@
 ﻿using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using QuickLauncher.Model;
-using System;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows;
-using Utility;
-using Utility.HotKey;
 
 namespace QuickLauncher.Dialogs
 {
@@ -15,9 +10,9 @@ namespace QuickLauncher.Dialogs
     /// </summary>
     public partial class Settings : CustomDialog
     {
-        private SettingDialogModel settingDialogModel;
+        private readonly SettingDialogModel settingDialogModel;
         public Settings(MetroWindow parent, MetroDialogSettings mySettings)
-            :base(parent, mySettings)
+            : base(parent, mySettings)
         {
             InitializeComponent();
 

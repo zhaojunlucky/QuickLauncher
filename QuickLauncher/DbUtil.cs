@@ -11,7 +11,7 @@ namespace QuickLauncher
 {
     class DbUtil
     {
-        
+
         private static string QUICK_COMMAND_TABLE = "CREATE TABLE IF NOT EXISTS QUICK_COMMAND(UUID TEXT PRIMARY KEY,ALIAS TEXT UNIQUE,PATH TEXT, WORKDIRECTORY TEXT,COMMAND TEXT, CustomIcon BLOB, AUTO_START INTEGER);";
         private static string QUICK_COMMAND_EVN_CONFIG_TABLE = "CREATE TABLE IF NOT EXISTS QUICK_COMMAND_ENV_CONFIG(Id INTEGER PRIMARY KEY, PARENT_ID TEXT NOT NULL, ENV_KEY TEXT, ENV_VALUE TEXT, FOREIGN KEY(PARENT_ID) REFERENCES QUICK_COMMAND(UUID))";
         private static string SETTING_TABLE = "CREATE TABLE IF NOT EXISTS SETTING(KEY TEXT, VALUE TEXT, PRIMARY KEY(KEY))";
@@ -43,7 +43,7 @@ namespace QuickLauncher
             int v = Convert.ToInt32(dbVerItem.Value);
             Trace.TraceInformation("current database version {0}", v);
             UpgradeSQL upgradeSQL = GlobalSetting.Instance.GetUpgradeSQL();
-            
+
             int newerVersion = upgradeSQL.SQLS.Count;
             Trace.TraceInformation("newer database version {0}", newerVersion);
             if (newerVersion > v)
@@ -82,7 +82,7 @@ namespace QuickLauncher
         {
             var dbConn = getConnection();
             dbConn.Open();
-            
+
             try
             {
                 ExecuteNonQuery(dbConn, QUICK_COMMAND_TABLE);

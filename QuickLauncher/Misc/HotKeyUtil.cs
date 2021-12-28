@@ -1,9 +1,7 @@
 ﻿using QuickLauncher.Model;
 using QuickLauncher.Notification;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using Utility.HotKey;
 
 namespace QuickLauncher.Misc

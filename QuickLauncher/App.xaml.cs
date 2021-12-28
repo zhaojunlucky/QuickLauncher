@@ -103,13 +103,13 @@ namespace QuickLauncher
                     Trace.TraceInformation("do database upgrade");
 
                     DbUtil.DoUpgradeDb();
-                } 
-                catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Trace.TraceError(ex.StackTrace);
                     MessageBox.Show("Failed to upgrade db, please delete the db or do manually upgrade. " + ex.Message);
                 }
-                
+
                 Environment.Exit(0);
             }
         }

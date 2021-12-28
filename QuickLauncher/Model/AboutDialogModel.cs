@@ -127,13 +127,13 @@ namespace QuickLauncher.Model
                     if (retry-- <= 0)
                     {
                         throw;
-                    } 
+                    }
                     else
                     {
                         await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
                     }
                 }
-            }    
+            }
         }
 
         public string this[string columnName]
@@ -146,7 +146,7 @@ namespace QuickLauncher.Model
 
         public string Error => string.Empty;
 
-        public string Version 
+        public string Version
         {
             get
             {
@@ -210,7 +210,7 @@ namespace QuickLauncher.Model
                 RaisePropertyChanged("NewVersionResult");
             }
         }
-        
+
         public string AllowNavigateToolTip
         {
             get
@@ -250,10 +250,10 @@ namespace QuickLauncher.Model
             }
         }
 
-        public bool AllowNavigateToNewVer 
-        { 
-            get 
-            { 
+        public bool AllowNavigateToNewVer
+        {
+            get
+            {
                 return allowNavigateToNewVer;
             }
             set

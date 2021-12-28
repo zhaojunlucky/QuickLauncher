@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace QuickLauncher
@@ -29,7 +25,7 @@ namespace QuickLauncher
 
         public void Execute(object parameter)
         {
-            if(_action != null)
+            if (_action != null)
             {
                 _action();
             }
