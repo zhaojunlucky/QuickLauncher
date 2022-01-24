@@ -116,12 +116,12 @@
             <MenuItem Header="About" Click="About_Click"/>
         </ContextMenu>
         <DataTemplate x:Key="tileView">
-            <Grid Height="72" Width="72" Background="{Binding ErrorBackground}">
+            <Grid Height="80" Width="80" Background="{Binding ErrorBackground}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
-                <Image Grid.Row="0" Source="{Binding Img}" ToolTip="{Binding Alias}" Visibility="{Binding ImgVisibility}" Width="40" Height="40" HorizontalAlignment="Center"/>
+                <Image Grid.Row="0" Source="{Binding Img}" ToolTip="{Binding Alias}" Visibility="{Binding ImgVisibility}" Width="48" Height="48" HorizontalAlignment="Center"/>
                 <TextBlock Grid.Row="1" Text="{Binding Alias}" ToolTip="{Binding Alias}" TextWrapping="Wrap" TextAlignment="Center" TextTrimming="WordEllipsis"/>
             </Grid>
         </DataTemplate>
