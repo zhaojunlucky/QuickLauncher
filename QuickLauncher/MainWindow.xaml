@@ -11,6 +11,7 @@
         GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
         NonActiveGlowBrush="#CDFF0000"
         WindowTransitionsEnabled="False"
+        Controls:DialogParticipation.Register="{Binding RelativeSource={RelativeSource Self}, Path=DataContext}"
         Title="Quick Launcher" MinHeight="608" MinWidth="1090" Width="1090" Height="608" WindowStartupLocation="CenterScreen" 
                       Closing="Root_Closing" Activated="Root_Activated" ShowTitleBar="False" Loaded="Root_Loaded" Closed="Root_Closed">
     <Grid ShowGridLines="False" ContextMenu="{DynamicResource ListViewContextMenu}">

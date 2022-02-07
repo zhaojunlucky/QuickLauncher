@@ -64,7 +64,7 @@ namespace QuickLauncher.Model
             catch (Exception e)
             {
                 Trace.TraceError(e.Message);
-                DialogUtil.showError(owningWindow, e.Message);
+                DialogUtil.ShowError(owningWindow, e.Message);
             }
         }
 
@@ -80,7 +80,7 @@ namespace QuickLauncher.Model
                 {
                     Trace.TraceError(r.Message);
                     Trace.TraceError(r.StackTrace);
-                    DialogUtil.showError(owningWindow, r.Message);
+                    DialogUtil.ShowError(owningWindow, r.Message);
                     return false;
                 }
             }
@@ -94,7 +94,7 @@ namespace QuickLauncher.Model
                 {
                     Trace.TraceError(r.Message);
                     Trace.TraceError(r.StackTrace);
-                    DialogUtil.showError(owningWindow, r.InnerException.Message);
+                    DialogUtil.ShowError(owningWindow, r.InnerException.Message);
                 }
 
             }
@@ -127,7 +127,7 @@ namespace QuickLauncher.Model
             {
                 Trace.TraceError(r.Message);
                 Trace.TraceError(r.StackTrace);
-                DialogUtil.showError(owningWindow, r.InnerException.Message);
+                DialogUtil.ShowError(owningWindow, r.InnerException.Message);
             }
         }
 

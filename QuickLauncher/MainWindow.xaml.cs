@@ -119,6 +119,7 @@ namespace QuickLauncher
             ThemeManager.Current.ChangeThemeColorScheme(Application.Current, "Blue");
 
             RegisterHotKeys(false);
+
         }
 
         public void RegisterHotKeys(bool reload)
@@ -179,12 +180,12 @@ namespace QuickLauncher
             {
                 Trace.TraceError(r.Message);
                 Trace.TraceError(r.StackTrace);
-                DialogUtil.showError(this, r.Message);
+                DialogUtil.ShowError(this, r.Message);
             }
 
         }
 
-        private void Qle_AddedNewQuickCommand(Model.QuickCommand command)
+        private void Reload()
         {
             LoadQuickCommandsFromDb("");
         }
@@ -298,7 +299,7 @@ namespace QuickLauncher
                     {
                         statusLabel.Content = "Started \"" + qc.Alias + "\" failed: \"" + e.Message + "\" at " + DateTime.Now.ToString();
                         ShowWindowNormal();
-                        DialogUtil.showError(this, e.Message);
+                        DialogUtil.ShowError(this, e.Message);
                     }), DispatcherPriority.Background);
                 }
 
@@ -311,8 +312,8 @@ namespace QuickLauncher
             QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
 
             var dialog = new CmdEditor(this, dialogSettings, qc);
-            dialog.AddedNewQuickCommand += Qle_AddedNewQuickCommand;
             await this.ShowMetroDialogAsync(dialog);
+            Reload();
         }
 
         private async void Delete_Click(object sender, RoutedEventArgs e)
@@ -375,8 +376,8 @@ namespace QuickLauncher
         private async void Newquickcommand_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new CmdEditor(this, dialogSettings, null);
-            dialog.AddedNewQuickCommand += Qle_AddedNewQuickCommand;
             await this.ShowMetroDialogAsync(dialog);
+            Reload();
         }
 
         private void About_Click(object sender, RoutedEventArgs e)
@@ -407,7 +408,7 @@ namespace QuickLauncher
             }
             catch (System.ComponentModel.Win32Exception exception)
             {
-                DialogUtil.showError(this, exception.Message);
+                DialogUtil.ShowError(this, exception.Message);
             }
         }
 
@@ -494,8 +495,8 @@ namespace QuickLauncher
             QuickCommand copy = new QuickCommand(qc);
 
             var dialog = new CmdEditor(this, dialogSettings, copy);
-            dialog.AddedNewQuickCommand += Qle_AddedNewQuickCommand;
             await this.ShowMetroDialogAsync(dialog);
+            Reload();
         }
 
         private void Root_Closed(object sender, EventArgs e)

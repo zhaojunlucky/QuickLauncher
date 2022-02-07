@@ -55,7 +55,7 @@ namespace QuickLauncher.Model
                 alias = quickCommand.alias,
                 command = quickCommand.command,
                 path = quickCommand.path,
-                autoStart = 0,
+                autoStart = quickCommand.autoStart,
                 uuid = quickCommand.uuid,
                 workDirectory = quickCommand.workDirectory,
                 customeIcon = quickCommand.customeIcon
@@ -131,6 +131,7 @@ namespace QuickLauncher.Model
             set
             {
                 autoStart = value ? 1 : 0;
+                RaisePropertyChanged("IsAutoStart");
             }
         }
 

@@ -79,7 +79,7 @@ namespace QuickLauncher.Dialogs
             var error = HasError();
             if (error != null)
             {
-                DialogUtil.showError(this.parent, error);
+                DialogUtil.ShowError(this.parent, error);
             }
             else
             {
