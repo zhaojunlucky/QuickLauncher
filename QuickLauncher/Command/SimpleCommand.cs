@@ -11,6 +11,11 @@ namespace QuickLauncher.Command
             this.ExecuteDelegate = execute;
         }
 
+        public SimpleCommand(Action<object> execute = null)
+            : this(x=> true, execute)
+        {
+        }
+
         public Func<object, bool> CanExecuteDelegate { get; set; }
 
         public Action<object> ExecuteDelegate { get; set; }

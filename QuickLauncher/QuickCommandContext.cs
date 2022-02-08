@@ -7,7 +7,7 @@ namespace QuickLauncher
     sealed class QuickCommandContext : DbContext
     {
         private static volatile QuickCommandContext instance;
-        private static object syncRoot = new Object();
+        private static readonly object syncRoot = new Object();
 
         public DbSet<QuickCommand> QuickCommands { get; set; }
         public DbSet<QuickCommandEnvConfig> QuickCommandEnvConfigs { get; set; }
@@ -19,7 +19,7 @@ namespace QuickLauncher
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(DbUtil.getConnection());
+            optionsBuilder.UseSqlite(DbUtil.GetConnection());
         }
 
         public static QuickCommandContext Instance
