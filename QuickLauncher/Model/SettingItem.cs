@@ -12,10 +12,7 @@ namespace QuickLauncher.Model
         [System.ComponentModel.DataAnnotations.Key, Column("KEY")]
         public string Key
         {
-            get
-            {
-                return key;
-            }
+            get => key;
             set
             {
                 key = value;
@@ -25,10 +22,7 @@ namespace QuickLauncher.Model
         [Column("VALUE")]
         public string Value
         {
-            get
-            {
-                return value;
-            }
+            get => value;
             set
             {
                 this.value = value;

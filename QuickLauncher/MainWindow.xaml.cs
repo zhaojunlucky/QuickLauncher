@@ -1,13 +1,9 @@
 ﻿using ControlzEx.Theming;
 using MahApps.Metro.Controls;
-using Microsoft.EntityFrameworkCore;
 using QuickLauncher.Config;
 using QuickLauncher.Misc;
 using QuickLauncher.Model;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO.Pipes;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -15,7 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Threading;
+using QuickLauncher.Command;
 using Utility.HotKey;
 using Utility.Win32.Api;
 
@@ -24,20 +20,17 @@ namespace QuickLauncher
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : MetroWindow
+    public partial class MainWindow
     {
         private readonly MainWindowModel viewModel;
-        private readonly HashSet<string> disabledCmdContextMenuItem = new HashSet<string>(new List<string>() { "Open Working Directory", "Edit", "Edit Environment Variables", "Delete", "Copy" });
 
-        private readonly QuickCommandContext dbContext = QuickCommandContext.Instance;
-        public const Int32 _AboutSysMenuID = 1001;
-        
+        public const int AboutSysMenuId = 1001;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            Utility.Singleton.AppSingleton.Instance.StartPipeServer(new AsyncCallback(ConnectionHandler));
+            Utility.Singleton.AppSingleton.Instance.StartPipeServer(ConnectionHandler);
             viewModel = new MainWindowModel(this);
             viewModel.ShowWindowNormal += ViewModel_ShowWindowNormal;
             viewModel.UpdateWindowState += ViewModel_UpdateWindowState;
@@ -58,14 +51,15 @@ namespace QuickLauncher
 
         private void LoadQuickLaunchers()
         {
-            Trace.TraceInformation("loading from database");
-
-            viewModel.Reload();
-            Trace.TraceInformation("loading from database - done");
 
             var openEditorCommand = new OpenEditorCommand(() =>
             {
-                viewModel.NewQuickCommand.Execute("Ctrl + N");
+                var param = "Ctrl + N";
+                if (viewModel.NewQuickCommand.CanExecute(param))
+                {
+                    viewModel.NewQuickCommand.Execute(param);
+                }
+
             });
 
             InputBindings.Add(new KeyBinding(openEditorCommand, Key.N, ModifierKeys.Control));
@@ -74,22 +68,25 @@ namespace QuickLauncher
         private void ConnectionHandler(IAsyncResult result)
         {
             var srv = result.AsyncState as NamedPipeServerStream;
-            srv.EndWaitForConnection(result);
-
-            // we're connected, now deserialize the incoming command line
-            var bf = new BinaryFormatter();
-            var msg = bf.Deserialize(srv) as string;
-
-            if (msg != "")
+            if (srv != null)
             {
-                this.BeginInvoke((Action)(() => ShowFromProcReq(msg)));
-                Utility.Singleton.AppSingleton.Instance.ReListen();
+                srv.EndWaitForConnection(result);
+
+                // we're connected, now deserialize the incoming command line
+                var bf = new BinaryFormatter();
+                var msg = bf.Deserialize(srv) as string;
+
+                if (msg != "")
+                {
+                    this.BeginInvoke(() => ShowFromProcReq(msg));
+                    Utility.Singleton.AppSingleton.Instance.ReListen();
+                }
             }
         }
 
         private void ShowFromProcReq(string message)
         {
-            if (message == QLConfig.Singleton)
+            if (message == QlConfig.Singleton)
             {
                 ShowWindowNormal();
             }
@@ -104,11 +101,11 @@ namespace QuickLauncher
 
             // Create our new System Menu items just before the Close menu item
             Win32Api.InsertMenu(systemMenuHandle, 5, Win32Api.MF_BYPOSITION | Win32Api.MF_SEPARATOR, 0, string.Empty); // <-- Add a menu seperator
-            Win32Api.InsertMenu(systemMenuHandle, 7, Win32Api.MF_BYPOSITION, _AboutSysMenuID, "About");
+            Win32Api.InsertMenu(systemMenuHandle, 7, Win32Api.MF_BYPOSITION, AboutSysMenuId, "About");
 
             // Attach our WndProc handler to this Window
             HwndSource source = HwndSource.FromHwnd(this.Handle);
-            source.AddHook(new HwndSourceHook(WndProc));
+            if (source != null) source.AddHook(WndProc);
 
             ThemeManager.Current.ChangeThemeColorScheme(Application.Current, "Blue");
 
@@ -167,7 +164,7 @@ namespace QuickLauncher
                 // Execute the appropriate code for the System Menu item that was clicked
                 switch (wParam.ToInt32())
                 {
-                    case _AboutSysMenuID:
+                    case AboutSysMenuId:
                         handled = true;
 
                         About about = new About
@@ -198,42 +195,12 @@ namespace QuickLauncher
             // commandsList.Focus();
         }
 
-        private void CommandsList_ContextMenuOpening(object sender, ContextMenuEventArgs e)
-        {
-            var selectedItems = viewModel.SelectedQuickCommands;
-            bool enabled = selectedItems.Count == 1;
-            ListViewItem lvi = sender as ListViewItem;
-            ContextMenu cm = lvi.ContextMenu;
-            foreach (object item in cm.Items)
-            {
-                if (item is MenuItem mi)
-                {
-                    var header = (string)mi.Header;
-                    if (disabledCmdContextMenuItem.Contains(header))
-                    {
-                        mi.IsEnabled = enabled;
-                    }
-                }
-
-            }
-        }
-
         private void Root_Loaded(object sender, RoutedEventArgs e)
         {
-            Trace.TraceInformation("start auto start command");
-            IList qcList = new List<QuickCommand>();
-            var query = from b in dbContext.QuickCommands.Include("QuickCommandEnvConfigs")
-                        where b.IsAutoStart == true
-                        select b;
-
-            foreach (QuickCommand qc in query)
+            var app = (App) Application.Current;
+            if (app.StartupArgs == null || app.StartupArgs.Length <= 0 || app.StartupArgs[0].Trim() != "/Restart")
             {
-                Trace.TraceInformation("auto start cmd: {0}", qc.Alias);
-                qcList.Add(qc);
-            }
-            if (qcList.Count > 0)
-            {
-                viewModel.StartProcesses(qcList, false);
+                viewModel.DoAutoStartCommands();
             }
         }
 
@@ -244,7 +211,7 @@ namespace QuickLauncher
 
         private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            viewModel.SelectedQuickCommands = (e.OriginalSource as ListView).SelectedItems.Cast<QuickCommand>()
+            viewModel.SelectedTab.SelectedQuickCommands = (e.OriginalSource as ListView)?.SelectedItems.Cast<QuickCommand>()
                 .ToList();
         }
     }

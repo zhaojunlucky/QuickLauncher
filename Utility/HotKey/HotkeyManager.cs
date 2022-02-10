@@ -16,7 +16,7 @@ namespace Utility.HotKey
 
         public bool IsEnabled { get; set; } = true;
 
-        public static HotkeyManager Current { get { return LazyInitializer.Instance; } }
+        public static HotkeyManager Current => LazyInitializer.Instance;
 
         private static class LazyInitializer
         {
@@ -63,11 +63,14 @@ namespace Utility.HotKey
 
         public void UnRegisterHotKey(string name)
         {
-            if (nameHotKey.TryGetValue(name, out HotKey hotKey))
+            lock (nameHotKey)
             {
-                hotKey.UnRegisterHotKey();
-                nameHotKey.Remove(name);
-                idHotkeyName.Remove(hotKey.Id);
+                if (nameHotKey.TryGetValue(name, out HotKey hotKey))
+                {
+                    hotKey.UnRegisterHotKey();
+                    nameHotKey.Remove(name);
+                    idHotkeyName.Remove(hotKey.Id);
+                }
             }
         }
 

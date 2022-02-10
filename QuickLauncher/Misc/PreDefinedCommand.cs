@@ -1,11 +1,10 @@
-﻿using QuickLauncher.Misc;
-using QuickLauncher.Model;
+﻿using QuickLauncher.Model;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace QuickLauncher.Miscs
+namespace QuickLauncher.Misc
 {
     public class PreDefinedCommand
     {
@@ -14,12 +13,12 @@ namespace QuickLauncher.Miscs
         [JsonConverter(typeof(JsonListConverter<QuickCommand>))]
         public List<QuickCommand> QuickCommands { get; set; }
 
-        public static PreDefinedCommand loadFile(string file)
+        public static PreDefinedCommand LoadFile(string file)
         {
-            return loadJson(File.ReadAllText(file));
+            return LoadJson(File.ReadAllText(file));
         }
 
-        public static PreDefinedCommand loadJson(string json)
+        public static PreDefinedCommand LoadJson(string json)
         {
             var options = new JsonSerializerOptions
             {

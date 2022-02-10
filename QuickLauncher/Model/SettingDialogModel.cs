@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
+using MahApps.Metro.Controls.Dialogs;
 using Utility;
 using Utility.HotKey;
 using Utility.Model;
@@ -12,27 +13,30 @@ namespace QuickLauncher.Model
 {
     class SettingDialogModel : AbstractNotifyPropertyChanged, IDataErrorInfo
     {
-        private SettingItem mainWindowHotKey;
+        private readonly SettingItem mainWindowHotKey;
+        private readonly SettingItem enableAutoDetect;
         private HotKey hotKey;
-        private MetroWindow owningWindow;
-        private string currentHotKey;
+        private readonly MetroWindow owningWindow;
+        private readonly string currentHotKey;
         private RawHotKey rawHotKey;
         public SettingDialogModel(MetroWindow window)
         {
             owningWindow = window;
             mainWindowHotKey = SettingItemUtils.GetMainWindowOpenHotkey();
+            enableAutoDetect = SettingItemUtils.GetEnableAutoDetect();
             currentHotKey = mainWindowHotKey.Value;
             InitHotKey();
         }
 
         internal void Save()
         {
-            if (mainWindowHotKey.Value != currentHotKey)
+            if (mainWindowHotKey.Value == currentHotKey)
             {
-                SafeSave(mainWindowHotKey);
-                MainWindow main = (MainWindow)Application.Current.MainWindow;
-                main.RegisterHotKeys(true);
+                return;
             }
+            SafeSave(mainWindowHotKey);
+            var main = (MainWindow)Application.Current.MainWindow;
+            main?.RegisterHotKeys(true);
         }
 
         internal void ResetOrClear()
@@ -44,14 +48,7 @@ namespace QuickLauncher.Model
                 return;
             }
             // reset
-            if (curInput != currentHotKey)
-            {
-                MainWindowOpenHotkey = new HotKey(rawHotKey.Key, rawHotKey.HotKeyModifiers);
-            }
-            else // clear
-            {
-                MainWindowOpenHotkey = new HotKey(Key.None, ModifierKeys.None);
-            }
+            MainWindowOpenHotkey = curInput != currentHotKey ? new HotKey(rawHotKey.Key, rawHotKey.HotKeyModifiers) : new HotKey(Key.None, ModifierKeys.None);
         }
 
         private void InitHotKey()
@@ -94,24 +91,47 @@ namespace QuickLauncher.Model
                 {
                     Trace.TraceError(r.Message);
                     Trace.TraceError(r.StackTrace);
-                    DialogUtil.ShowError(owningWindow, r.InnerException.Message);
+                    DialogUtil.ShowError(owningWindow, (r.InnerException ?? r).Message);
                 }
 
             }
         }
+
+        public bool EnableAutoDetect
+        {
+            get => enableAutoDetect.Value == "1";
+            set
+            {
+                enableAutoDetect.Value = value ? "1" : "0";
+                RaisePropertyChanged("EnableAutoDetect");
+                SafeSave(enableAutoDetect);
+                PromptRestart();
+            }
+        }
+
+        private async void PromptRestart()
+        {
+            var result = await DialogUtil.ShowYesNo("Confirm", owningWindow, "Restart to take effect?");
+            if (result == MessageDialogResult.Affirmative)
+            {
+                AppUtil.RestartApp("PromptRestart", "/Restart");
+            }
+        }
+
+        
 
         private string CheckMainWindowOpenHotkey()
         {
             try
             {
                 var key = "CheckMainWindowOpenHotkey";
-                HotkeyManager.Current.RegisterHotKey(key, mainWindowHotKey.Value, (object sender, HotkeyEventArgs e) => { });
+                HotkeyManager.Current.RegisterHotKey(key, mainWindowHotKey.Value, (sender, e) => { });
                 HotkeyManager.Current.UnRegisterHotKey(key);
             }
             catch (HotkeyAlreadyRegisteredException e)
             {
                 Trace.TraceError(e.ToString());
-                return String.Format("{0} is already registered", hotKey.ToString());
+                return $"{hotKey} is already registered";
 
             }
             return null;
@@ -127,16 +147,13 @@ namespace QuickLauncher.Model
             {
                 Trace.TraceError(r.Message);
                 Trace.TraceError(r.StackTrace);
-                DialogUtil.ShowError(owningWindow, r.InnerException.Message);
+                DialogUtil.ShowError(owningWindow, (r.InnerException ?? r).Message);
             }
         }
 
         public HotKey MainWindowOpenHotkey
         {
-            get
-            {
-                return hotKey;
-            }
+            get => hotKey;
             set
             {
                 hotKey = value;
@@ -146,7 +163,7 @@ namespace QuickLauncher.Model
             }
         }
 
-        public string Error => String.Empty;
+        public string Error => string.Empty;
 
         public string this[string name]
         {

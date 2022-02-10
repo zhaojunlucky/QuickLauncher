@@ -8,7 +8,7 @@ namespace QuickLauncher.Dialogs
     /// <summary>
     /// Interaction logic for CmdEditor.xaml
     /// </summary>
-    public partial class CmdEditor : CustomDialog
+    public partial class CmdEditor
     {
         public CmdEditor(MetroWindow parent, MetroDialogSettings mySettings, QuickCommand command) :
             base(parent, mySettings)

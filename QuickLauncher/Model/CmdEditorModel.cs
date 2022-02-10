@@ -1,6 +1,6 @@
 ﻿using Microsoft.Win32;
 using QuickLauncher.Command;
-using QuickLauncher.Miscs;
+using QuickLauncher.Misc;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,7 +32,7 @@ namespace QuickLauncher.Model
             }
             else
             {
-                QCommand = QuickCommand.Copy(quickCommand);
+                QCommand = quickCommand.IsReadOnly ? quickCommand : QuickCommand.Copy(quickCommand);
                 Title = "Edit Quick Command";
             }
             DefaultCmdDropDownMenuItemCommand = new SimpleCommand(o => true, DefaultQuickCommandSelected);
@@ -44,6 +44,8 @@ namespace QuickLauncher.Model
             get;
             set;
         }
+
+        public bool IsWritable => !QCommand.IsReadOnly;
 
         public string Title
         {
@@ -73,7 +75,7 @@ namespace QuickLauncher.Model
 
             var dirInfo = fileInfo.Directory;
             //while (dirInfo != null && !dirInfo.Exists)
-            while (dirInfo != null && !dirInfo.Exists)
+            while (dirInfo is {Exists: false})
             {
                 dirInfo = dirInfo.Parent;
             }
@@ -168,44 +170,61 @@ namespace QuickLauncher.Model
             {
                 saveCmd ??= new SimpleCommand(o => true, x =>
                 {
-                    if (QCommand.Error != null)
+                    if (QCommand.IsReadOnly)
                     {
-                        DialogUtil.ShowError(this, QCommand.Error);
+                        SaveReadOnlyCommand();
                     }
                     else
                     {
-                        try
-                        {
-                            var dbContext = QuickCommandContext.Instance;
-                            QuickCommand qc = dbContext.QuickCommands.SingleOrDefault(b => b.UUID == QCommand.UUID);
-                            if (qc != null)
-                            {
-                                qc.Alias = QCommand.Alias;
-                                qc.Path = QCommand.Path;
-                                qc.Command = QCommand.Command;
-                                qc.WorkDirectory = QCommand.WorkDirectory;
-                                qc.CustomIcon = QCommand.CustomIcon;
-                                qc.IsAutoStart = QCommand.IsAutoStart;
-                                dbContext.SaveChanges();
-                            }
-                            else
-                            {
-                                dbContext.QuickCommands.Add(QCommand);
-                                dbContext.SaveChanges();
-                            }
-
-                        }
-                        catch (Exception ee)
-                        {
-                            Trace.TraceError(ee.Message);
-                            Trace.TraceError(ee.StackTrace);
-                            DialogUtil.ShowError(this, ee.Message);
-                        }
+                        SaveWritableCommand();
                     }
+                    
                     CloseDialog();
                 });
 
                 return saveCmd;
+            }
+        }
+
+        private void SaveReadOnlyCommand()
+        {
+            AutoDetectCommandAutoStartMgr.Current.ChangeItem(QCommand.Uuid, QCommand.IsAutoStart);
+        }
+
+        private void SaveWritableCommand()
+        {
+            if (QCommand.Error != null)
+            {
+                DialogUtil.ShowError(this, QCommand.Error);
+            }
+            else
+            {
+                try
+                {
+                    var dbContext = QuickCommandContext.Instance;
+                    QuickCommand qc = dbContext.QuickCommands.SingleOrDefault(b => b.Uuid == QCommand.Uuid);
+                    if (qc != null)
+                    {
+                        qc.Alias = QCommand.Alias;
+                        qc.Path = QCommand.Path;
+                        qc.Command = QCommand.Command;
+                        qc.WorkDirectory = QCommand.WorkDirectory;
+                        qc.CustomIcon = QCommand.CustomIcon;
+                        qc.IsAutoStart = QCommand.IsAutoStart;
+                        dbContext.SaveChanges();
+                    }
+                    else
+                    {
+                        dbContext.QuickCommands.Add(QCommand);
+                        dbContext.SaveChanges();
+                    }
+                }
+                catch (Exception ee)
+                {
+                    Trace.TraceError(ee.Message);
+                    Trace.TraceError(ee.StackTrace);
+                    DialogUtil.ShowError(this, ee.Message);
+                }
             }
         }
 
@@ -216,7 +235,7 @@ namespace QuickLauncher.Model
                 QCommand.Path = defaultCmd.Path ?? "";
                 QCommand.Alias = defaultCmd.Alias ?? "";
                 QCommand.Command = defaultCmd.Command ?? "";
-                QCommand.WorkDirectory = FileUtil.getDirectoryOfFile(QCommand.Path);
+                QCommand.WorkDirectory = FileUtil.GetDirectoryOfFile(QCommand.Path);
             }
         }
 
@@ -228,7 +247,7 @@ namespace QuickLauncher.Model
                 {
                     if (!string.IsNullOrEmpty(QCommand.Path))
                     {
-                        QCommand.Alias = FileUtil.getFileNameNoExt(QCommand.Path);
+                        QCommand.Alias = FileUtil.GetFileNameNoExt(QCommand.Path);
                     }
                 });
 
@@ -244,7 +263,7 @@ namespace QuickLauncher.Model
                 {
                     if (!string.IsNullOrEmpty(QCommand.Path))
                     {
-                        QCommand.WorkDirectory = FileUtil.getDirectoryOfFile(QCommand.Path);
+                        QCommand.WorkDirectory = FileUtil.GetDirectoryOfFile(QCommand.Path);
                     }
                 });
                 return autoSetWorkingDirCmd;

@@ -1,10 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace QuickLauncher
 {
     class FileUtil
     {
-        public static string getDirectoryOfFile(string path)
+        public static string GetDirectoryOfFile(string path)
         {
             int i;
             for (i = path.Length - 1; i > 0; i--)
@@ -17,7 +18,7 @@ namespace QuickLauncher
             return path;
         }
 
-        public static string getFileNameNoExt(string filePath)
+        public static string GetFileNameNoExt(string filePath)
         {
 
             FileInfo fInfo = new FileInfo(filePath);
@@ -25,7 +26,7 @@ namespace QuickLauncher
 
             if (fileName.Contains("."))
             {
-                return fileName.Substring(0, fileName.IndexOf("."));
+                return fileName.Substring(0, fileName.IndexOf(".", StringComparison.CurrentCulture));
             }
             return fileName;
         }

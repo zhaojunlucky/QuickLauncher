@@ -6,8 +6,8 @@ namespace QuickLauncher
 {
     sealed class QuickCommandContext : DbContext
     {
-        private static volatile QuickCommandContext instance;
-        private static readonly object syncRoot = new Object();
+        private static volatile QuickCommandContext _instance;
+        private static readonly object SyncRoot = new Object();
 
         public DbSet<QuickCommand> QuickCommands { get; set; }
         public DbSet<QuickCommandEnvConfig> QuickCommandEnvConfigs { get; set; }
@@ -26,16 +26,15 @@ namespace QuickLauncher
         {
             get
             {
-                if (instance == null)
+                if (_instance == null)
                 {
-                    lock (syncRoot)
+                    lock (SyncRoot)
                     {
-                        if (instance == null)
-                            instance = new QuickCommandContext();
+                        _instance ??= new QuickCommandContext();
                     }
                 }
 
-                return instance;
+                return _instance;
             }
         }
 

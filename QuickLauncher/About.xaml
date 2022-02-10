@@ -23,7 +23,7 @@
                 <Controls:ProgressRing Width="20" Height="20" ToolTip="Checking for updates" Visibility="{Binding ProgressRingVisibility}"/>
                 <TextBlock Margin="5, 6, 0, 0">
                     <Hyperlink Click="DownloadNew_Click" IsEnabled="{Binding AllowNavigateToNewVer}" TextDecorations="None" ToolTip="{Binding AllowNavigateToolTip}">
-                        <TextBlock Text="{Binding NewVersionResult}" FontSize="12" Visibility="{Binding NewVersionUIVisibility}"/>
+                        <TextBlock Text="{Binding NewVersionResult}" FontSize="12" Visibility="{Binding NewVersionUiVisibility}"/>
                     </Hyperlink>
                 </TextBlock>
             </WrapPanel>

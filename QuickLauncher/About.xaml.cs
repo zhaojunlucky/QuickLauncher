@@ -8,9 +8,9 @@ namespace QuickLauncher
     /// <summary>
     /// Interaction logic for About.xaml
     /// </summary>
-    public partial class About : MetroWindow
+    public partial class About
     {
-        private AboutDialogModel aboutDialogModel;
+        private readonly AboutDialogModel aboutDialogModel;
         public About()
         {
             InitializeComponent();

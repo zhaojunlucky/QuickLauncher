@@ -3,28 +3,26 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
-using Microsoft.EntityFrameworkCore;
 using QuickLauncher.Command;
+using QuickLauncher.Detector;
 using QuickLauncher.Dialogs;
+using Utility;
 
 namespace QuickLauncher.Model
 {
     internal class MainWindowModel : AbstractMetroModel
     {
-        private readonly QuickCommandContext dbContext = QuickCommandContext.Instance;
         private readonly MetroDialogSettings dialogSettings = new MetroDialogSettings()
         {
             ColorScheme = MetroDialogColorScheme.Accented// win.MetroDialogOptions.ColorScheme
         };
+        private readonly QuickCommandContext dbContext = QuickCommandContext.Instance;
         public event EventHandler<WindowState> UpdateWindowState;
         public event EventHandler<object> ShowWindowNormal;
         private string commandSearchKey;
@@ -40,12 +38,29 @@ namespace QuickLauncher.Model
         private ICommand refreshAllCommand;
         private ICommand refreshCommand;
         private ICommand copyCmd;
+        private int selectedTabIndex;
+        private string statusLabel;
 
         public MainWindowModel(MetroWindow mainWindow)
         {
             MainWindow = mainWindow;
             QuickCommands = new ObservableCollection<QuickCommand>();
             StatusLabel = "Ready";
+            Tabs = new ObservableCollection<TabItemModel>
+            {
+                new UserTabItemModel
+                {
+                    Header = "Users",
+                    IsReadOnly = false,
+                },
+            };
+
+            if (SettingItemUtils.GetEnableAutoDetect().Value == "1")
+            {
+                Tabs.Add(new AutoDetectTabItemModel(new JetBrainsDetector()));
+                Tabs.Add(new AutoDetectTabItemModel(new MicrosoftDetector()));
+            }
+            SelectedTabIndex = 0;
         }
         public override string this[string columnName] => throw new NotImplementedException();
 
@@ -67,46 +82,58 @@ namespace QuickLauncher.Model
 
         public string StatusLabel
         {
-            get;
-            set;
+            get => statusLabel;
+            set
+            {
+                statusLabel = value;
+                RaisePropertyChanged("StatusLabel");
+            }
         }
 
         public string CommandSearchKey
         {
-            get
-            {
-                return commandSearchKey;
-            }
+            get => commandSearchKey;
             set
             {
                 commandSearchKey = value;
                 RaisePropertyChanged("CommandSearchKey");
-                LoadQuickCommands(value);
+                SearchQuickCommandsOnAllTabs(value);
             }
         }
 
-        public QuickCommand SelectedQuickCommand
+        public ObservableCollection<TabItemModel> Tabs
         {
             get;
             set;
         }
 
-        public IList<QuickCommand> SelectedQuickCommands
+        public int SelectedTabIndex
         {
-            get;
-            set;
+            get => selectedTabIndex;
+            set
+            {
+                selectedTabIndex = value;
+                RaisePropertyChanged("SelectedTabIndex");
+                RaisePropertyChanged("SelectedTab");
+                RaisePropertyChanged("TabCommandCount");
+            }
         }
+
+        public TabItemModel SelectedTab => Tabs[SelectedTabIndex];
+
+        public string TabCommandCount => $"{SelectedTab.QuickCommands.Count}";
 
         public ICommand NewQuickCommand
         {
             get
             {
-                newQuickCmd ??= new SimpleCommand(async x =>
+                async void Execute(object x)
                 {
                     var dialog = new CmdEditor(MainWindow, dialogSettings, null);
-                    await DialogCoordinator.Instance.ShowMetroDialogAsync(this, dialog, dialogSettings);
-                    LoadQuickCommands(CommandSearchKey);
-                });
+                    await ShowDialogAsync(dialog, true);
+                }
+
+                newQuickCmd ??= new SimpleCommand(x => !SelectedTab.IsReadOnly, Execute);
                 return newQuickCmd;
             }
         }
@@ -115,9 +142,9 @@ namespace QuickLauncher.Model
         {
             get
             {
-                startCmd ??= new SimpleCommand(x =>
+                startCmd ??= new SimpleCommand(IsQuickCommandList, x =>
                 {
-                    StartProcesses(SelectedQuickCommands as IList, false);
+                    StartProcesses(x as IList, false);
                 });
                 return startCmd;
             }
@@ -127,9 +154,9 @@ namespace QuickLauncher.Model
         {
             get
             {
-                startAdminCmd ??= new SimpleCommand(x =>
+                startAdminCmd ??= new SimpleCommand(IsQuickCommandList, x =>
                 {
-                    StartProcesses(SelectedQuickCommands as IList, true);
+                    StartProcesses(x as IList, true);
                 });
                 return startAdminCmd;
             }
@@ -139,9 +166,9 @@ namespace QuickLauncher.Model
         {
             get
             {
-                editCmd ??= new SimpleCommand(x =>
+                editCmd ??= new SimpleCommand(IsSingleCommand, x =>
                 {
-                    var dialog = new CmdEditor(MainWindow, dialogSettings, SelectedQuickCommand);
+                    var dialog = new CmdEditor(MainWindow, dialogSettings, GetFirstSelectedCommand(x));
                     _ = ShowDialogAsync(dialog, true);
                 });
                 return editCmd;
@@ -152,9 +179,9 @@ namespace QuickLauncher.Model
         {
             get
             {
-                copyCmd ??= new SimpleCommand(x =>
+                copyCmd ??= new SimpleCommand(IsSingleCommandEditable, x =>
                 {
-                    QuickCommand copy = new QuickCommand(SelectedQuickCommand);
+                    QuickCommand copy = new QuickCommand(GetFirstSelectedCommand(x));
 
                     var dialog = new CmdEditor(MainWindow, dialogSettings, copy);
                     _ = ShowDialogAsync(dialog, true);
@@ -167,19 +194,22 @@ namespace QuickLauncher.Model
         {
             get
             {
-                deleteCmd ??= new SimpleCommand(async x =>
+                async void Execute(object x)
                 {
-                    var qc = SelectedQuickCommand;
+                    var qc = GetFirstSelectedCommand(x);
                     var result = await DialogUtil.ShowYesNo("Delete confirmation", this, "Are you sure to delete the selected quick commands?");
-  
+
                     if (result == MessageDialogResult.Affirmative)
                     {
                         dbContext.QuickCommandEnvConfigs.RemoveRange(qc.QuickCommandEnvConfigs);
                         dbContext.QuickCommands.Remove(qc);
                         dbContext.SaveChanges();
                         QuickCommands.Remove(qc);
+                        SelectedTab.Reload(CommandSearchKey);
                     }
-                });
+                }
+
+                deleteCmd ??= new SimpleCommand(IsSingleCommandEditable, Execute);
                 return deleteCmd;
             }
         }
@@ -188,11 +218,11 @@ namespace QuickLauncher.Model
         {
             get
             {
-                openWorkingDirCommand ??= new SimpleCommand(x =>
+                openWorkingDirCommand ??= new SimpleCommand(IsSingleCommand, x =>
                 {
                     try
                     {
-                        Process.Start("explorer.exe", SelectedQuickCommand.ExpandedWorkDirectory);
+                        Process.Start("explorer.exe", GetFirstSelectedCommand(x).ExpandedWorkDirectory);
                     }
                     catch (System.ComponentModel.Win32Exception exception)
                     {
@@ -207,9 +237,9 @@ namespace QuickLauncher.Model
         {
             get
             {
-                editEnvConfigCommand ??= new SimpleCommand(x =>
+                editEnvConfigCommand ??= new SimpleCommand(IsSingleCommandEditable, x =>
                 {
-                    EnvEditor envEditor = new EnvEditor(MainWindow, dialogSettings, SelectedQuickCommand);
+                    EnvEditor envEditor = new EnvEditor(MainWindow, dialogSettings, GetFirstSelectedCommand(x));
                     _ = ShowDialogAsync(envEditor, false);
                 });
                 return editEnvConfigCommand;
@@ -251,7 +281,7 @@ namespace QuickLauncher.Model
             {
                 refreshAllCommand ??= new SimpleCommand(x =>
                 {
-                    Reload();
+                    SelectedTab.Reload(CommandSearchKey);
                 });
                 return refreshAllCommand;
             }
@@ -261,12 +291,58 @@ namespace QuickLauncher.Model
         {
             get
             {
-                refreshCommand ??= new SimpleCommand(x =>
+                refreshCommand ??= new SimpleCommand(IsSingleCommandEditable, x =>
                 {
-                    dbContext.Entry(SelectedQuickCommand).ReloadAsync();
+                    dbContext.Entry(GetFirstSelectedCommand(x)).ReloadAsync();
                 });
                 return refreshCommand;
             }
+        }
+
+        private bool IsSingleCommandEditable(object x)
+        {
+            if (x == null)
+            {
+                return false;
+            }
+            IList commands = x as IList;
+            if (commands == null || commands.Count == 0 || !(commands[0] is QuickCommand))
+            {
+                return false;
+            }
+
+            return commands.Count == 1 && !((QuickCommand) commands[0]).IsReadOnly;
+        }
+
+        private bool IsSingleCommand(object x)
+        {
+            if (x == null)
+            {
+                return false;
+            }
+            var commands = x as IList;
+            if (commands == null || commands.Count == 0 || !(commands[0] is QuickCommand))
+            {
+                return false;
+            }
+
+            return commands.Count == 1;
+        }
+
+        private bool IsQuickCommandList(object x)
+        {
+            if (x == null)
+            {
+                return false;
+            }
+
+            return x is IList commands && commands.Count > 0 && commands[0] is QuickCommand;
+        }
+
+        private static QuickCommand GetFirstSelectedCommand(object x)
+        {
+            if (x is IList commands) return commands[0] as QuickCommand;
+            return null;
         }
 
         private async Task ShowDialogAsync(BaseMetroDialog dialog, bool reload)
@@ -274,49 +350,19 @@ namespace QuickLauncher.Model
             await DialogCoordinator.Instance.ShowMetroDialogAsync(this, dialog, dialogSettings);
             if (reload)
             {
-                LoadQuickCommands(CommandSearchKey);
-            }
-        }
-
-        public void LoadQuickCommands(string key)
-        {
-            IQueryable<QuickCommand> query;
-#nullable enable
-            string? cleanKey = key?.Trim();
-#nullable restore
-            if (string.IsNullOrEmpty(cleanKey))
-            {
-                query = from b in dbContext.QuickCommands.Include("QuickCommandEnvConfigs")
-                    orderby b.Alias.ToLower()
-                    select b;
-            }
-            else
-            {
-                query = from b in dbContext.QuickCommands.Include("QuickCommandEnvConfigs")
-                    where b.Alias.ToLower().Contains(cleanKey)
-                    orderby b.Alias.ToLower()
-                    select b;
-            }
-            try
-            {
-                QuickCommands.Clear();
-                foreach (QuickCommand qc in query)
+                dialog.Unloaded += (sender, args) =>
                 {
-                    QuickCommands.Add(qc);
-                }
+                    SelectedTab.Reload(CommandSearchKey);
+                };
             }
-            catch (Exception r)
-            {
-                Trace.TraceError(r.Message);
-                Trace.TraceError(r.StackTrace);
-                DialogUtil.ShowError(this, r.Message);
-            }
-
         }
 
-        public void Reload()
+        private void SearchQuickCommandsOnAllTabs(string value)
         {
-            LoadQuickCommands(CommandSearchKey);
+            foreach (var tab in Tabs)
+            {
+                MainWindow.Dispatcher.InvokeAsync(() => tab.Search(value));
+            }
         }
 
         public bool StartProcess(QuickCommand qc, bool asAdmin)
@@ -372,7 +418,7 @@ namespace QuickLauncher.Model
             string workingDir = qc.ExpandedWorkDirectory;
             if (workingDir.Length == 0)
             {
-                workingDir = FileUtil.getDirectoryOfFile(qc.ExpandedPath);
+                workingDir = FileUtil.GetDirectoryOfFile(qc.ExpandedPath);
             }
 
             startInfo.WorkingDirectory = workingDir;
@@ -411,6 +457,39 @@ namespace QuickLauncher.Model
 
             }
             return false;
+        }
+
+        internal void DoAutoStartCommands()
+        {
+            var lastRebootTimeItem = SettingItemUtils.GetSystemLastRebootTime();
+            var lastRebootTime = string.IsNullOrEmpty(lastRebootTimeItem.Value)
+                ? DateTime.MinValue
+                : DateTime.Parse(lastRebootTimeItem.Value);
+            var curRebootTime = AppUtil.GetSystemLastRebootTime();
+
+            Trace.TraceInformation($"saved reboot time {lastRebootTime}, current reboot time {curRebootTime}");
+            if (curRebootTime <= lastRebootTime || curRebootTime.ToString() == lastRebootTime.ToString())
+            {
+                Trace.TraceWarning("Skip auto start");
+                return;
+            }
+            var qcList = new List<QuickCommand>();
+
+            foreach (var tab in Tabs)
+            {
+                qcList.AddRange(tab.GetAutoStartCommands());
+            }
+
+            Trace.TraceInformation("start auto start command");
+
+            if (qcList.Count > 0)
+            {
+                StartProcesses(qcList, false);
+            }
+
+            lastRebootTimeItem.Value = $"{curRebootTime}";
+            SettingItemUtils.SaveSettingItem(lastRebootTimeItem);
+
         }
     }
 }

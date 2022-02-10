@@ -10,7 +10,6 @@ namespace Utility.HotKey
         private readonly int id;
         private readonly uint fsModifiers;
         private readonly uint vk;
-        private readonly EventHandler<HotkeyEventArgs> handler;
         private readonly IntPtr hwnd;
         private readonly string name;
 
@@ -21,29 +20,17 @@ namespace Utility.HotKey
             id = ++_nextHotKeyId;
             this.fsModifiers = fsModifiers;
             vk = virtualKey;
-            this.handler = handler;
+            this.Handler = handler;
 
         }
 
-        public int Id
-        {
-            get { return id; }
-        }
+        public int Id => id;
 
-        public uint VirtualKey
-        {
-            get { return vk; }
-        }
+        public uint VirtualKey => vk;
 
-        public uint FsModifiers
-        {
-            get { return fsModifiers; }
-        }
+        public uint FsModifiers => fsModifiers;
 
-        public EventHandler<HotkeyEventArgs> Handler
-        {
-            get { return handler; }
-        }
+        public EventHandler<HotkeyEventArgs> Handler { get; }
 
         public void RegisterHotKey()
         {
@@ -53,7 +40,7 @@ namespace Utility.HotKey
                 var ex = Marshal.GetExceptionForHR(hr);
                 if ((uint)hr == 0x80070581)
                     throw new HotkeyAlreadyRegisteredException(name + " is already registered.", ex);
-                throw ex;
+                if (ex != null) throw ex;
             }
         }
 
@@ -62,7 +49,7 @@ namespace Utility.HotKey
             if (!Win32Api.UnregisterHotKey(hwnd, Id))
             {
                 var hr = Marshal.GetHRForLastWin32Error();
-                throw Marshal.GetExceptionForHR(hr);
+                throw Marshal.GetExceptionForHR(hr)!;
             }
 
         }

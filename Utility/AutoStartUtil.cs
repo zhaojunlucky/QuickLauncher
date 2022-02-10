@@ -13,12 +13,12 @@ namespace Utility
             if (on)
             {
                 string name = Process.GetCurrentProcess().MainModule.ModuleName;
-                name = name[..name.LastIndexOf(".")];
-                SetAutoStart(GetAutoStartShortCutDir(), name, GetAppFullPath());
+                name = name[..name.LastIndexOf(".", StringComparison.CurrentCulture)];
+                SetAutoStart(GetAutoStartShortCutDir(), name, AppUtil.GetAppFullPath());
             }
             else
             {
-                CancelAutoStart(GetAutoStartShortCutDir(), GetAppFullPath());
+                CancelAutoStart(GetAutoStartShortCutDir(), AppUtil.GetAppFullPath());
             }
         }
 
@@ -50,9 +50,9 @@ namespace Utility
             {
                 Directory.CreateDirectory(directory);
             }
-            string shortcutPath = Path.Combine(directory, string.Format("{0}.lnk", shortcutName));
-            WshShell shell = new IWshRuntimeLibrary.WshShell();
-            IWshShortcut shortcut = (IWshRuntimeLibrary.IWshShortcut)shell.CreateShortcut(shortcutPath);
+            string shortcutPath = Path.Combine(directory, $"{shortcutName}.lnk");
+            WshShell shell = new WshShell();
+            IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutPath);
             shortcut.TargetPath = targetPath;
             shortcut.WorkingDirectory = Path.GetDirectoryName(targetPath);
             shortcut.WindowStyle = 1;
@@ -63,7 +63,7 @@ namespace Utility
 
         public static bool IsAutoStart()
         {
-            return IsAutoStart(GetAutoStartShortCutDir(), GetAppFullPath());
+            return IsAutoStart(GetAutoStartShortCutDir(), AppUtil.GetAppFullPath());
         }
 
         public static bool IsAutoStart(string startupDir, string appFullName)
@@ -90,8 +90,8 @@ namespace Utility
             if (System.IO.File.Exists(shortcutPath))
             {
                 WshShell shell = new WshShell();
-                IWshShortcut shortct = (IWshShortcut)shell.CreateShortcut(shortcutPath);
-                return shortct.TargetPath;
+                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutPath);
+                return shortcut.TargetPath;
             }
             else
             {
@@ -102,11 +102,6 @@ namespace Utility
         public static string GetAutoStartShortCutDir()
         {
             return Environment.GetFolderPath(Environment.SpecialFolder.Startup);
-        }
-
-        public static string GetAppFullPath()
-        {
-            return Process.GetCurrentProcess().MainModule.FileName;
         }
     }
 }

@@ -12,7 +12,7 @@
         NonActiveGlowBrush="#CDFF0000"
         WindowTransitionsEnabled="False"
         Controls:DialogParticipation.Register="{Binding RelativeSource={RelativeSource Self}, Path=DataContext}"
-        Title="Quick Launcher" MinHeight="608" MinWidth="1090" Width="1090" Height="608" WindowStartupLocation="CenterScreen" 
+        Title="Quick Launcher" MinHeight="608" MinWidth="1034" Width="1034" Height="608" WindowStartupLocation="CenterScreen" 
                       Closing="Root_Closing" Activated="Root_Activated" ShowTitleBar="False" Loaded="Root_Loaded" Closed="Root_Closed">
     <Grid ShowGridLines="False" ContextMenu="{DynamicResource ListViewContextMenu}">
         <Grid.ColumnDefinitions>
@@ -52,25 +52,42 @@
                 </TextBox.Style>
             </TextBox>
         </WrapPanel>
-        <ListView Grid.Row="1" Margin="0,0,0,-50" Width="Auto" Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}}" MouseDoubleClick="CommandsList_MouseDoubleClick" ScrollViewer.VerticalScrollBarVisibility="Auto" MinHeight="539" MinWidth="1070" SelectionMode="Extended"
+        <Controls:MetroAnimatedTabControl Grid.Row="1" Grid.ColumnSpan="3" Margin="0,0,0,-50" Width="Auto" Height="{Binding Path=ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}}"
+                                          ItemsSource="{Binding Tabs}" SelectedIndex="{Binding SelectedTabIndex}">
+            <Controls:MetroAnimatedTabControl.ItemContainerStyle>
+                <Style BasedOn="{StaticResource {x:Type TabItem}}" TargetType="{x:Type TabItem}">
+                    <Setter Property="Header" Value="{Binding Header}" />
+                </Style>
+            </Controls:MetroAnimatedTabControl.ItemContainerStyle>
+            <Controls:MetroAnimatedTabControl.ContentTemplate>
+                <DataTemplate>
+                    <ListView MouseDoubleClick="CommandsList_MouseDoubleClick" ScrollViewer.VerticalScrollBarVisibility="Auto" MinHeight="539" MinWidth="1070" SelectionMode="Extended"
                       Padding="10,0,10,0" IsSynchronizedWithCurrentItem="True"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" TextSearch.TextPath="Alias" IsTextSearchCaseSensitive="False"
-                      Grid.ColumnSpan="3" ItemsSource="{Binding Path=QuickCommands, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=SelectedQuickCommand}"
+                      ItemsSource="{Binding Path=QuickCommands, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=SelectedQuickCommand}"
                       SelectionChanged="Selector_OnSelectionChanged">
-            <ListView.Resources>
-                <ContextMenu x:Key="ItemContextMenu">
-                    <MenuItem Header="Start" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.StartCommand}" />
-                    <MenuItem Header="Start As Administrator"  Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.StartAdminCommand}"/>
-                    <MenuItem Header="Open Working Directory" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.OpenWorkingDirCommand}"/>
-                    <Separator></Separator>
-                    <MenuItem Header="Edit" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.EditCommand}"/>
-                    <MenuItem Header="Edit Environment Variables" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.EditEnvConfigCommand}"/>
-                    <MenuItem Header="Copy" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.CopyCommand}"/>
-                    <MenuItem Header="Delete" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.DeleteCommand}"/>
-                    <MenuItem Header="Refresh" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.RefreshCommand}"/>
-                </ContextMenu>
+                        <ListView.Resources>
+                            <ContextMenu x:Key="ItemContextMenu">
+                                <MenuItem Header="Start" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.StartCommand}" 
+                                          CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=SelectedItems}"/>
+                                <MenuItem Header="Start As Administrator"  Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.StartAdminCommand}"
+                                          CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=SelectedItems}"/>
+                                <MenuItem Header="Open Working Directory" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.OpenWorkingDirCommand}"
+                                          CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=SelectedItems}"/>
+                                <Separator></Separator>
+                                <MenuItem Header="Edit" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.EditCommand}"
+                                          CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=SelectedItems}"/>
+                                <MenuItem Header="Edit Environment Variables" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.EditEnvConfigCommand}"
+                                          CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=SelectedItems}"/>
+                                <MenuItem Header="Copy" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.CopyCommand}"
+                                          CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=SelectedItems}"/>
+                                <MenuItem Header="Delete" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.DeleteCommand}"
+                                          CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=SelectedItems}"/>
+                                <MenuItem Header="Refresh" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.RefreshCommand}"
+                                          CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=SelectedItems}"/>
+                            </ContextMenu>
 
-                <ItemsPanelTemplate x:Key="tileViewCtrl">
-                    <WrapPanel Width="{Binding (FrameworkElement.ActualWidth),
+                            <ItemsPanelTemplate x:Key="tileViewCtrl">
+                                <WrapPanel Width="{Binding (FrameworkElement.ActualWidth),
                      RelativeSource={RelativeSource 
                                      AncestorType=ScrollContentPresenter}}"
                      ItemWidth="{Binding (ListView.View).ItemWidth,
@@ -78,28 +95,31 @@
 
                      ItemHeight="{Binding (ListView.View).ItemHeight,
                      RelativeSource={RelativeSource AncestorType=ListView}}"/>
-                </ItemsPanelTemplate>
-            </ListView.Resources>
-            <ListView.ItemContainerStyle>
-                <Style TargetType="{x:Type ListViewItem}" >
-                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
-                    <EventSetter Event="ContextMenuOpening" Handler="CommandsList_ContextMenuOpening"/>
-                </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.Style>
-                <Style TargetType="{x:Type ListView}" >
-                    <Setter Property="ContextMenu" Value="{DynamicResource ListViewContextMenu}" />
-                    <Setter Property="ItemsPanel" Value="{DynamicResource tileViewCtrl}" />
-                    <Setter Property="ItemTemplate" Value="{DynamicResource tileView}" />
-                </Style>
+                            </ItemsPanelTemplate>
+                        </ListView.Resources>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="{x:Type ListViewItem}" >
+                                <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                                <!--<EventSetter Event="ContextMenuOpening" Handler="CommandsList_ContextMenuOpening"/>-->
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.Style>
+                            <Style TargetType="{x:Type ListView}" >
+                                <Setter Property="ContextMenu" Value="{DynamicResource ListViewContextMenu}" />
+                                <Setter Property="ItemsPanel" Value="{DynamicResource tileViewCtrl}" />
+                                <Setter Property="ItemTemplate" Value="{DynamicResource tileView}" />
+                            </Style>
 
-            </ListView.Style>
-        </ListView>
+                        </ListView.Style>
+                    </ListView>
+                </DataTemplate>
+            </Controls:MetroAnimatedTabControl.ContentTemplate>
+        </Controls:MetroAnimatedTabControl>
         <DockPanel Grid.Row="2" Height="25" Grid.ColumnSpan="3">
             <StatusBar DockPanel.Dock="Left" Width="Auto" Height="Auto">
                 <StatusBarItem Content="{Binding Path=StatusLabel}" Height="25" VerticalAlignment="Center"/>
                 <StatusBarItem
-                    Content="{Binding QuickCommands.Count, Mode=OneWay}"
+                    Content="{Binding Path=TabCommandCount, Mode=OneWay}"
                     Height="25"
                     ContentStringFormat="Total Commands: {0}"
                     VerticalAlignment="Center"
@@ -111,11 +131,11 @@
     </Grid>
     <Window.Resources>
         <ContextMenu x:Key="ListViewContextMenu" >
-            <MenuItem Header="New Quick Command" Command="{Binding NewQuickCommand}"/>
-            <MenuItem Header="Refresh All" Command="{Binding RefreshAllCommand}"></MenuItem>
+            <MenuItem Header="New Quick Command" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.NewQuickCommand}"/>
+            <MenuItem Header="Refresh All" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.RefreshAllCommand}"></MenuItem>
             <Separator></Separator>
-            <MenuItem Header="Settings" Command="{Binding SettingsCommand}"/>
-            <MenuItem Header="About" Command="{Binding AboutCommand}"/>
+            <MenuItem Header="Settings" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.SettingsCommand}"/>
+            <MenuItem Header="About" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.AboutCommand}"/>
         </ContextMenu>
         <DataTemplate x:Key="tileView">
             <Grid Height="80" Width="80" Background="{Binding ErrorBackground}">

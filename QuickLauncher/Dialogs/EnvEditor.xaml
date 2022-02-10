@@ -17,7 +17,7 @@
         </Grid.RowDefinitions>
         <DataGrid Grid.Row="0" x:Name="envGrid" ItemsSource="{Binding Path=EnvConfigs}" CanUserAddRows="True" CanUserDeleteRows="True"
                   AutoGenerateColumns="False" CanUserSortColumns="False"
-                  GridLinesVisibility="Horizontal">
+                  GridLinesVisibility="Horizontal" ContextMenu="{DynamicResource EnvGridContextMenu}">
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="Key" MinWidth="150">
                     <DataGridTemplateColumn.CellEditingTemplate>
@@ -46,6 +46,11 @@
                     <Setter Property="AlternatingRowBackground" Value="{DynamicResource MahApps.Brushes.Gray10}" />
                 </Style>
             </DataGrid.Style>
+            <DataGrid.Resources>
+                <ContextMenu x:Key="EnvGridContextMenu">
+                    <MenuItem Header="Fill System Environment Variables" Command="{Binding FillSysEnvVarsCmd}"/>
+                </ContextMenu>
+            </DataGrid.Resources>
         </DataGrid>
         <Grid Grid.Row="1" Margin="0 5 0 0">
             <Grid.ColumnDefinitions>

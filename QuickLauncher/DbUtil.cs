@@ -18,18 +18,18 @@ namespace QuickLauncher
 
         public static SqliteConnection GetConnection()
         {
-            return new SqliteConnection(QLConfig.DbConnStr);
+            return new SqliteConnection(QlConfig.DbConnStr);
         }
 
         public static void CheckDb()
         {
-            if (!Directory.Exists(QLConfig.AppConfigBaseDir))
+            if (!Directory.Exists(QlConfig.AppConfigBaseDir))
             {
-                Directory.CreateDirectory(QLConfig.AppConfigBaseDir);
+                Directory.CreateDirectory(QlConfig.AppConfigBaseDir);
                 Trace.TraceInformation("create db folder");
             }
 
-            if (!File.Exists(QLConfig.DbFilePath))
+            if (!File.Exists(QlConfig.DbFilePath))
             {
                 Trace.TraceInformation("initialize a new db");
                 PrepareTables();
@@ -42,9 +42,9 @@ namespace QuickLauncher
             var dbVerItem = SettingItemUtils.GetDbVersion();
             int v = Convert.ToInt32(dbVerItem.Value);
             Trace.TraceInformation("current database version {0}", v);
-            UpgradeSQL upgradeSQL = GlobalSetting.Instance.GetUpgradeSQL();
+            UpgradeSql upgradeSql = GlobalSetting.Instance.GetUpgradeSql();
 
-            int newerVersion = upgradeSQL.SQLS.Count;
+            int newerVersion = upgradeSql.Sqls.Count;
             Trace.TraceInformation("newer database version {0}", newerVersion);
             if (newerVersion > v)
             {
@@ -54,7 +54,7 @@ namespace QuickLauncher
                 using var transaction = dbConn.BeginTransaction();
                 for (int i = v; i < newerVersion; i++)
                 {
-                    List<string> sqls = upgradeSQL.SQLS[i];
+                    List<string> sqls = upgradeSql.Sqls[i];
                     foreach (string sql in sqls)
                     {
                         Trace.TraceInformation("run sql {0}", sql);
@@ -63,8 +63,8 @@ namespace QuickLauncher
                     }
                 }
                 Trace.TraceInformation("write current database version to db");
-                var verSQL = string.Format("INSERT OR REPLACE INTO SETTING(KEY, VALUE) VALUES ('db.version', '{0}');", newerVersion);
-                var verCmd = new SqliteCommand(verSQL, dbConn, transaction);
+                var verSql = $"INSERT OR REPLACE INTO SETTING(KEY, VALUE) VALUES ('db.version', '{newerVersion}');";
+                var verCmd = new SqliteCommand(verSql, dbConn, transaction);
                 verCmd.ExecuteNonQuery();
                 transaction.Commit();
             }

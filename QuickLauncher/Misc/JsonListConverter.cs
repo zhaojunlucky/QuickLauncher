@@ -24,7 +24,7 @@ namespace QuickLauncher.Misc
 
             JsonConverter converter = (JsonConverter)Activator.CreateInstance(
                 typeof(JsonListConverter<>)
-                    .MakeGenericType(new Type[] { elementType }),
+                    .MakeGenericType(elementType),
                 BindingFlags.Instance | BindingFlags.Public,
                 binder: null,
                 args: null,

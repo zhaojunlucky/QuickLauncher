@@ -10,7 +10,7 @@ namespace QuickLauncher
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App
     {
 #if !DEBUG
         System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
@@ -19,10 +19,10 @@ namespace QuickLauncher
         public App()
         {
             InitTraceLogger();
-            if (Utility.Singleton.AppSingleton.Instance.CheckIsAppRunning(QLConfig.Singleton))
+            if (Utility.Singleton.AppSingleton.Instance.CheckIsAppRunning(QlConfig.Singleton))
             {
 
-                Utility.Singleton.AppSingleton.Instance.SendMsgToRunningServer(QLConfig.Singleton);
+                Utility.Singleton.AppSingleton.Instance.SendMsgToRunningServer(QlConfig.Singleton);
                 Environment.Exit(1);
             }
 
@@ -32,15 +32,17 @@ namespace QuickLauncher
             nIcon.Text = "QuickLancher By MagicWorldZ";
 
             System.Windows.Forms.ToolStripMenuItem open = new System.Windows.Forms.ToolStripMenuItem("Open");
-            open.Click += new EventHandler(nIcon_Click);
+            open.Click += new EventHandler(NIcon_Click);
             System.Windows.Forms.ToolStripMenuItem exit = new System.Windows.Forms.ToolStripMenuItem("Exit");
-            exit.Click += new EventHandler(exit_Click);
+            exit.Click += new EventHandler(Exit_Click);
             System.Windows.Forms.ToolStripMenuItem about = new System.Windows.Forms.ToolStripMenuItem("About");
             about.Click += new EventHandler((o, e) =>
             {
-                show();
-                About a = new About();
-                a.Owner = MainWindow;
+                Show();
+                About a = new About
+                {
+                    Owner = MainWindow
+                };
                 a.ShowDialog();
             });
             System.Windows.Forms.ToolStripMenuItem[] childen = new System.Windows.Forms.ToolStripMenuItem[] { about, open, exit };
@@ -48,12 +50,17 @@ namespace QuickLauncher
             nIcon.ContextMenuStrip.Items.AddRange(childen);
             this.nIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler((o, e) =>
             {
-                if (e.Button == System.Windows.Forms.MouseButtons.Left) show();
+                if (e.Button == System.Windows.Forms.MouseButtons.Left) Show();
             });
             nIcon.Visible = true;
 #endif
         }
 
+        public string[] StartupArgs
+        {
+            get;
+            set;
+        }
         private static void InitDb()
         {
             Trace.TraceInformation("checking db");
@@ -62,7 +69,7 @@ namespace QuickLauncher
         }
         private static void InitTraceLogger()
         {
-            var listener = new TextWriterTraceListener(QLConfig.LogFile, "quickLauncher")
+            var listener = new TextWriterTraceListener(QlConfig.LogFile, "quickLauncher")
             {
                 TraceOutputOptions = TraceOptions.DateTime,
             };
@@ -91,7 +98,7 @@ namespace QuickLauncher
 
         private void Show()
         {
-            ((MainWindow)MainWindow).ShowWindowNormal();
+            ((MainWindow)MainWindow)?.ShowWindowNormal();
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)
@@ -112,6 +119,8 @@ namespace QuickLauncher
 
                 Environment.Exit(0);
             }
+
+            StartupArgs = e.Args;
         }
 
         private async void Application_ExitAsync(object sender, ExitEventArgs e)

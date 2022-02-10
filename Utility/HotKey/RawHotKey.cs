@@ -7,21 +7,14 @@ namespace Utility.HotKey
     public class RawHotKey
     {
         private readonly List<ModifierKeys> hotKeyModifiers;
-        private readonly Key key;
 
         private RawHotKey(List<ModifierKeys> modifiers, Key k)
         {
             this.hotKeyModifiers = modifiers;
-            this.key = k;
+            this.Key = k;
         }
 
-        public Key Key
-        {
-            get
-            {
-                return key;
-            }
-        }
+        public Key Key { get; }
 
         public ModifierKeys HotKeyModifiers
         {

@@ -11,31 +11,18 @@ namespace QuickLauncher.Model
     [Table("QUICK_COMMAND_ENV_CONFIG")]
     public class QuickCommandEnvConfig : AbstractNotifyPropertyChanged, IDataErrorInfo
     {
-        private long id = 0;
         private string parentId = "";
         private string envKey = "";
         private string envValue = "";
 
         [Key]
-        [DatabaseGeneratedAttribute(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Identity)]
-        public long Id
-        {
-            get
-            {
-                return id;
-            }
-            set
-            {
-                id = value;
-            }
-        }
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        public long Id { get; set; } = 0;
+
         [Column("PARENT_ID")]
         public string ParentId
         {
-            get
-            {
-                return parentId;
-            }
+            get => parentId;
             set
             {
                 parentId = value;
@@ -45,10 +32,7 @@ namespace QuickLauncher.Model
         [Column("ENV_KEY")]
         public string EnvKey
         {
-            get
-            {
-                return envKey;
-            }
+            get => envKey;
             set
             {
                 envKey = value;
@@ -58,10 +42,7 @@ namespace QuickLauncher.Model
         [Column("ENV_VALUE")]
         public string EnvValue
         {
-            get
-            {
-                return envValue;
-            }
+            get => envValue;
             set
             {
                 envValue = value;
@@ -70,13 +51,7 @@ namespace QuickLauncher.Model
         }
 
         [NotMapped]
-        public string ExpandedEnvValue
-        {
-            get
-            {
-                return Environment.ExpandEnvironmentVariables(EnvValue);
-            }
-        }
+        public string ExpandedEnvValue => Environment.ExpandEnvironmentVariables(EnvValue);
 
         [NotMapped]
         public ObservableCollection<QuickCommandEnvConfig> BindingEnvs
@@ -110,16 +85,16 @@ namespace QuickLauncher.Model
                     {
                         return "Key is required, and can't be all spaces.";
                     }
-                    else if (checkDup(EnvKey))
+                    else if (CheckDup(EnvKey))
                     {
-                        return string.Format("Key {0} is duplicate!!!", EnvKey);
+                        return $"Key {EnvKey} is duplicate!!!";
                     }
                 }
                 return null;
             }
         }
 
-        private bool checkDup(string key)
+        private bool CheckDup(string key)
         {
             if (BindingEnvs == null)
             {
@@ -142,8 +117,7 @@ namespace QuickLauncher.Model
 
         public override bool Equals(object obj)
         {
-            var other = obj as QuickCommandEnvConfig;
-            if (other != null)
+            if (obj is QuickCommandEnvConfig other)
             {
                 return EnvKey == other.EnvKey;
             }

@@ -7,40 +7,45 @@ namespace QuickLauncher
 {
     public class SettingItemUtils
     {
-        private static Dictionary<string, SettingItem> cache = new Dictionary<string, SettingItem>();
-        public static SettingItem GetByKey(string key, string defaulValue, bool cacheAble = false)
+        private static readonly Dictionary<string, SettingItem> Cache = new Dictionary<string, SettingItem>();
+        public static SettingItem GetByKey(string key, string defaultValue, bool cacheAble = false)
         {
             SettingItem item = null;
-            if (cacheAble && cache.ContainsKey(key))
+            if (cacheAble && Cache.ContainsKey(key))
             {
-                item = cache[key];
+                item = Cache[key];
             }
             if (item == null)
             {
-                item = getSettingItem(key);
+                item = GetSettingItem(key);
                 if (cacheAble)
                 {
-                    cache[key] = item;
+                    Cache[key] = item;
                 }
             }
 
-            if (item == null && defaulValue != null)
+            if (item == null && defaultValue != null)
             {
-                item = new SettingItem { Key = key, Value = defaulValue };
+                item = new SettingItem { Key = key, Value = defaultValue };
                 SaveSettingItem(item);
                 if (cacheAble)
                 {
-                    cache[key] = item;
+                    Cache[key] = item;
                 }
             }
 
             return item;
         }
 
+        internal static SettingItem GetEnableAutoDetect()
+        {
+            return GetByKey("auto.detect.commands", "0", true);
+        }
+
         public static void SaveSettingItem(SettingItem item)
         {
             var dbContext = QuickCommandContext.Instance;
-            var dbItem = getSettingItem(item.Key);
+            var dbItem = GetSettingItem(item.Key);
             if (dbItem == null)
             {
                 dbContext.SettingItems.Add(item);
@@ -52,7 +57,7 @@ namespace QuickLauncher
             dbContext.SaveChanges();
         }
 
-        private static SettingItem getSettingItem(string key)
+        private static SettingItem GetSettingItem(string key)
         {
             var dbContext = QuickCommandContext.Instance;
             var query = from b in dbContext.SettingItems
@@ -69,6 +74,16 @@ namespace QuickLauncher
         public static SettingItem GetMainWindowOpenHotkey()
         {
             return GetByKey("hotkey.main.window", "", true);
+        }
+
+        public static SettingItem GetAutoCommandAutoStart()
+        {
+            return GetByKey("auto.command.auto.start", "", true);
+        }
+
+        public static SettingItem GetSystemLastRebootTime()
+        {
+            return GetByKey("system.reboot.time", "", true);
         }
     }
 }

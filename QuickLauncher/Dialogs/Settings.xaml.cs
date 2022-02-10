@@ -8,7 +8,7 @@ namespace QuickLauncher.Dialogs
     /// <summary>
     /// Interaction logic for Settings.xaml
     /// </summary>
-    public partial class Settings : CustomDialog
+    public partial class Settings
     {
         private readonly SettingDialogModel settingDialogModel;
         public Settings(MetroWindow parent, MetroDialogSettings mySettings)
@@ -22,7 +22,6 @@ namespace QuickLauncher.Dialogs
 
         private async void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            SettingDialogModel settingDialogModel = (SettingDialogModel)DataContext;
             settingDialogModel.Save();
             await OwningWindow.HideMetroDialogAsync(this);
         }

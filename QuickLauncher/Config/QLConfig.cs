@@ -3,7 +3,7 @@ using System.IO;
 
 namespace QuickLauncher.Config
 {
-    public class QLConfig
+    public class QlConfig
     {
         internal static string AppConfigBaseDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Unicorn\\QuickLancher");
 

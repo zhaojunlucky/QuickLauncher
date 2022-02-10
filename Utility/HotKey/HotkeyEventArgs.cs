@@ -4,16 +4,11 @@ namespace Utility.HotKey
 {
     public class HotkeyEventArgs : EventArgs
     {
-        private readonly string _name;
-
         internal HotkeyEventArgs(string name)
         {
-            _name = name;
+            this.Name = name;
         }
 
-        public string Name
-        {
-            get { return _name; }
-        }
+        public string Name { get; }
     }
 }

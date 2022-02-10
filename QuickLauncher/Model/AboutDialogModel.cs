@@ -22,18 +22,18 @@ namespace QuickLauncher.Model
         private string copyright;
         private bool checkingUpdates;
         private string newVersionResult;
-        private Visibility newVersionUIVisibility;
+        private Visibility newVersionUiVisibility;
         private Visibility progressRingVisibility;
         private bool allowNavigateToNewVer;
         private string allowNavigateToolTip;
 
         public AboutDialogModel()
         {
-            NewVersionUIVisibility = Visibility.Collapsed;
+            NewVersionUiVisibility = Visibility.Collapsed;
             newVersionResult = "(Quicklauncher is up to date)";
 
             var rAssembly = Assembly.GetEntryAssembly();
-            Version = rAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+            Version = rAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 #if DEBUG
             FullVersion = $"Version {Version} Debug Build";
 #else
@@ -56,7 +56,7 @@ namespace QuickLauncher.Model
                 LatestRelease = await CheckNewVersion();
                 var newVer = LatestRelease.Name.Substring("QuickLauncher-v".Length);
                 Trace.TraceInformation($"GitHub version {newVer}");
-                if (string.Compare(newVer, version) > 0)
+                if (string.Compare(newVer, version, StringComparison.CurrentCulture) > 0)
                 {
                     result = $"New version {newVer}";
                     allowNavigate = true;
@@ -80,13 +80,13 @@ namespace QuickLauncher.Model
             {
                 CheckingUpdates = true;
                 ProgressRingVisibility = Visibility.Visible;
-                NewVersionUIVisibility = Visibility.Collapsed;
+                NewVersionUiVisibility = Visibility.Collapsed;
             }
             else
             {
                 CheckingUpdates = false;
                 NewVersionResult = $"({result})";
-                NewVersionUIVisibility = Visibility.Visible;
+                NewVersionUiVisibility = Visibility.Visible;
                 ProgressRingVisibility = Visibility.Collapsed;
             }
             AllowNavigateToNewVer = allowNavigate;
@@ -116,11 +116,9 @@ namespace QuickLauncher.Model
             {
                 try
                 {
-                    using (var client = new HttpClient())
-                    {
-                        client.DefaultRequestHeaders.Add("user-agent", $"QuickLauncher {version}");
-                        return await client.GetStringAsync(new Uri(url));
-                    }
+                    using var client = new HttpClient();
+                    client.DefaultRequestHeaders.Add("user-agent", $"QuickLauncher {version}");
+                    return await client.GetStringAsync(new Uri(url));
                 }
                 catch (Exception)
                 {
@@ -136,22 +134,13 @@ namespace QuickLauncher.Model
             }
         }
 
-        public string this[string columnName]
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public string this[string columnName] => null;
 
         public string Error => string.Empty;
 
         public string Version
         {
-            get
-            {
-                return version;
-            }
+            get => version;
             set
             {
                 version = value;
@@ -161,10 +150,7 @@ namespace QuickLauncher.Model
 
         public string FullVersion
         {
-            get
-            {
-                return fullVersion;
-            }
+            get => fullVersion;
             set
             {
                 fullVersion = value;
@@ -174,10 +160,7 @@ namespace QuickLauncher.Model
 
         public string Copyright
         {
-            get
-            {
-                return copyright;
-            }
+            get => copyright;
             set
             {
                 copyright = value;
@@ -187,10 +170,7 @@ namespace QuickLauncher.Model
 
         public bool CheckingUpdates
         {
-            get
-            {
-                return checkingUpdates;
-            }
+            get => checkingUpdates;
             set
             {
                 checkingUpdates = value;
@@ -200,10 +180,7 @@ namespace QuickLauncher.Model
 
         public string NewVersionResult
         {
-            get
-            {
-                return newVersionResult;
-            }
+            get => newVersionResult;
             set
             {
                 newVersionResult = value;
@@ -213,10 +190,7 @@ namespace QuickLauncher.Model
 
         public string AllowNavigateToolTip
         {
-            get
-            {
-                return allowNavigateToolTip;
-            }
+            get => allowNavigateToolTip;
             set
             {
                 allowNavigateToolTip = value;
@@ -226,10 +200,7 @@ namespace QuickLauncher.Model
 
         public Visibility ProgressRingVisibility
         {
-            get
-            {
-                return progressRingVisibility;
-            }
+            get => progressRingVisibility;
             set
             {
                 progressRingVisibility = value;
@@ -237,25 +208,19 @@ namespace QuickLauncher.Model
             }
         }
 
-        public Visibility NewVersionUIVisibility
+        public Visibility NewVersionUiVisibility
         {
-            get
-            {
-                return newVersionUIVisibility;
-            }
+            get => newVersionUiVisibility;
             set
             {
-                newVersionUIVisibility = value;
+                newVersionUiVisibility = value;
                 RaisePropertyChanged("NewVersionUIVisibility");
             }
         }
 
         public bool AllowNavigateToNewVer
         {
-            get
-            {
-                return allowNavigateToNewVer;
-            }
+            get => allowNavigateToNewVer;
             set
             {
                 allowNavigateToNewVer = value;

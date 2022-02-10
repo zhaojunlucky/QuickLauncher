@@ -5,23 +5,23 @@ using System.Text.Json.Serialization;
 
 namespace QuickLauncher.Misc
 {
-    public class UpgradeSQL
+    public class UpgradeSql
     {
         [JsonConverter(typeof(JsonListConverter<List<string>>))]
-        public List<List<string>> SQLS { get; set; }
+        public List<List<string>> Sqls { get; set; }
 
-        public static UpgradeSQL loadFile(string file)
+        public static UpgradeSql LoadFile(string file)
         {
-            return loadJson(File.ReadAllText(file));
+            return LoadJson(File.ReadAllText(file));
         }
 
-        public static UpgradeSQL loadJson(string json)
+        public static UpgradeSql LoadJson(string json)
         {
             var options = new JsonSerializerOptions
             {
                 Converters = { new JsonListConverter<List<string>>() },
             };
-            return JsonSerializer.Deserialize<UpgradeSQL>(json, options);
+            return JsonSerializer.Deserialize<UpgradeSql>(json, options);
         }
     }
 }
