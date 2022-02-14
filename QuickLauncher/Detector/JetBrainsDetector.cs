@@ -130,7 +130,7 @@ namespace QuickLauncher.Detector
             }
 
             Trace.TraceInformation($"Find application {appFile}");
-            var uuid = GuidUtil.Create(GuidUtil.UrlNamespace, $"{Category}-{appFile.ToLower()}").ToString();
+            var uuid = GuidUtil.Create(GuidUtil.UrlNamespace, $"{Category.ToLower()}-{productName.ToLower()}").ToString();
             var quickCommand = new QuickCommand
             {
                 Path = appFile,

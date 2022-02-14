@@ -55,7 +55,7 @@ namespace QuickLauncher.Detector
                             workingDir = Path.GetDirectoryName(sc.TargetPath);
                         }
 
-                        var uuid = GuidUtil.Create(GuidUtil.UrlNamespace, $"{Category}-{sc.TargetPath.ToLower()}")
+                        var uuid = GuidUtil.Create(GuidUtil.UrlNamespace, $"{Category.ToLower()}-{name.ToLower()}")
                             .ToString();
                         var quickCommand = new QuickCommand
                         {

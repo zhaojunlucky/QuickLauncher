@@ -5,15 +5,15 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <Platforms>AnyCPU;x64</Platforms>
+    <Platforms>x64</Platforms>
     <ApplicationIcon>Resources\launcher.ico</ApplicationIcon>
     <StartupObject>QuickLauncher.App</StartupObject>
-    <Version>2.3.0</Version>
     <Authors>Jun Zhao</Authors>
-    <Copyright>Copyright 2021 of Jun Zhao</Copyright>
+    <Copyright>Copyright 2022 of Jun Zhao</Copyright>
     <PackageLicenseFile></PackageLicenseFile>
-    <AssemblyVersion>2.3.0.1</AssemblyVersion>
-    <FileVersion>2.3.0.1</FileVersion>
+	<GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+	<GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+	<GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <RepositoryUrl>https://github.com/zhaojunlucky/QuickLauncher</RepositoryUrl>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -55,6 +55,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="GitVersion.MsBuild" Version="5.8.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="MahApps.Metro" Version="2.4.9" />
     <PackageReference Include="MahApps.Metro.IconPacks" Version="4.11.0" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="5.0.11" />

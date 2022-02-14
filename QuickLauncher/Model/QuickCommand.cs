@@ -147,16 +147,22 @@ namespace QuickLauncher.Model
         {
             get
             {
-                if (img == null)
+                if (img != null)
                 {
-                    if (CustomIcon != null)
-                    {
-                        img = ByteToImageSourceConverter.ConvertByteToImage(CustomIcon);
-                    }
-                    else
-                    {
-                        LoadImgFromPath();
-                    }
+                    return img;
+                }
+
+                if (CustomIcon != null)
+                {
+                    img = ByteToImageSourceConverter.ConvertByteToImage(CustomIcon);
+                }
+                else
+                {
+                    LoadImgFromPath();
+                }
+
+                if (img != null)
+                {
                     RaisePropertyChanged("Img");
                     RaisePropertyChanged("ImgVisibility");
 
