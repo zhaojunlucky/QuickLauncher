@@ -12,54 +12,49 @@ namespace Utility.Singleton
 {
     public class AppSingleton
     {
-        private System.Threading.Mutex mutex = null;
-        private Object obj = new object();
-        private static AppSingleton instance = new AppSingleton();
+        private System.Threading.Mutex mutex;
+        private readonly object obj = new object();
 #if DEBUG
-        private static string _AppName =
-          Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().GetName().Name) + "_DEBUG";
+        private static readonly string AppName =
+          Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly()?.GetName().Name) + "_DEBUG";
 #else
-        private static string _AppName =
+        private static readonly string AppName =
           Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().GetName().Name);
 #endif
         private NamedPipeServerStream namedPipeServerStream;
         private AsyncCallback asyncCallback;
 
-        public static AppSingleton Instance
-        {
-            get { return instance; }
-        }
+        public static AppSingleton Instance { get; } = new AppSingleton();
 
         private AppSingleton()
         {
 
         }
 
-        public bool checkIsAppRunning(string mutexName)
+        public bool CheckIsAppRunning(string mutexName)
         {
             bool isRunning = false;
             lock (obj)
             {
                 if (mutex == null)
                 {
-                    bool createdNew = false;
-                    mutex = new System.Threading.Mutex(true, getHash(mutexName), out createdNew);
+                    mutex = new System.Threading.Mutex(true, GetHash(mutexName), out bool createdNew);
                     isRunning = !createdNew;
                 }
             }
             return isRunning;
         }
 
-        private string getHash(string mutexName)
+        private string GetHash(string mutexName)
         {
-            byte[] data = HashAlgorithm.Create("SHA256").ComputeHash(Encoding.UTF8.GetBytes(mutexName));
+            byte[] data = HashAlgorithm.Create("SHA256")?.ComputeHash(Encoding.UTF8.GetBytes(mutexName));
             StringBuilder sBuilder = new StringBuilder();
 
             // Loop through each byte of the hashed data  
             // and format each one as a hexadecimal string. 
-            for (int i = 0; i < data.Length; i++)
+            foreach (var t in data)
             {
-                sBuilder.Append(data[i].ToString("x2"));
+                sBuilder.Append(t.ToString("x2"));
             }
 
             // Return the hexadecimal string. 
@@ -69,7 +64,7 @@ namespace Utility.Singleton
         public void StartPipeServer(AsyncCallback asyncCallback)
         {
             this.asyncCallback = asyncCallback;
-            namedPipeServerStream = new NamedPipeServerStream(_AppName + "IPC",
+            namedPipeServerStream = new NamedPipeServerStream(AppName + "IPC",
                PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
             // it's easier to use the AsyncCallback than it is to use Tasks here:
             // this can't block, so some form of async is a must
@@ -80,7 +75,7 @@ namespace Utility.Singleton
 
         public void ReListen()
         {
-            if (namedPipeServerStream != null && namedPipeServerStream.IsConnected)
+            if (namedPipeServerStream is {IsConnected: true})
             {
                 namedPipeServerStream.Disconnect();
             }
@@ -107,7 +102,7 @@ namespace Utility.Singleton
         {
             try
             {
-                var cli = new NamedPipeClientStream(".", _AppName + "IPC", PipeDirection.InOut);
+                var cli = new NamedPipeClientStream(".", AppName + "IPC", PipeDirection.InOut);
                 cli.Connect(2000);
                 var bf = new BinaryFormatter();
                 // serialize and send the command line

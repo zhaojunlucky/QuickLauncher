@@ -5,13 +5,13 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Utility.Model;
-using System.Linq;
-using System.Drawing;
 
 namespace QuickLauncher.Model
 {
@@ -22,10 +22,12 @@ namespace QuickLauncher.Model
         private string alias = "";
         private string command = "";
         private string path = "";
-        private int autoStart = 0;
-        private ImageSource img = null;
+        private int autoStart;
+        private ImageSource img;
         private string workDirectory = "";
-        private byte[] customeIcon = null;
+        private byte[] customIcon;
+        private bool isReadOnly;
+        private static readonly System.Windows.Media.Brush ErrorBgBrush = (System.Windows.Media.Brush)Application.Current.FindResource("MahApps.Brushes.ValidationSummary4");
 
         public QuickCommand(bool isNew)
         {
@@ -37,26 +39,30 @@ namespace QuickLauncher.Model
         }
 
         public QuickCommand(QuickCommand quickCommand)
-            :this(true)
+            : this(true)
         {
             alias = quickCommand.alias + "_Copy";
             command = quickCommand.command;
             path = quickCommand.path;
             autoStart = 0;
             workDirectory = quickCommand.workDirectory;
-            customeIcon = quickCommand.customeIcon;
+            customIcon = quickCommand.customIcon;
+            img = quickCommand.Img;
         }
 
         public static QuickCommand Copy(QuickCommand quickCommand)
         {
-            var cmd = new QuickCommand();
-            cmd.alias = quickCommand.alias;
-            cmd.command = quickCommand.command;
-            cmd.path = quickCommand.path;
-            cmd.autoStart = 0;
-            cmd.uuid = quickCommand.uuid;
-            cmd.workDirectory = quickCommand.workDirectory;
-            cmd.customeIcon = quickCommand.customeIcon;
+            var cmd = new QuickCommand
+            {
+                alias = quickCommand.alias,
+                command = quickCommand.command,
+                path = quickCommand.path,
+                autoStart = quickCommand.autoStart,
+                uuid = quickCommand.uuid,
+                workDirectory = quickCommand.workDirectory,
+                customIcon = quickCommand.customIcon,
+                img = quickCommand.Img
+            };
             return cmd;
         }
 
@@ -64,25 +70,22 @@ namespace QuickLauncher.Model
         {
             IsNew = false;
         }
+
         [Key]
-        public string UUID
+        [Column("UUID")]
+        public string Uuid
         {
-            get
-            {
-                return uuid;
-            }
+            get => uuid;
             set
             {
                 uuid = value;
+                RaisePropertyChanged("Uuid");
             }
         }
-        
+
         public string Alias
         {
-            get
-            {
-                return alias;
-            }
+            get => alias;
             set
             {
                 alias = value;
@@ -92,10 +95,7 @@ namespace QuickLauncher.Model
 
         public string Command
         {
-            get
-            {
-                return command;
-            }
+            get => command;
             set
             {
                 command = value;
@@ -107,10 +107,7 @@ namespace QuickLauncher.Model
 
         public string Path
         {
-            get
-            {
-                return path;
-            }
+            get => path;
             set
             {
                 path = value;
@@ -121,40 +118,23 @@ namespace QuickLauncher.Model
         [Column("AUTO_START")]
         public bool IsAutoStart
         {
-            get
-            {
-                return autoStart > 0;
-            }
+            get => autoStart > 0;
             set
             {
                 autoStart = value ? 1 : 0;
+                RaisePropertyChanged("IsAutoStart");
             }
         }
 
         [NotMapped]
-        public string ExpandedPath
-        {
-            get
-            {
-                return Environment.ExpandEnvironmentVariables(Path);
-            }
-        }
+        public string ExpandedPath => Environment.ExpandEnvironmentVariables(Path);
 
         [NotMapped]
-        public string ExpandedWorkDirectory
-        {
-            get
-            {
-                return Environment.ExpandEnvironmentVariables(WorkDirectory);
-            }
-        }
+        public string ExpandedWorkDirectory => Environment.ExpandEnvironmentVariables(WorkDirectory);
 
         public string WorkDirectory
         {
-            get
-            {
-                return workDirectory;
-            }
+            get => workDirectory;
             set
             {
                 workDirectory = value;
@@ -167,50 +147,70 @@ namespace QuickLauncher.Model
         {
             get
             {
-                if (img == null)
+                if (img != null)
+                {
+                    return img;
+                }
+
+                if (CustomIcon != null)
+                {
+                    img = ByteToImageSourceConverter.ConvertByteToImage(CustomIcon);
+                }
+                else
                 {
                     LoadImgFromPath();
+                }
+
+                if (img != null)
+                {
+                    RaisePropertyChanged("Img");
+                    RaisePropertyChanged("ImgVisibility");
+
                 }
                 return img;
             }
             set
             {
                 img = value;
-                customeIcon = ByteToImageSourceConverter.ImageSourceToBytes(img);
+                customIcon = ByteToImageSourceConverter.ImageSourceToBytes(img);
                 RaisePropertyChanged("Img");
                 RaisePropertyChanged("ImgVisibility");
             }
         }
 
         public byte[] CustomIcon
-        { 
-            get
-            {
-                return customeIcon;
-            }
+        {
+            get => customIcon;
             set
             {
-                customeIcon = value;
-                img = ByteToImageSourceConverter.ConvertByteToImage(customeIcon);
+                customIcon = value;
+                img = ByteToImageSourceConverter.ConvertByteToImage(value);
+                RaisePropertyChanged("CustomIcon");
+                RaisePropertyChanged("Img");
+                RaisePropertyChanged("ImgVisibility");
             }
         }
 
         [NotMapped]
-        public System.Windows.Visibility ImgVisibility
-        {
-            get
-            {
-                return img == null ? System.Windows.Visibility.Hidden:System.Windows.Visibility.Visible;
-            }
-        }
+        public Visibility ImgVisibility => img == null ? Visibility.Hidden : Visibility.Visible;
 
         [NotMapped]
         public bool IsNew { get; set; }
 
+        [NotMapped]
+        public bool IsReadOnly
+        {
+            get => isReadOnly;
+            set
+            {
+                isReadOnly = value;
+                RaisePropertyChanged("IsReadOnly");
+            }
+        }
+
         public override bool Equals(object obj)
         {
-            var other = obj as QuickCommand;
-            if(other != null)
+            if (obj is QuickCommand other)
             {
                 return Alias == other.Alias;
             }
@@ -223,22 +223,29 @@ namespace QuickLauncher.Model
         }
 
         [NotMapped]
-        public bool DelEnabled
+        public System.Windows.Media.Brush ErrorBackground
         {
             get
             {
-                return Alias.Trim().Length > 0;
+                if (!File.Exists(ExpandedPath) || !Directory.Exists(ExpandedWorkDirectory))
+                {
+                    return ErrorBgBrush;
+                }
+                else
+                {
+                    return System.Windows.Media.Brushes.Transparent;
+                }
             }
         }
 
-        private bool CheckAlias(string alias)
+        private bool CheckAlias(string aliasToCheck)
         {
             var dbContext = QuickCommandContext.Instance;
             var existingComm = from b in dbContext.QuickCommands
-                               where b.Alias == Alias
+                               where b.Alias == aliasToCheck
                                select b;
             int cnt = 0;
-            foreach (var comm in existingComm)
+            foreach (var _ in existingComm)
             {
                 ++cnt;
             }
@@ -278,22 +285,22 @@ namespace QuickLauncher.Model
                 {
                     if (Path == null || Path.Trim().Length == 0)
                     {
-                        return "Aplication path is required.";
+                        return "Application path is required.";
                     }
                     else if (!File.Exists(ExpandedPath))
                     {
-                        return "Aplication path doesn't exist.";
+                        return "Application path doesn't exist.";
                     }
                 }
                 else if (name == "WorkDirectory")
                 {
                     if (WorkDirectory == null || WorkDirectory.Trim().Length == 0)
                     {
-                        return "Aplication work directory is required.";
+                        return "Application work directory is required.";
                     }
                     else if (!Directory.Exists(ExpandedWorkDirectory))
                     {
-                        return "Aplication  work directory doesn't exist.";
+                        return "Application work directory doesn't exist.";
                     }
                 }
                 return null;
@@ -302,21 +309,22 @@ namespace QuickLauncher.Model
 
         public void PathChanged()
         {
-            if (string.IsNullOrEmpty(WorkDirectory) || !Directory.Exists(WorkDirectory))
-            {
-                WorkDirectory = FileUtil.getDirectoryOfFile(Path);
-            }
+            //if (string.IsNullOrEmpty(WorkDirectory) || !Directory.Exists(WorkDirectory))
+            //{
+            //    WorkDirectory = FileUtil.getDirectoryOfFile(Path);
+            //}
 
-            if (string.IsNullOrEmpty(Alias))
-            {
-                Alias = FileUtil.getFileNameNoExt(path);
-            }
+            //if (string.IsNullOrEmpty(Alias))
+            //{
+            //    Alias = FileUtil.getFileNameNoExt(path);
+            //}
 
             // if user didn't custom the icon, then load from path
             if (CustomIcon == null)
             {
                 LoadImgFromPath();
             }
+            RaisePropertyChanged("ErrorBackground");
         }
 
         private void LoadImgFromPath()

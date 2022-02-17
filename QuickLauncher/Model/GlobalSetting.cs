@@ -1,5 +1,4 @@
 ﻿using QuickLauncher.Misc;
-using QuickLauncher.Miscs;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -11,49 +10,44 @@ namespace QuickLauncher.Model
 {
     public sealed class GlobalSetting
     {
-        private static volatile GlobalSetting instance;
-        private static object syncRoot = new Object();
-        private PreDefinedCommand preDefinedCommand = null;
+        private static volatile GlobalSetting _instance;
+        private static readonly object SyncRoot = new Object();
+        private PreDefinedCommand preDefinedCommand;
 
         public static GlobalSetting Instance
         {
             get
             {
-                if (instance == null)
+                if (_instance == null)
                 {
-                    lock (syncRoot)
+                    lock (SyncRoot)
                     {
-                        if (instance == null)
-                            instance = new GlobalSetting();
+                        _instance ??= new GlobalSetting();
                     }
                 }
 
-                return instance;
+                return _instance;
             }
         }
 
         public PreDefinedCommand GetPreDefinedCommand()
         {
-            if (preDefinedCommand == null)
-            {
-                preDefinedCommand = loadDefaultCommands();
-            }
-            return preDefinedCommand;
+            return preDefinedCommand ?? (preDefinedCommand = LoadDefaultCommands());
         }
 
-        public UpgradeSQL GetUpgradeSQL()
+        public UpgradeSql GetUpgradeSql()
         {
-            return loadUpgradeSQL();
+            return LoadUpgradeSql();
         }
 
-        private PreDefinedCommand loadDefaultCommands()
+        private PreDefinedCommand LoadDefaultCommands()
         {
             PreDefinedCommand result = null;
             string fileName = "DefaultCommands.json";
-            var streamInfo = readAppFile(fileName);
+            var streamInfo = ReadAppFile(fileName);
             if (streamInfo == null)
             {
-                streamInfo = readAppResource(fileName);
+                streamInfo = ReadAppResource(fileName);
             }
 
             if (streamInfo != null)
@@ -61,40 +55,38 @@ namespace QuickLauncher.Model
                 StreamReader sr = new StreamReader(streamInfo.Stream);
                 try
                 {
-                    result = PreDefinedCommand.loadJson(sr.ReadToEnd());
+                    result = PreDefinedCommand.LoadJson(sr.ReadToEnd());
                 }
                 catch (JsonException e)
                 {
                     Debug.WriteLine(e);
                 }
-                
+
                 if (result == null)
                 {
-                    result = new PreDefinedCommand();
-                    result.Version = 0;
-                    result.QuickCommands = new System.Collections.Generic.List<QuickCommand>();
+                    result = new PreDefinedCommand
+                    {
+                        Version = 0,
+                        QuickCommands = new System.Collections.Generic.List<QuickCommand>()
+                    };
                 }
             }
-            
+
             return result;
         }
 
-        private UpgradeSQL loadUpgradeSQL()
+        private UpgradeSql LoadUpgradeSql()
         {
-            UpgradeSQL result = null;
+            UpgradeSql result = null;
             string fileName = "Upgrade.json";
-            var streamInfo = readAppFile(fileName);
-            if (streamInfo == null)
-            {
-                streamInfo = readAppResource(fileName);
-            }
+            var streamInfo = ReadAppFile(fileName) ?? ReadAppResource(fileName);
 
             if (streamInfo != null)
             {
                 StreamReader sr = new StreamReader(streamInfo.Stream);
                 try
                 {
-                    result = UpgradeSQL.loadJson(sr.ReadToEnd());
+                    result = UpgradeSql.LoadJson(sr.ReadToEnd());
                 }
                 catch (JsonException e)
                 {
@@ -107,7 +99,7 @@ namespace QuickLauncher.Model
             return result;
         }
 
-        private StreamResourceInfo readAppFile(string fileName)
+        private StreamResourceInfo ReadAppFile(string fileName)
         {
             Uri uri = new Uri(fileName, UriKind.Relative);
             try
@@ -121,9 +113,9 @@ namespace QuickLauncher.Model
             return null;
         }
 
-        private StreamResourceInfo readAppResource(string fileName)
+        private StreamResourceInfo ReadAppResource(string fileName)
         {
-            Uri uri = new Uri(string.Format("/Resources/{0}", fileName), UriKind.Relative);
+            Uri uri = new Uri($"/Resources/{fileName}", UriKind.Relative);
             try
             {
                 return Application.GetResourceStream(uri);

@@ -1,35 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Windows.Input;
 
 namespace Utility.HotKey
 {
     public class RawHotKey
     {
-        private List<ModifierKeys> hotKeyModifiers;
-        private Key key;
+        private readonly List<ModifierKeys> hotKeyModifiers;
 
         private RawHotKey(List<ModifierKeys> modifiers, Key k)
         {
             this.hotKeyModifiers = modifiers;
-            this.key = k;
+            this.Key = k;
         }
 
-        public Key Key
-        {
-            get
-            {
-                return key;
-            }
-        }
+        public Key Key { get; }
 
         public ModifierKeys HotKeyModifiers
         {
             get
             {
                 ModifierKeys hotKeyModifier = ModifierKeys.None;
-                foreach(ModifierKeys modifier in hotKeyModifiers)
+                foreach (ModifierKeys modifier in hotKeyModifiers)
                 {
                     hotKeyModifier |= modifier;
                 }
@@ -39,7 +31,7 @@ namespace Utility.HotKey
 
         private static bool ParseHotKeyModifiers(string keyStr, out ModifierKeys hotKeyModifiers)
         {
-            switch(keyStr.ToLower())
+            switch (keyStr.ToLower())
             {
                 case "ctrl":
                     hotKeyModifiers = ModifierKeys.Control; return true;
@@ -75,12 +67,11 @@ namespace Utility.HotKey
 
             foreach (string k in keys)
             {
-                ModifierKeys hkm;
-                if (ParseHotKeyModifiers(k, out hkm))
+                if (ParseHotKeyModifiers(k, out ModifierKeys hkm))
                 {
                     hotKeyModifiers.Add(hkm);
-                } 
-                else if(key != Key.None)
+                }
+                else if (key != Key.None)
                 {
                     throw new InvalidHotKeyStringException("Invalid hotkey string: " + hotKeyStr + ". Mutilple key found.");
                 }

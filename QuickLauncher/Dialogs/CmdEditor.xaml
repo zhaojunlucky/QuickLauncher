@@ -6,10 +6,11 @@
              xmlns:local="clr-namespace:QuickLauncher.Dialogs"
              xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             Controls:DialogParticipation.Register="{Binding RelativeSource={RelativeSource Self}, Path=DataContext}"
              xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
                      mc:Ignorable="d" 
              d:DesignHeight="460" d:DesignWidth="800"
-             Title="Create Quick Command">
+             Title="{Binding Path=Title}">
     <Grid Margin="0 5 0 0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" MinHeight="20" />
@@ -23,17 +24,18 @@
             <ColumnDefinition></ColumnDefinition>
             <ColumnDefinition Width="50"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <TextBox x:Name="appPath" Height="30" Grid.Row="0" Grid.Column="0" Margin="0 5 0 0"
+        <TextBox Height="30" Grid.Row="0" Grid.Column="0" Margin="0 5 0 0"
                  ToolTip="Application path"
-                 Controls:TextBoxHelper.Watermark="Choose or type applciation"
+                 Controls:TextBoxHelper.Watermark="Choose or type application"
                  Text="{Binding Path=QCommand.Path, Mode=TwoWay,NotifyOnValidationError=True,ValidatesOnDataErrors=True,UpdateSourceTrigger=PropertyChanged}"
-                 Style="{DynamicResource MahApps.Styles.TextBox.Button}" TextChanged="appPath_TextChanged">
+                 Style="{DynamicResource MahApps.Styles.TextBox.Button}" IsReadOnly="{Binding QCommand.IsReadOnly}">
             <Controls:TextBoxHelper.ButtonContent>
-                <Controls:DropDownButton DisplayMemberPath="Alias" Visibility="{Binding DefaultCMDDropDownVisibility}"
-                                         ItemsSource="{Binding DefaultQuickCommand}" ToolTip="Choose Predefined Command">
+                <Controls:DropDownButton DisplayMemberPath="Alias" Visibility="{Binding DefaultCmdDropDownVisibility}"
+                                         ItemsSource="{Binding DefaultQuickCommand}" ToolTip="Choose Predefined Command"
+                                         IsEnabled="{Binding IsWritable}">
                     <Controls:DropDownButton.ItemContainerStyle>
                         <Style BasedOn="{StaticResource {x:Type MenuItem}}" TargetType="{x:Type MenuItem}">
-                            <Setter Property="Command" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:DropDownButton}}, Path=DataContext.DefaultCMDDropDownMenuItemCommand}" />
+                            <Setter Property="Command" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:CustomDialog}}, Path=DataContext.DefaultCmdDropDownMenuItemCommand}" />
                             <Setter Property="CommandParameter" Value="{Binding }" />
                         </Style>
                     </Controls:DropDownButton.ItemContainerStyle>
@@ -41,19 +43,19 @@
             </Controls:TextBoxHelper.ButtonContent>
         </TextBox>
 
-        <Button Grid.Row="0" Grid.Column="1" Margin="5 5 0 0" ToolTip="Click to choose application" Click="ChooseApplication_Click"
-                BorderThickness="0">
+        <Button Grid.Row="0" Grid.Column="1" Margin="5 5 0 0" ToolTip="Click to choose application" Command="{Binding Path=ChooseApplicationCmd}"
+                BorderThickness="0" IsEnabled="{Binding IsWritable}">
             <Button.Content>
                 <iconPacks:PackIconMaterial Kind="FileFindOutline"/>
             </Button.Content>
         </Button>
-        <TextBox x:Name="appAlias" Height="30" Grid.Row="1" Grid.Column="0" Margin="0 5 0 0" Controls:TextBoxHelper.Watermark="Type alias" ToolTip="Type Alias"
+        <TextBox Height="30" Grid.Row="1" Grid.Column="0" Margin="0 5 0 0" Controls:TextBoxHelper.Watermark="Type alias" ToolTip="Type Alias"
                  Text="{Binding Path=QCommand.Alias, Mode=TwoWay,NotifyOnValidationError=True,ValidatesOnDataErrors=True,UpdateSourceTrigger=PropertyChanged}"
-                 Controls:TextBoxHelper.ButtonContent="aa"
+                 Controls:TextBoxHelper.ButtonContent="aa" IsReadOnly="{Binding QCommand.IsReadOnly}"
                  >
             <TextBox.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Auto Set" Click="AutoSetAlias_Click" />
+                    <MenuItem Header="Auto Set" IsEnabled="{Binding IsWritable}" Command="{Binding Path=AutoSetAliasCmd}" />
                     <Separator />
                     <MenuItem Command="ApplicationCommands.Cut" Style="{DynamicResource MahApps.Styles.MenuItem}" />
                     <MenuItem Command="ApplicationCommands.Copy" Style="{DynamicResource MahApps.Styles.MenuItem}" />
@@ -61,11 +63,12 @@
                 </ContextMenu>
             </TextBox.ContextMenu>
         </TextBox>
-        <TextBox x:Name="appWorkDir" Height="30" Grid.Row="2" Grid.Column="0" Margin="0 5 0 0" Controls:TextBoxHelper.Watermark="Choose or type working directory" ToolTip="Application working directory"
-                 Text="{Binding Path=QCommand.WorkDirectory, Mode=TwoWay,NotifyOnValidationError=True,ValidatesOnDataErrors=True,UpdateSourceTrigger=PropertyChanged}">
+        <TextBox Height="30" Grid.Row="2" Grid.Column="0" Margin="0 5 0 0" Controls:TextBoxHelper.Watermark="Choose or type working directory" ToolTip="Application working directory"
+                 Text="{Binding Path=QCommand.WorkDirectory, Mode=TwoWay,NotifyOnValidationError=True,ValidatesOnDataErrors=True,UpdateSourceTrigger=PropertyChanged}"
+                 IsReadOnly="{Binding QCommand.IsReadOnly}">
             <TextBox.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Auto Set" Click="AutoSetWorkingDir_Click" />
+                    <MenuItem Header="Auto Set" IsEnabled="{Binding IsWritable}" Command="{Binding AutoSetWorkingDirCmd}" />
                     <Separator />
                     <MenuItem Command="ApplicationCommands.Cut" Style="{DynamicResource MahApps.Styles.MenuItem}" />
                     <MenuItem Command="ApplicationCommands.Copy" Style="{DynamicResource MahApps.Styles.MenuItem}" />
@@ -74,28 +77,25 @@
             </TextBox.ContextMenu>
         </TextBox>
         <Button Grid.Row="2" Grid.Column="1" Margin="5 5 0 0" BorderThickness="0" ToolTip="Click to choose application working directory"
-                Click="ChooseWD_Click">
+                Command="{Binding Path=ChooseWorkingDirCmd}" IsEnabled="{Binding IsWritable}">
             <Button.Content>
                 <iconPacks:PackIconMaterial Kind="FolderCogOutline" />
             </Button.Content>
         </Button>
-        <TextBox x:Name="appArgs" Height="60" Grid.Row="3" Grid.Column="0" Margin="0 5 0 0" TextWrapping="Wrap" Controls:TextBoxHelper.Watermark="Type arguments" ToolTip="Type arguments"
-                 Text="{Binding QCommand.Command}"></TextBox>
+        <TextBox Height="60" Grid.Row="3" Grid.Column="0" Margin="0 5 0 0" TextWrapping="Wrap" Controls:TextBoxHelper.Watermark="Type arguments" ToolTip="Type arguments"
+                 Text="{Binding QCommand.Command}" IsReadOnly="{Binding QCommand.IsReadOnly}"></TextBox>
 
         <Button Grid.Row="3" Grid.Column="1" Margin="5 5 0 0" ToolTip="Click to change icon" MaxWidth="40" MaxHeight="40"
                 Visibility="{Binding QCommand.ImgVisibility}" Background="Transparent" BorderThickness="0"
-                Click="ChooseIcon_Click">
+                Command="{Binding Path=ChooseIconCmd}" IsEnabled="{Binding IsWritable}">
             <Button.Content>
-                <Image x:Name="appIcon" 
-               Source="{Binding QCommand.Img}"></Image>
+                <Image Source="{Binding QCommand.Img}"></Image>
             </Button.Content>
         </Button>
         <Controls:ToggleSwitch Grid.Row="4" Grid.Column="0"
-                               IsOn="{Binding Path=QCommand.IsAutoStart}"
+                               IsOn="{Binding QCommand.IsAutoStart, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                Margin="0 5, 0, 0"
-                               Foreground="{DynamicResource MahApps.Brushes.Control.Background}"
-                               OffContent="Off"
-                               OnContent="On">
+                               Foreground="{DynamicResource MahApps.Brushes.Control.Background}">
             <Controls:ToggleSwitch.Header>
                 <Label Margin="-5, 0, 0, 0" Content="Auto Start" Foreground="{DynamicResource MahApps.Brushes.Control.Background}"/>
             </Controls:ToggleSwitch.Header>
@@ -105,8 +105,8 @@
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Click="Cancel_Click" Content="Cancel" Style="{DynamicResource MahApps.Styles.Button.Dialogs.AccentHighlight}"/>
-            <Button Grid.Column="1" Click="Save_Click" Content="Save" Style="{DynamicResource MahApps.Styles.Button.Dialogs.Accent}"/>
+            <Button Grid.Column="0" Command="{Binding Path=CloseCommand}" Content="Cancel" Style="{DynamicResource MahApps.Styles.Button.Dialogs.AccentHighlight}"/>
+            <Button Grid.Column="1" Command="{Binding Path=SaveCmd}" Content="Save" Style="{DynamicResource MahApps.Styles.Button.Dialogs.Accent}"/>
         </Grid>
     </Grid>
 </Dialog:CustomDialog>

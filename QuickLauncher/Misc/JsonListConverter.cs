@@ -1,13 +1,9 @@
-﻿using QuickLauncher.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace QuickLauncher.Misc
 {
@@ -28,7 +24,7 @@ namespace QuickLauncher.Misc
 
             JsonConverter converter = (JsonConverter)Activator.CreateInstance(
                 typeof(JsonListConverter<>)
-                    .MakeGenericType(new Type[] { elementType }),
+                    .MakeGenericType(elementType),
                 BindingFlags.Instance | BindingFlags.Public,
                 binder: null,
                 args: null,

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Globalization;
-using System.Windows.Data;
-using System.Windows.Media.Imaging;
-using System.Windows.Media;
 using System.IO;
+using System.Windows.Data;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace QuickLauncher.Converter
 {
@@ -25,17 +25,14 @@ namespace QuickLauncher.Converter
         {
             byte[] bytes = null;
             BitmapEncoder encoder = new PngBitmapEncoder();
-            var bitmapSource = imageSource as BitmapSource;
 
-            if (bitmapSource != null)
+            if (imageSource is BitmapSource bitmapSource)
             {
                 encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
 
-                using (var stream = new MemoryStream())
-                {
-                    encoder.Save(stream);
-                    bytes = stream.ToArray();
-                }
+                using var stream = new MemoryStream();
+                encoder.Save(stream);
+                bytes = stream.ToArray();
             }
 
             return bytes;

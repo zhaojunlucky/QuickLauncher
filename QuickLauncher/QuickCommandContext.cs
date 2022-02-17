@@ -1,18 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QuickLauncher.Model;
 using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace QuickLauncher
 {
     sealed class QuickCommandContext : DbContext
     {
-        private static volatile QuickCommandContext instance;
-        private static object syncRoot = new Object();
+        private static volatile QuickCommandContext _instance;
+        private static readonly object SyncRoot = new Object();
 
         public DbSet<QuickCommand> QuickCommands { get; set; }
         public DbSet<QuickCommandEnvConfig> QuickCommandEnvConfigs { get; set; }
@@ -24,23 +19,22 @@ namespace QuickLauncher
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(DbUtil.getConnection());
+            optionsBuilder.UseSqlite(DbUtil.GetConnection());
         }
 
         public static QuickCommandContext Instance
         {
             get
             {
-                if (instance == null)
+                if (_instance == null)
                 {
-                    lock (syncRoot)
+                    lock (SyncRoot)
                     {
-                        if (instance == null)
-                            instance = new QuickCommandContext();
+                        _instance ??= new QuickCommandContext();
                     }
                 }
 
-                return instance;
+                return _instance;
             }
         }
 

@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace QuickLauncher
+namespace QuickLauncher.Command
 {
     class OpenEditorCommand : ICommand
     {
-        private readonly Action _action;
+        private readonly Action action;
 
         public OpenEditorCommand(Action action)
         {
-            _action = action;
+            this.action = action;
         }
 
         public event EventHandler CanExecuteChanged
@@ -29,9 +25,9 @@ namespace QuickLauncher
 
         public void Execute(object parameter)
         {
-            if(_action != null)
+            if (action != null)
             {
-                _action();
+                action();
             }
         }
     }

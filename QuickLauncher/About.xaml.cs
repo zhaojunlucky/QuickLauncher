@@ -1,9 +1,6 @@
 ﻿using MahApps.Metro.Controls;
 using QuickLauncher.Model;
-using System;
-using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace QuickLauncher
@@ -11,9 +8,9 @@ namespace QuickLauncher
     /// <summary>
     /// Interaction logic for About.xaml
     /// </summary>
-    public partial class About : MetroWindow
+    public partial class About
     {
-        private AboutDialogModel aboutDialogModel;
+        private readonly AboutDialogModel aboutDialogModel;
         public About()
         {
             InitializeComponent();
@@ -39,7 +36,7 @@ namespace QuickLauncher
                 ThreadPool.QueueUserWorkItem(delegate { System.Diagnostics.Process.Start("explorer.exe", aboutDialogModel.LatestRelease.HtmlUrl); });
             }
         }
-        
+
         private async void MetroWindow_Loaded(object sender, RoutedEventArgs e)
         {
             await aboutDialogModel.CheckUpdates();

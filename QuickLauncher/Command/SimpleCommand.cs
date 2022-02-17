@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace QuickLauncher.Command
@@ -13,6 +9,11 @@ namespace QuickLauncher.Command
         {
             this.CanExecuteDelegate = canExecute;
             this.ExecuteDelegate = execute;
+        }
+
+        public SimpleCommand(Action<object> execute = null)
+            : this(x=> true, execute)
+        {
         }
 
         public Func<object, bool> CanExecuteDelegate { get; set; }

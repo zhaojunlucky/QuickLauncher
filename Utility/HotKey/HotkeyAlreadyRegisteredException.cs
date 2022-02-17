@@ -6,9 +6,6 @@ namespace Utility.HotKey
     [Serializable]
     public class HotkeyAlreadyRegisteredException : Exception
     {
-        private object name;
-        private Exception ex;
-
         public HotkeyAlreadyRegisteredException()
         {
         }
@@ -17,10 +14,9 @@ namespace Utility.HotKey
         {
         }
 
-        public HotkeyAlreadyRegisteredException(object name, Exception ex)
+        public HotkeyAlreadyRegisteredException(object name, Exception ex) : base(name.ToString(), ex)
         {
-            this.name = name;
-            this.ex = ex;
+
         }
 
         public HotkeyAlreadyRegisteredException(string message, Exception innerException) : base(message, innerException)

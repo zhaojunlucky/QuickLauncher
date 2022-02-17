@@ -19,11 +19,11 @@
         <Label Grid.Row="0" Content="About Quick Launcher"/>
         <StackPanel Grid.Row="1" Margin="25, 0, 0, 0">
             <WrapPanel Margin="0, 5, 0, 0">
-                <Label Content="{Binding FullVersion}" FontSize="14"/>
+                <TextBlock Margin="5, 0, 0, 0" Text="{Binding FullVersion}" FontSize="14" ToolTip="{Binding FullVersion}" TextWrapping="WrapWithOverflow"/>
                 <Controls:ProgressRing Width="20" Height="20" ToolTip="Checking for updates" Visibility="{Binding ProgressRingVisibility}"/>
-                <TextBlock Margin="5, 6, 0, 0">
+                <TextBlock Margin="5, 2, 0, 0">
                     <Hyperlink Click="DownloadNew_Click" IsEnabled="{Binding AllowNavigateToNewVer}" TextDecorations="None" ToolTip="{Binding AllowNavigateToolTip}">
-                        <TextBlock Text="{Binding NewVersionResult}" FontSize="12" Visibility="{Binding NewVersionUIVisibility}"/>
+                        <TextBlock Text="{Binding NewVersionResult}" FontSize="12" Visibility="{Binding NewVersionUiVisibility}"/>
                     </Hyperlink>
                 </TextBlock>
             </WrapPanel>

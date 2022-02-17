@@ -10,7 +10,7 @@ namespace QuickLauncher
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App
     {
 #if !DEBUG
         System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
@@ -19,10 +19,10 @@ namespace QuickLauncher
         public App()
         {
             InitTraceLogger();
-            if (Utility.Singleton.AppSingleton.Instance.checkIsAppRunning(QLConfig.Singleton))
+            if (Utility.Singleton.AppSingleton.Instance.CheckIsAppRunning(QlConfig.Singleton))
             {
 
-                Utility.Singleton.AppSingleton.Instance.SendMsgToRunningServer(QLConfig.Singleton);
+                Utility.Singleton.AppSingleton.Instance.SendMsgToRunningServer(QlConfig.Singleton);
                 Environment.Exit(1);
             }
 
@@ -32,15 +32,17 @@ namespace QuickLauncher
             nIcon.Text = "QuickLancher By MagicWorldZ";
 
             System.Windows.Forms.ToolStripMenuItem open = new System.Windows.Forms.ToolStripMenuItem("Open");
-            open.Click += new EventHandler(nIcon_Click);
+            open.Click += new EventHandler(NIcon_Click);
             System.Windows.Forms.ToolStripMenuItem exit = new System.Windows.Forms.ToolStripMenuItem("Exit");
-            exit.Click += new EventHandler(exit_Click);
+            exit.Click += new EventHandler(Exit_Click);
             System.Windows.Forms.ToolStripMenuItem about = new System.Windows.Forms.ToolStripMenuItem("About");
             about.Click += new EventHandler((o, e) =>
             {
-                show();
-                About a = new About();
-                a.Owner = MainWindow;
+                Show();
+                About a = new About
+                {
+                    Owner = MainWindow
+                };
                 a.ShowDialog();
             });
             System.Windows.Forms.ToolStripMenuItem[] childen = new System.Windows.Forms.ToolStripMenuItem[] { about, open, exit };
@@ -48,12 +50,17 @@ namespace QuickLauncher
             nIcon.ContextMenuStrip.Items.AddRange(childen);
             this.nIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler((o, e) =>
             {
-                if (e.Button == System.Windows.Forms.MouseButtons.Left) show();
+                if (e.Button == System.Windows.Forms.MouseButtons.Left) Show();
             });
             nIcon.Visible = true;
 #endif
         }
 
+        public string[] StartupArgs
+        {
+            get;
+            set;
+        }
         private static void InitDb()
         {
             Trace.TraceInformation("checking db");
@@ -62,7 +69,7 @@ namespace QuickLauncher
         }
         private static void InitTraceLogger()
         {
-            var listener = new TextWriterTraceListener(QLConfig.LogFile, "quickLauncher")
+            var listener = new TextWriterTraceListener(QlConfig.LogFile, "quickLauncher")
             {
                 TraceOutputOptions = TraceOptions.DateTime,
             };
@@ -70,15 +77,15 @@ namespace QuickLauncher
             Trace.AutoFlush = true;
         }
 
-        private void nIcon_Click(object sender, EventArgs e)
+        private void NIcon_Click(object sender, EventArgs e)
         {
             //events comes here
-            show();
+            Show();
         }
 
-        private async void exit_Click(object sender, EventArgs e)
+        private async void Exit_Click(object sender, EventArgs e)
         {
-            show();
+            Show();
             var result = await DialogUtil.ShowYesNo("Confirm exit", (MahApps.Metro.Controls.MetroWindow)MainWindow, "Are you sure to exit?");
             if (result == MessageDialogResult.Affirmative)
             {
@@ -89,9 +96,9 @@ namespace QuickLauncher
             }
         }
 
-        private void show()
+        private void Show()
         {
-            ((MainWindow)MainWindow).ShowWindowNormal();
+            ((MainWindow)MainWindow)?.ShowWindowNormal();
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)
@@ -103,15 +110,17 @@ namespace QuickLauncher
                     Trace.TraceInformation("do database upgrade");
 
                     DbUtil.DoUpgradeDb();
-                } 
-                catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Trace.TraceError(ex.StackTrace);
                     MessageBox.Show("Failed to upgrade db, please delete the db or do manually upgrade. " + ex.Message);
                 }
-                
+
                 Environment.Exit(0);
             }
+
+            StartupArgs = e.Args;
         }
 
         private async void Application_ExitAsync(object sender, ExitEventArgs e)

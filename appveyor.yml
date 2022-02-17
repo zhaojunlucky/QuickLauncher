@@ -1,4 +1,4 @@
-version: 2.3.{build}
+# version: 2.3.{build}
 configuration: Release
 image: Visual Studio 2022
 branches:
@@ -6,14 +6,14 @@ branches:
     - master
 skip_tags: true
 
-dotnet_csproj:
-  patch: true
-  file: '**\*.csproj'
-  version: '{version}'
-  package_version: '{version}'
-  assembly_version: '{version}'
-  file_version: '{version}'
-  informational_version: '{version}'
+# dotnet_csproj:
+#   patch: true
+#   file: '**\*.csproj'
+#   version: '{version}'
+#   package_version: '{version}'
+#   assembly_version: '{version}'
+#   file_version: '{version}'
+#   informational_version: '{version}'
 
 build_script:
 - cmd: >-
@@ -28,20 +28,20 @@ build_script:
     "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\devenv.com" ".\QuickLauncherSetup\QuickLauncherSetup.vdproj" /build "Release"
 
 after_build:
-- ps: 7z a QuickLauncherSetup-${env:APPVEYOR_BUILD_VERSION}.zip QuickLauncherSetup\Release\*
+- ps: .\after_build.ps1
 - ps: ls
 artifacts:
 
   # pushing a single file
-  - path: QuickLauncherSetup-$(APPVEYOR_BUILD_VERSION).zip
+  - path: QuickLauncherSetup-*.zip
 
 deploy:
-  release: QuickLauncher-v$(APPVEYOR_BUILD_VERSION)
+  release: 'QuickLauncher Release v'
   description: 'QuickLauncher'
   provider: GitHub
   auth_token:
     secure: dkuuUUu5SVpAdawNcb7E40lkJvcv+Fuqdc1zd/k0rkRWef3gfMHaOqgMD5VWJVmg # your encrypted token from GitHub
-  artifact: QuickLauncherSetup-$(APPVEYOR_BUILD_VERSION).zip # upload all NuGet packages to release assets
+  artifact: /QuickLauncherSetup-.+\.zip/ # upload all NuGet packages to release assets
   draft: true
   prerelease: false
   on:

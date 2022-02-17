@@ -1,27 +1,17 @@
 ﻿using ControlzEx.Theming;
 using MahApps.Metro.Controls;
-using MahApps.Metro.Controls.Dialogs;
-using Microsoft.EntityFrameworkCore;
 using QuickLauncher.Config;
-using QuickLauncher.Dialogs;
 using QuickLauncher.Misc;
 using QuickLauncher.Model;
-using QuickLauncher.Notification;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO.Pipes;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Threading;
-using Utility;
+using QuickLauncher.Command;
 using Utility.HotKey;
 using Utility.Win32.Api;
 
@@ -30,99 +20,73 @@ namespace QuickLauncher
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : MetroWindow
+    public partial class MainWindow
     {
-        private OpenEditorCommand OpenNewEditorCommand;
-        private ObservableCollection<QuickCommand> quickCommands = new ObservableCollection<QuickCommand>();
-        private QuickCommandContext dbContext = QuickCommandContext.Instance;
-        public const Int32 _AboutSysMenuID = 1001;
-        private SettingItem viewSetting = null;
-        private MetroDialogSettings dialogSettings = new MetroDialogSettings()
-        {
-            ColorScheme = MetroDialogColorScheme.Accented// win.MetroDialogOptions.ColorScheme
-        };
-        private HashSet<string> disabledCmdContextMenuItem = new HashSet<string>(new List<string>() { "Open Working Directory", "Edit", "Edit Environment Variables", "Delete", "Copy" });
+        private readonly MainWindowModel viewModel;
+
+        public const int AboutSysMenuId = 1001;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            Utility.Singleton.AppSingleton.Instance.StartPipeServer(new AsyncCallback(_ConnectionHandler));
+            Utility.Singleton.AppSingleton.Instance.StartPipeServer(ConnectionHandler);
+            viewModel = new MainWindowModel(this);
+            viewModel.ShowWindowNormal += ViewModel_ShowWindowNormal;
+            viewModel.UpdateWindowState += ViewModel_UpdateWindowState;
+            this.DataContext = viewModel;
 
             this.Loaded += MainWindow_Loaded;
         }
 
+        private void ViewModel_UpdateWindowState(object sender, WindowState e)
+        {
+            WindowState = e;
+        }
+
+        private void ViewModel_ShowWindowNormal(object sender, object e)
+        {
+            ShowWindowNormal();
+        }
+
         private void LoadQuickLaunchers()
         {
-            Trace.TraceInformation("loading from database");
-            try
-            {
-                loadSettings();
-            }
-            catch (Exception e)
-            {
-                Trace.TraceError(e.StackTrace);
-                DialogUtil.showError(this, "Fail to query database:" + e.Message);
 
-                Environment.Exit(-1);
-            }
- 
-            loadQuickCommandsFromDb("");
-            Trace.TraceInformation("loading from database - done");
-
-            this.DataContext = this;
-            OpenNewEditorCommand = new OpenEditorCommand(() =>
+            var openEditorCommand = new OpenEditorCommand(() =>
             {
-                newquickcommand_Click(null, null);
+                var param = "Ctrl + N";
+                if (viewModel.NewQuickCommand.CanExecute(param))
+                {
+                    viewModel.NewQuickCommand.Execute(param);
+                }
+
             });
 
-            KeyBinding OpenCmdKeyBinding = new KeyBinding(OpenNewEditorCommand, Key.N, ModifierKeys.Control);
-
-            InputBindings.Add(OpenCmdKeyBinding);
-
-            commandsList.ItemsSource = quickCommands;
+            InputBindings.Add(new KeyBinding(openEditorCommand, Key.N, ModifierKeys.Control));
         }
 
-        public SettingItem ViewMode
-        {
-            get
-            {
-                return viewSetting;
-            }
-        }
-
-        public ObservableCollection<QuickCommand> QuickCommands
-        {
-            get
-            {
-                return quickCommands;
-            }
-        }
-
-        private void loadSettings()
-        {
-            viewSetting = SettingItemUtils.GetViewMode();
-        }
-
-        private void _ConnectionHandler(IAsyncResult result)
+        private void ConnectionHandler(IAsyncResult result)
         {
             var srv = result.AsyncState as NamedPipeServerStream;
-            srv.EndWaitForConnection(result);
-
-            // we're connected, now deserialize the incoming command line
-            var bf = new BinaryFormatter();
-            var msg = bf.Deserialize(srv) as string;
-
-            if (msg != "")
+            if (srv != null)
             {
-                this.BeginInvoke((Action)(() => ShowFromProcReq(msg)));
-                Utility.Singleton.AppSingleton.Instance.ReListen();
+                srv.EndWaitForConnection(result);
+
+                // we're connected, now deserialize the incoming command line
+                var bf = new BinaryFormatter();
+                var msg = bf.Deserialize(srv) as string;
+
+                if (msg != "")
+                {
+                    this.BeginInvoke(() => ShowFromProcReq(msg));
+                    Utility.Singleton.AppSingleton.Instance.ReListen();
+                }
             }
         }
 
-        private void ShowFromProcReq(string messgae)
+        private void ShowFromProcReq(string message)
         {
-            if (messgae == QLConfig.Singleton)
+            if (message == QlConfig.Singleton)
             {
                 ShowWindowNormal();
             }
@@ -132,20 +96,21 @@ namespace QuickLauncher
         {
             LoadQuickLaunchers();
 
-            /// Get the Handle for the Forms System Menu
+            // Get the Handle for the Forms System Menu
             IntPtr systemMenuHandle = Win32Api.GetSystemMenu(this.Handle, false);
 
-            /// Create our new System Menu items just before the Close menu item
+            // Create our new System Menu items just before the Close menu item
             Win32Api.InsertMenu(systemMenuHandle, 5, Win32Api.MF_BYPOSITION | Win32Api.MF_SEPARATOR, 0, string.Empty); // <-- Add a menu seperator
-            Win32Api.InsertMenu(systemMenuHandle, 7, Win32Api.MF_BYPOSITION, _AboutSysMenuID, "About");
+            Win32Api.InsertMenu(systemMenuHandle, 7, Win32Api.MF_BYPOSITION, AboutSysMenuId, "About");
 
             // Attach our WndProc handler to this Window
             HwndSource source = HwndSource.FromHwnd(this.Handle);
-            source.AddHook(new HwndSourceHook(WndProc));
+            if (source != null) source.AddHook(WndProc);
 
             ThemeManager.Current.ChangeThemeColorScheme(Application.Current, "Blue");
 
             RegisterHotKeys(false);
+
         }
 
         public void RegisterHotKeys(bool reload)
@@ -177,201 +142,18 @@ namespace QuickLauncher
             Activate();
         }
 
-        private void loadQuickCommandsFromDb(string key)
+        private void CommandsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            quickCommands.Clear();
-            IQueryable<QuickCommand> query = null;
-            var cleanKey = key.Trim().ToLower();
-            if (cleanKey.Length == 0)
+            if (((FrameworkElement)e.OriginalSource).DataContext is QuickCommand item)
             {
-                query = from b in dbContext.QuickCommands.Include("QuickCommandEnvConfigs")
-                        orderby b.Alias.ToLower()
-                        select b;
-            }
-            else
-            {
-                query = from b in dbContext.QuickCommands.Include("QuickCommandEnvConfigs")
-                        where b.Alias.ToLower().Contains(cleanKey)
-                        orderby b.Alias.ToLower()
-                        select b;
-            }
-            try
-            {
-                foreach (QuickCommand qc in query)
-                {
-                    quickCommands.Add(qc);
-                }
-            }
-            catch (Exception r)
-            {
-                Trace.TraceError(r.Message);
-                Trace.TraceError(r.StackTrace);
-                DialogUtil.showError(this, r.Message);
-            }
-
-        }
-
-        private void Qle_AddedNewQuickCommand(Model.QuickCommand command)
-        {
-            loadQuickCommandsFromDb("");
-        }
-
-        private void keyWords_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            var key = keyWords.Text.Trim();
-            loadQuickCommandsFromDb(key);
-        }
-
-        // for details view only
-        private void start_Click(object sender, RoutedEventArgs e)
-        {
-            QuickCommand qc = ((System.Windows.Controls.Button)sender).Tag as QuickCommand;
-            StartProcess(qc, false);
-        }
-        
-        // for details view only
-        private void startAdmin_Click(object sender, RoutedEventArgs e)
-        {
-            QuickCommand qc = ((System.Windows.Controls.Button)sender).Tag as QuickCommand;
-            StartProcess(qc, true);
-        }
-
-
-        private bool StartProcess(QuickCommand qc, bool asAdmin)
-        {
-            statusLabel.Content = "Starting \"" + qc.Alias + "\"";
-
-            bool isCtrlKeyPressed = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
-            ThreadPool.QueueUserWorkItem(delegate { startProcess(qc, asAdmin); });
-            if (!isCtrlKeyPressed)
-            {
-                this.WindowState = System.Windows.WindowState.Minimized;
-            }
-
-            return false;
-        }
-
-        private bool StartProcess(IList qcList, bool asAdmin)
-        {
-            var names = new List<string>();
-            foreach (QuickCommand qc in qcList)
-            {
-                names.Add(qc.Alias);
-            }
-            var m = "Starting \"" + string.Join(", ", names) + "\", as admin = " + asAdmin;
-            statusLabel.Content = m;
-            Trace.TraceInformation(m);
-
-            bool isCtrlKeyPressed = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
-            foreach (QuickCommand qc in qcList)
-            {
-                ThreadPool.QueueUserWorkItem(delegate { startProcess(qc, asAdmin); });
-            }
-
-            if (!isCtrlKeyPressed)
-            {
-                this.WindowState = System.Windows.WindowState.Minimized;
-            }
-
-            return false;
-        }
-
-
-        private bool startProcess(QuickCommand qc, bool asAdmin)
-        {
-            ProcessStartInfo startInfo = new ProcessStartInfo(qc.ExpandedPath, qc.Command);
-            startInfo.UseShellExecute = true;
-            if (asAdmin)
-            {
-                startInfo.Verb = "runas";
-            }
-            string workingDir = qc.ExpandedWorkDirectory;
-            if (workingDir.Length == 0)
-            {
-                workingDir = FileUtil.getDirectoryOfFile(qc.ExpandedPath);
-            }
-
-            startInfo.WorkingDirectory = workingDir;
-            if (qc.QuickCommandEnvConfigs != null)
-            {
-                foreach (var o in qc.QuickCommandEnvConfigs)
-                {
-                    startInfo.EnvironmentVariables[o.EnvKey] = o.ExpandedEnvValue;
-                }
-                if (qc.QuickCommandEnvConfigs.Count > 0)
-                {
-                    startInfo.UseShellExecute = false;
-                }
-            }
-            try
-            {
-                Process.Start(startInfo);
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    statusLabel.Content = "Started \"" + qc.Alias + "\" at " + DateTime.Now.ToString();
-                }), DispatcherPriority.Background);
-
-                return true;
-            }
-            catch (System.ComponentModel.Win32Exception e)
-            {
-                Trace.TraceError(e.StackTrace);
-                if(e.NativeErrorCode != 1223) // if it is not canceled by the user
-                                              // see https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes--1000-1299-
-                {
-                    Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        statusLabel.Content = "Started \"" + qc.Alias + "\" failed: \"" + e.Message + "\" at " + DateTime.Now.ToString();
-                        ShowWindowNormal();
-                        DialogUtil.showError(this, e.Message);
-                    }), DispatcherPriority.Background);
-                }
-                
-            }
-            return false;
-        }
-
-        private async void edit_Click(object sender, RoutedEventArgs e)
-        {
-            QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
-
-            var dialog = new CmdEditor(this, dialogSettings, qc);
-            dialog.AddedNewQuickCommand += Qle_AddedNewQuickCommand;
-            await this.ShowMetroDialogAsync(dialog);
-        }
-
-        private async void delete_Click(object sender, RoutedEventArgs e)
-        {
-            QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
-            MessageDialogResult result = await DialogUtil.ShowYesNo("Delete confirmation", this, "Are you sure to delete the selected quick commands?");
-            if (result == MessageDialogResult.Affirmative)
-            {
-                dbContext.QuickCommandEnvConfigs.RemoveRange(qc.QuickCommandEnvConfigs);
-                dbContext.QuickCommands.Remove(qc);
-                dbContext.SaveChanges();
-                quickCommands.Remove(qc);
-            }
-        }
-
-        private void commandsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            var item = ((FrameworkElement)e.OriginalSource).DataContext as QuickCommand;
-            if (item != null)
-            {
-                StartProcess(item, false);
+                viewModel.StartProcess(item, false);
             }
         }
 
         /// <summary>
         /// This is the Win32 Interop Handle for this Window
         /// </summary>
-        public IntPtr Handle
-        {
-            get
-            {
-                return new WindowInteropHelper(this).Handle;
-            }
-        }
+        public IntPtr Handle => new WindowInteropHelper(this).Handle;
 
         private static IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
@@ -382,11 +164,13 @@ namespace QuickLauncher
                 // Execute the appropriate code for the System Menu item that was clicked
                 switch (wParam.ToInt32())
                 {
-                    case _AboutSysMenuID:
+                    case AboutSysMenuId:
                         handled = true;
 
-                        About about = new About();
-                        about.Owner = Application.Current.MainWindow;
+                        About about = new About
+                        {
+                            Owner = Application.Current.MainWindow
+                        };
                         about.ShowDialog();
 
                         break;
@@ -396,57 +180,7 @@ namespace QuickLauncher
             return IntPtr.Zero;
         }
 
-        private async void newquickcommand_Click(object sender, RoutedEventArgs e)
-        {
-            var dialog = new CmdEditor(this, dialogSettings, null);
-            dialog.AddedNewQuickCommand += Qle_AddedNewQuickCommand;
-            await this.ShowMetroDialogAsync(dialog);
-        }
-
-        private void about_Click(object sender, RoutedEventArgs e)
-        {
-            About about = new About();
-            about.Owner = this;
-            about.ShowDialog();
-        }
-
-        private void startMenu_Click(object sender, RoutedEventArgs e)
-        {
-            StartProcess(this.commandsList.SelectedItems, false);
-        }
-
-        private void startAdminMenu_Click(object sender, RoutedEventArgs e)
-        {
-            StartProcess(this.commandsList.SelectedItems, true);
-        }
-
-        private void openWorkingDir_Click(object sender, RoutedEventArgs e)
-        {
-            QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
-            try
-            {
-                System.Diagnostics.Process.Start("explorer.exe", qc.ExpandedWorkDirectory);
-            }
-            catch (System.ComponentModel.Win32Exception exception)
-            {
-                DialogUtil.showError(this, exception.Message);
-            }
-        }
-
-        private async void editEnvConfig_Click(object sender, RoutedEventArgs e)
-        {
-            QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
-            EnvEditor envEditor = new EnvEditor(this, dialogSettings, qc);
-            await this.ShowMetroDialogAsync(envEditor);
-        }
-
-        private async void Settings_Click(object sender, RoutedEventArgs e)
-        {
-            Settings settings = new Settings(this, dialogSettings);
-            await this.ShowMetroDialogAsync(settings);
-        }
-
-        private void root_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Root_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
 #if DEBUG
             // do nothing
@@ -456,80 +190,29 @@ namespace QuickLauncher
 #endif
         }
 
-        private void root_Activated(object sender, EventArgs e)
+        private void Root_Activated(object sender, EventArgs e)
         {
-            commandsList.Focus();
+            // commandsList.Focus();
         }
 
-        private void RefreshAll_Click(object sender, RoutedEventArgs e)
+        private void Root_Loaded(object sender, RoutedEventArgs e)
         {
-            loadQuickCommandsFromDb("");
-        }
-
-        private async void Refresh_Click(object sender, RoutedEventArgs e)
-        {
-            QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
-            await dbContext.Entry(qc).ReloadAsync();
-        }
-
-        private void commandsList_ContextMenuOpening(object sender, ContextMenuEventArgs e)
-        {
-            bool enabled = commandsList.SelectedItems.Count == 1;
-            ListViewItem lvi = sender as ListViewItem;
-            ContextMenu cm = lvi.ContextMenu;
-            foreach (object item in cm.Items)
+            var app = (App) Application.Current;
+            if (app.StartupArgs == null || app.StartupArgs.Length <= 0 || app.StartupArgs[0].Trim() != "/Restart")
             {
-                var mi = item as MenuItem;
-                if (mi == null)
-                {
-                    continue;
-                }
-
-                var header = (String)mi.Header;
-                if (disabledCmdContextMenuItem.Contains(header))
-                {
-                    mi.IsEnabled = enabled;
-                }
+                viewModel.DoAutoStartCommands();
             }
         }
 
-        private void root_Loaded(object sender, RoutedEventArgs e)
-        {
-            Trace.TraceInformation("start auto start command");
-            IList qcList = new List<QuickCommand>();
-            var query = from b in dbContext.QuickCommands.Include("QuickCommandEnvConfigs")
-                        where b.IsAutoStart == true
-                        select b;
-
-            foreach (QuickCommand qc in query)
-            {
-                Trace.TraceInformation("auto start cmd: {0}", qc.Alias);
-                qcList.Add(qc);
-            }
-            if (qcList.Count > 0)
-            {
-                StartProcess(qcList, false);
-            }
-            else
-            {
-                Trace.TraceInformation("no auto start command found");
-            }
-            
-        }
-
-        private async void Copy_Click(object sender, RoutedEventArgs e)
-        {
-            QuickCommand qc = this.commandsList.SelectedItem as QuickCommand;
-            QuickCommand copy = new QuickCommand(qc);
-
-            var dialog = new CmdEditor(this, dialogSettings, copy);
-            dialog.AddedNewQuickCommand += Qle_AddedNewQuickCommand;
-            await this.ShowMetroDialogAsync(dialog);
-        }
-
-        private void root_Closed(object sender, EventArgs e)
+        private void Root_Closed(object sender, EventArgs e)
         {
             HotKeyUtil.UnRegisterHotKeys();
+        }
+
+        private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            viewModel.SelectedTab.SelectedQuickCommands = (e.OriginalSource as ListView)?.SelectedItems.Cast<QuickCommand>()
+                .ToList();
         }
     }
 }
