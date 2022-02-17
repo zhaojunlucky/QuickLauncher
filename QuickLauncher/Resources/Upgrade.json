@@ -1,6 +1,5 @@
 {
-  "SQLS": 
-  [
+  "Sqls": [
     [ "ALTER TABLE QUICK_COMMAND ADD COLUMN AUTO_START INTEGER DEFAULT 0;" ],
     [ "DELETE FROM SETTING WHERE KEY='view.viewmode';" ]
   ]
