@@ -6,7 +6,7 @@
 #define MyAppPublisher "MagicWorldZ"
 #define MyAppURL "https://blog.magicworldz.de/quicklauncher/"
 #define MyAppExeName "QuickLauncher.exe"
-#define Platform "$PLATFORM"
+#define Config "$CONFIG"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -24,7 +24,7 @@ DisableProgramGroupPage=yes
 ; Remove the following line to run in administrative install mode (install for all users.)
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
-OutputBaseFilename=QuickLauncherInstaller
+OutputBaseFilename=QuickLauncherInstaller-{#MyAppVersion}
 SetupIconFile=..\..\QuickLauncher\Resource\launcher.ico
 Compression=lzma
 SolidCompression=yes
@@ -38,8 +38,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\QuickLauncher\bin\x64\{#Platform}\netcoreapp3.1\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\QuickLauncher\bin\x64\{#Platform}\netcoreapp3.1\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\QuickLauncher\bin\x64\{#Config}\netcoreapp3.1\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\QuickLauncher\bin\x64\{#Config}\netcoreapp3.1\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

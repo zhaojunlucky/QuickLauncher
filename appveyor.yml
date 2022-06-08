@@ -22,10 +22,10 @@ build_script:
     msbuild  ".\QuickLauncher\QuickLauncher.csproj" /t:Restore
 
 
-    "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\devenv.com" ".\QuickLauncherSetup\QuickLauncherSetup.vdproj" /clean "Release"
+    "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\devenv.com" ".\QuickLauncherInstaller\QuickLauncherInstaller.csproj" /clean "Release|x64"
 
 
-    "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\devenv.com" ".\QuickLauncherSetup\QuickLauncherSetup.vdproj" /build "Release"
+    "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\devenv.com" ".\QuickLauncherInstaller\QuickLauncherInstaller.csproj" /build "Release|x64"
 
 after_build:
 - ps: .\after_build.ps1
