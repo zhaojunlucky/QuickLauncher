@@ -20,6 +20,8 @@ namespace QuickLauncher.Model
 
         public bool IsReadOnly { get; set; }
 
+        public bool IsWritable => !IsReadOnly;
+
         public QuickCommand SelectedQuickCommand
         {
             get;

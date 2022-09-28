@@ -1,13 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30406.217
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32516.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickLauncher", "QuickLauncher\QuickLauncher.csproj", "{D6562AFD-F79B-4095-92DC-A93D3A380CF3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utility", "Utility\Utility.csproj", "{E8EC79B8-4B35-4C59-A65C-7E3D15419DCF}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "QuickLauncherSetup", "QuickLauncherSetup\QuickLauncherSetup.vdproj", "{9B97E6DF-A222-489A-960C-75B0D317BFFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickLauncherInstaller", "QuickLauncherInstaller\QuickLauncherInstaller.csproj", "{D1998DAF-3ED4-42F4-A994-DFD6FE1ABF7F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D6562AFD-F79B-4095-92DC-A93D3A380CF3} = {D6562AFD-F79B-4095-92DC-A93D3A380CF3}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,9 +26,10 @@ Global
 		{E8EC79B8-4B35-4C59-A65C-7E3D15419DCF}.Debug|x64.Build.0 = Debug|x64
 		{E8EC79B8-4B35-4C59-A65C-7E3D15419DCF}.Release|x64.ActiveCfg = Release|x64
 		{E8EC79B8-4B35-4C59-A65C-7E3D15419DCF}.Release|x64.Build.0 = Release|x64
-		{9B97E6DF-A222-489A-960C-75B0D317BFFA}.Debug|x64.ActiveCfg = Debug
-		{9B97E6DF-A222-489A-960C-75B0D317BFFA}.Release|x64.ActiveCfg = Release
-		{9B97E6DF-A222-489A-960C-75B0D317BFFA}.Release|x64.Build.0 = Release
+		{D1998DAF-3ED4-42F4-A994-DFD6FE1ABF7F}.Debug|x64.ActiveCfg = Debug|x64
+		{D1998DAF-3ED4-42F4-A994-DFD6FE1ABF7F}.Debug|x64.Build.0 = Debug|x64
+		{D1998DAF-3ED4-42F4-A994-DFD6FE1ABF7F}.Release|x64.ActiveCfg = Release|x64
+		{D1998DAF-3ED4-42F4-A994-DFD6FE1ABF7F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -30,7 +30,7 @@ namespace QuickLauncher.Model
         public AboutDialogModel()
         {
             NewVersionUiVisibility = Visibility.Collapsed;
-            newVersionResult = "(Quicklauncher is up to date)";
+            newVersionResult = "(QuickLauncher is up to date)";
 
             var rAssembly = Assembly.GetEntryAssembly();
             Version = rAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
