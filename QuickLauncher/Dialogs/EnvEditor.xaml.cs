@@ -48,8 +48,7 @@ namespace QuickLauncher.Dialogs
             {
                 foreach (var o in e.NewItems)
                 {
-                    var item = o as QuickCommandEnvConfig;
-                    if (item != null)
+                    if (o is QuickCommandEnvConfig item)
                     {
                         item.BindingEnvs = quickCommandEnvs;
                         item.ParentId = quickCommand.Uuid;
@@ -117,13 +116,13 @@ namespace QuickLauncher.Dialogs
             }
             else
             {
-                doSave();
+                DoSave();
                 quickCommandEnvs.CollectionChanged -= QuickCommands_CollectionChanged;
                 await parent.HideMetroDialogAsync(this);
             }
         }
 
-        private void doSave()
+        private void DoSave()
         {
             var dbContext = QuickCommandContext.Instance;
             var toRemove = new List<QuickCommandEnvConfig>();

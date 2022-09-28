@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:QuickLauncher"
         xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:dd="urn:gong-wpf-dragdrop"
         mc:Ignorable="d"
         x:Name="root" 
         BorderThickness="0" 
@@ -64,7 +65,9 @@
                     <ListView MouseDoubleClick="CommandsList_MouseDoubleClick" ScrollViewer.VerticalScrollBarVisibility="Auto" MinHeight="539" MinWidth="1070" SelectionMode="Extended"
                       Padding="10,0,10,0" IsSynchronizedWithCurrentItem="True"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" TextSearch.TextPath="Alias" IsTextSearchCaseSensitive="False"
                       ItemsSource="{Binding Path=QuickCommands, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=SelectedQuickCommand}"
-                      SelectionChanged="Selector_OnSelectionChanged">
+                      SelectionChanged="Selector_OnSelectionChanged" dd:DragDrop.IsDragSource="False"
+                      dd:DragDrop.IsDropTarget="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.SelectedTab.IsWritable}"
+                      dd:DragDrop.DropHandler="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext}">
                         <ListView.Resources>
                             <ContextMenu x:Key="ItemContextMenu">
                                 <MenuItem Header="Start" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext.StartCommand}" 

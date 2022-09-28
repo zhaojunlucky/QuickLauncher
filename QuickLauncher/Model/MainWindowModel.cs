@@ -2,11 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using GongSolutions.Wpf.DragDrop;
+using IWshRuntimeLibrary;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using QuickLauncher.Command;
@@ -16,13 +20,14 @@ using Utility;
 
 namespace QuickLauncher.Model
 {
-    internal class MainWindowModel : AbstractMetroModel
+    internal class MainWindowModel : AbstractMetroModel, IDropTarget
     {
         private readonly MetroDialogSettings dialogSettings = new MetroDialogSettings()
         {
             ColorScheme = MetroDialogColorScheme.Accented// win.MetroDialogOptions.ColorScheme
         };
         private readonly QuickCommandContext dbContext = QuickCommandContext.Instance;
+        private readonly Semaphore dragDropDialogWaiter = new Semaphore(1, 1);
         public event EventHandler<WindowState> UpdateWindowState;
         public event EventHandler<object> ShowWindowNormal;
         private string commandSearchKey;
@@ -305,6 +310,7 @@ namespace QuickLauncher.Model
             {
                 return false;
             }
+
             IList commands = x as IList;
             if (commands == null || commands.Count == 0 || !(commands[0] is QuickCommand))
             {
@@ -347,7 +353,6 @@ namespace QuickLauncher.Model
 
         private async Task ShowDialogAsync(BaseMetroDialog dialog, bool reload)
         {
-            await DialogCoordinator.Instance.ShowMetroDialogAsync(this, dialog, dialogSettings);
             if (reload)
             {
                 dialog.Unloaded += (sender, args) =>
@@ -355,6 +360,7 @@ namespace QuickLauncher.Model
                     SelectedTab.Reload(CommandSearchKey);
                 };
             }
+            await DialogCoordinator.Instance.ShowMetroDialogAsync(this, dialog, dialogSettings);
         }
 
         private void SearchQuickCommandsOnAllTabs(string value)
@@ -490,6 +496,90 @@ namespace QuickLauncher.Model
             lastRebootTimeItem.Value = $"{curRebootTime}";
             SettingItemUtils.SaveSettingItem(lastRebootTimeItem);
 
+        }
+
+        private bool IsSupportedFile(string filePath)
+        {
+            var fileLower = filePath.ToLower();
+            return fileLower.EndsWith(".lnk") || fileLower.EndsWith(".exe");
+        }
+
+        public void DragOver(IDropInfo dropInfo)
+        {
+            DragDropEffects effect = DragDropEffects.None;
+            if (dropInfo.Data is DataObject data)
+            {
+                foreach(var file in data.GetFileDropList())
+                {
+                    if (!IsSupportedFile(file)) continue;
+                    effect = DragDropEffects.Link;
+                    break;
+                }
+            }
+
+            dropInfo.Effects = effect;
+
+        }
+
+        public void Drop(IDropInfo dropInfo)
+        {
+            var fileList = new List<string>();
+
+            if (!(dropInfo.Data is DataObject data)) return;
+
+            foreach (var file in data.GetFileDropList())
+            {
+                if (!IsSupportedFile(file)) continue;
+
+                fileList.Add(file);
+            }
+            Trace.TraceInformation("dropped file list {0}", fileList.ToString());
+            ThreadPool.QueueUserWorkItem(delegate { CreateCommandsForDrop(fileList); });
+            
+        }
+
+        private void CreateCommandsForDrop(List<string> fileList)
+        {
+            foreach (var file in fileList)
+            {
+                dragDropDialogWaiter.WaitOne();
+                MainWindow.BeginInvoke(()=> CreateCommandForDrop(file));
+            }
+        }
+
+        private async void CreateCommandForDrop(string file)
+        {
+            IWshShell wsh = new WshShell();
+            var qc = new QuickCommand(true);
+            if (file.ToLower().EndsWith(".lnk"))
+            {
+                IWshShortcut sc = (IWshShortcut)wsh.CreateShortcut(file);
+                var workingDir = sc.WorkingDirectory;
+                if (string.IsNullOrEmpty(workingDir))
+                {
+                    qc.WorkDirectory = Path.GetDirectoryName(sc.TargetPath);
+                }
+
+                qc.Path = sc.TargetPath;
+                qc.Command = sc.Arguments;
+                qc.Alias = FileUtil.GetFileNameNoExt(file);
+            }
+            else
+            {
+                qc.Path = file;
+            }
+            var dialog = new CmdEditor(MainWindow, dialogSettings, qc);
+
+            dialog.BeforeClose += delegate(object sender)
+            {
+                if (sender != dialog) return;
+                Trace.TraceInformation("{0} dialog closed", file);
+                dragDropDialogWaiter.Release();
+
+            };
+            Trace.TraceInformation("handle drop {0}", file);
+
+            await ShowDialogAsync(dialog, true);
         }
     }
 }
