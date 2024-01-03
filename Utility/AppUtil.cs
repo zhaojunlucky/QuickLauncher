@@ -35,18 +35,5 @@ namespace Utility
             };
             Application.Current.Shutdown();
         }
-
-        public static DateTime GetSystemLastRebootTime()
-        {
-            IntPtr bufPtr = IntPtr.Zero;
-            int val = Win32Api.NetStatisticsGet(null, "LanmanWorkstation", 0, 0, out bufPtr);
-            Win32Api.STAT_WORKSTATION_0 wks = new Win32Api.STAT_WORKSTATION_0();
-            if (val == 0)
-            {
-                wks = (Win32Api.STAT_WORKSTATION_0)Marshal.PtrToStructure(bufPtr, typeof(Win32Api.STAT_WORKSTATION_0));
-            }
-            DateTime rebootTime = DateTime.FromFileTime(wks.StatisticsStartTime);
-            return rebootTime;
-        }
     }
 }

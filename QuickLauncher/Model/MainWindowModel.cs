@@ -467,18 +467,7 @@ namespace QuickLauncher.Model
 
         internal void DoAutoStartCommands()
         {
-            var lastRebootTimeItem = SettingItemUtils.GetSystemLastRebootTime();
-            var lastRebootTime = string.IsNullOrEmpty(lastRebootTimeItem.Value)
-                ? DateTime.MinValue
-                : DateTime.Parse(lastRebootTimeItem.Value);
-            var curRebootTime = AppUtil.GetSystemLastRebootTime();
-
-            Trace.TraceInformation($"saved reboot time {lastRebootTime}, current reboot time {curRebootTime}");
-            if (curRebootTime <= lastRebootTime || curRebootTime.ToString() == lastRebootTime.ToString())
-            {
-                Trace.TraceWarning("Skip auto start");
-                return;
-            }
+           
             var qcList = new List<QuickCommand>();
 
             foreach (var tab in Tabs)
@@ -492,9 +481,6 @@ namespace QuickLauncher.Model
             {
                 StartProcesses(qcList, false);
             }
-
-            lastRebootTimeItem.Value = $"{curRebootTime}";
-            SettingItemUtils.SaveSettingItem(lastRebootTimeItem);
 
         }
 

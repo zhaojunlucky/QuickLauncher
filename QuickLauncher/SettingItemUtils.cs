@@ -80,10 +80,5 @@ namespace QuickLauncher
         {
             return GetByKey("auto.command.auto.start", "", true);
         }
-
-        public static SettingItem GetSystemLastRebootTime()
-        {
-            return GetByKey("system.reboot.time", "", true);
-        }
     }
 }

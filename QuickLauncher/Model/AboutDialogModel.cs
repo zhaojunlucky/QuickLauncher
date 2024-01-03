@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using Utility.Model;
@@ -33,7 +34,8 @@ namespace QuickLauncher.Model
             newVersionResult = "(QuickLauncher is up to date)";
 
             var rAssembly = Assembly.GetEntryAssembly();
-            Version = rAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+            Version = ParseVersion(rAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
+
 #if DEBUG
             FullVersion = $"Version {Version} Debug Build";
 #else
@@ -45,6 +47,18 @@ namespace QuickLauncher.Model
             AllowNavigateToolTip = "";
         }
 
+        private string ParseVersion(string informationalVersion)
+        {
+            //3.1.0-rc.48+Branch.master.Sha.09defdc8c281779943956efd1c96547115fa29a8
+            Regex rg = new Regex(@"^(\d+\.\d+\.\d+)-rc\.(\d+).+$");
+            MatchCollection matchedVers = rg.Matches(informationalVersion.Trim());
+            if (matchedVers.Count > 0)
+            {
+                return $"{matchedVers[0].Groups[1].Value}.{matchedVers[0].Groups[2].Value}";
+            }
+            return informationalVersion;
+        }
+
         public async Task CheckUpdates()
         {
             string result = "";
@@ -54,7 +68,7 @@ namespace QuickLauncher.Model
             try
             {
                 LatestRelease = await CheckNewVersion();
-                var newVer = LatestRelease.Name.Substring("QuickLauncher-v".Length);
+                var newVer = ParseGHRelease(LatestRelease.Name);
                 Trace.TraceInformation($"GitHub version {newVer}");
                 if (string.Compare(newVer, version, StringComparison.CurrentCulture) > 0)
                 {
@@ -72,6 +86,17 @@ namespace QuickLauncher.Model
                 result = "Network Error";
             }
             UpdateCheckingStatus(false, result, allowNavigate);
+        }
+
+        private string ParseGHRelease(string name)
+        {
+            Regex rg = new Regex(@"^.*(\d+\.\d+\.\d+\.\d+).*$");
+            MatchCollection matchedVers = rg.Matches(name.Trim());
+            if (matchedVers.Count > 0)
+            {
+                return matchedVers[0].Groups[1].Value;
+            }
+            return name;
         }
 
         private void UpdateCheckingStatus(bool start, string result, bool allowNavigate)
