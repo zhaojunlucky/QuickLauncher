@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using QuickLauncher.Misc;
 using Utility;
+using System.IO.Compression;
 
 namespace QuickLauncher.Detector
 {
@@ -30,136 +31,78 @@ namespace QuickLauncher.Detector
                 return;
             }
 
-            var settingJsonPath = Path.Combine(toolboxPath, ".settings.json");
-            string appPath = ReadSettingJson(settingJsonPath);
+            var stateJsonPath = Path.Combine(toolboxPath, "state.json");
 
-            appPath ??= Path.Combine(toolboxPath, "apps");
+            DetectApplicationBinary(stateJsonPath);
 
-            if (!Directory.Exists(appPath))
+        }
+
+
+
+        private void DetectApplicationBinary(string stateJson)
+        {
+
+            if (!File.Exists(stateJson))
             {
                 return;
             }
-
-            Trace.TraceInformation($"Jetbrains folder {appPath}");
-            Detect(appPath);
-
-        }
-
-        private void Detect(string fullPath)
-        {
-            foreach (var product in Directory.GetDirectories(fullPath))
+            using JsonDocument document = JsonDocument.Parse(File.ReadAllText(stateJson));
+            if (document.RootElement.TryGetProperty("tools", out JsonElement tools))
             {
-                Trace.TraceInformation($"Checking {product}");
-                var folderInfo = new DirectoryInfo(product);
-
-                DetectProduct(folderInfo.Name, product);
-            }
-        }
-
-        private void DetectProduct(string productName, string productPath)
-        {
-            var subDirs = Directory.GetDirectories(productPath, "ch-*");
-            if (subDirs.Length == 0)
-            {
-                Trace.TraceWarning($"{productPath} doesn't have application installed");
-                return;
-            }
-            Array.Sort(subDirs);
-            var activePath = subDirs.Last();
-            DetectApplication(productName, activePath);
-        }
-
-        private void DetectApplication(string productName, string activePath)
-        {
-            Regex rx = new Regex(@"^\d+(.\d+)+\.\d+$",
-                RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            var appFolders = new List<string>();
-            foreach (var folder in Directory.GetDirectories(activePath))
-            {
-                var folderInfo = new DirectoryInfo(folder);
-                if (!rx.IsMatch(folderInfo.Name))
+                if (tools.ValueKind != JsonValueKind.Array)
                 {
-                    continue;
+                    return;
                 }
-                appFolders.Add(folder);
             }
-
-            if (appFolders.Count == 0)
+            foreach(JsonElement prod in tools.EnumerateArray())
             {
-                return;
-            }
-            appFolders.Sort();
-            var appFolder = appFolders.Last();
-            DetectApplicationBinary(productName, appFolder);
-        }
-
-        private void DetectApplicationBinary(string productName, string appFolder)
-        {
-            string appFile = null;
-            var workingDir = Path.Combine(appFolder, "bin");
-            if (!Directory.Exists(workingDir))
-            {
-                Trace.TraceError($"Invalid path {workingDir}");
-                return;
-            }
-
-            var exeFiles = Directory.GetFiles(workingDir, "*64.exe");
-            if (exeFiles.Length == 1)
-            {
-                appFile = exeFiles[0];
-            }
-            else if(exeFiles.Length > 1)
-            {
-                foreach (var exe in exeFiles)
+                Trace.WriteLine(prod.ToString());
+                try
                 {
-                    var exeInfo = new FileInfo(exe);
-                    var name = exeInfo.Name.TrimEnd("64.exe".ToCharArray());
-                    if (!productName.Contains(name))
+                    if (!prod.TryGetProperty("displayName", out JsonElement displayNameEl)) {
+                        Trace.TraceError($"invalid displayName");
+                        continue; 
+                    }
+                    var displayName = displayNameEl.GetString();
+
+                    if (!prod.TryGetProperty("installLocation", out JsonElement installLocationEl))
                     {
+                        Trace.TraceError($"invalid installLocation");
                         continue;
                     }
-                    appFile = exe;
-                    break;
-                }
-            }
+                    var installLocation = installLocationEl.GetString();
 
-            if (appFile == null)
-            {
-                Trace.TraceWarning($"Unable to find application for {productName}");
-                return;
-            }
+                    if (!prod.TryGetProperty("launchCommand", out JsonElement launchCommandEl))
+                    {
+                        Trace.TraceError($"invalid launchCommand");
+                        continue;
+                    }
+                    var launchCommand = launchCommandEl.GetString();
+                    var workDir = Path.Combine(installLocation, "jbr\\bin");
+                    if (!Directory.Exists(workDir))
+                    {
+                        workDir = installLocation;
+                    }
 
-            Trace.TraceInformation($"Find application {appFile}");
-            var uuid = GuidUtil.Create(GuidUtil.UrlNamespace, $"{Category.ToLower()}-{productName.ToLower()}").ToString();
-            var quickCommand = new QuickCommand
-            {
-                Path = appFile,
-                WorkDirectory = workingDir,
-                Alias = productName,
-                Uuid = uuid,
-                IsReadOnly = true,
-                IsAutoStart = AutoDetectCommandAutoStartMgr.Current.IsAutoStart(uuid)
-            };
-            quickCommands.Add(quickCommand);
 
-        }
-
-        private string ReadSettingJson(string path)
-        {
-            if (!File.Exists(path))
-            {
-                return null;
-            }
-            using JsonDocument document = JsonDocument.Parse(File.ReadAllText(path));
-            if (document.RootElement.TryGetProperty("install_location", out JsonElement installLocation))
-            {
-                if (installLocation.ValueKind == JsonValueKind.String)
+                    var uuid = GuidUtil.Create(GuidUtil.UrlNamespace, $"{Category.ToLower()}-{displayName.ToLower()}").ToString();
+                    var quickCommand = new QuickCommand
+                    {
+                        Path = Path.Combine(installLocation, launchCommand),
+                        WorkDirectory = workDir,
+                        Alias = displayName,
+                        Uuid = uuid,
+                        IsReadOnly = true,
+                        IsAutoStart = AutoDetectCommandAutoStartMgr.Current.IsAutoStart(uuid)
+                    };
+                    quickCommands.Add(quickCommand);
+                } catch (Exception ex)
                 {
-                    return installLocation.GetString();
+                    Trace.TraceError(ex.ToString());
                 }
+                
             }
 
-            return null;
         }
     }
 }

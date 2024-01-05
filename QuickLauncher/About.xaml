@@ -30,7 +30,7 @@
             <Label Content="{Binding Copyright}" Margin="0, 15, 0, 0" FontSize="14"/>
             <TextBlock Margin="5, 15, 0, 0">
                 <Hyperlink Click="Hyperlink_Click">
-                    <TextBlock x:Name="link" Text="https://blog.magicworldz.de/quicklauncher" FontSize="14"/>
+                    <TextBlock x:Name="link" Text="https://magicworldz.dev/" FontSize="14"/>
                 </Hyperlink>
             </TextBlock>
         </StackPanel>
