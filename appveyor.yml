@@ -36,7 +36,7 @@ artifacts:
   - path: QuickLauncherSetup-*.zip
 
 deploy:
-  release: 'QuickLauncher Release v3.2.0-build $(build)'
+  #release: 'QuickLauncher Release v3.2.0-build $(build)'
   description: 'QuickLauncher'
   provider: GitHub
   auth_token:
