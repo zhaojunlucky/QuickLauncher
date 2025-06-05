@@ -1,17 +1,17 @@
 ﻿using ControlzEx.Theming;
 using MahApps.Metro.Controls;
+using QuickLauncher.Command;
 using QuickLauncher.Config;
 using QuickLauncher.Misc;
 using QuickLauncher.Model;
 using System;
+using System.IO;
 using System.IO.Pipes;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
-using QuickLauncher.Command;
 using Utility.HotKey;
 using Utility.Win32.Api;
 
@@ -65,6 +65,8 @@ namespace QuickLauncher
             InputBindings.Add(new KeyBinding(openEditorCommand, Key.N, ModifierKeys.Control));
         }
 
+        // ...
+
         private void ConnectionHandler(IAsyncResult result)
         {
             var srv = result.AsyncState as NamedPipeServerStream;
@@ -73,13 +75,14 @@ namespace QuickLauncher
                 srv.EndWaitForConnection(result);
 
                 // we're connected, now deserialize the incoming command line
-                var bf = new BinaryFormatter();
-                var msg = bf.Deserialize(srv) as string;
-
-                if (msg != "")
+                using (var reader = new StreamReader(srv))
                 {
-                    this.BeginInvoke(() => ShowFromProcReq(msg));
-                    Utility.Singleton.AppSingleton.Instance.ReListen();
+                    var msg = reader.ReadToEnd();
+                    if (!string.IsNullOrEmpty(msg))
+                    {
+                        this.BeginInvoke(() => ShowFromProcReq(msg));
+                        Utility.Singleton.AppSingleton.Instance.ReListen();
+                    }
                 }
             }
         }
