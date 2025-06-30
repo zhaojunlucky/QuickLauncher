@@ -1,13 +1,11 @@
 assembly-versioning-scheme: Major
 assembly-file-versioning-scheme: MajorMinorPatchTag
-mode: Mainline
-next-version: 3.2.0
+next-version: 3.3.0
 branches:
   master:
     regex: ^master
     mode: ContinuousDeployment
     tag: rc
-    prevent-increment-of-merged-branch-version: true
     track-merge-target: false
     is-release-branch: true
   pull-request:

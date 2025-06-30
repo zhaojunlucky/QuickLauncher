@@ -35,6 +35,7 @@ namespace QuickLauncher.Model
             newVersionResult = "(QuickLauncher is up to date)";
 
             var rAssembly = Assembly.GetEntryAssembly();
+            //Version = ParseVersion(rAssembly.GetName().Version?.ToString());
             Version = ParseVersion(rAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
 
 #if DEBUG
