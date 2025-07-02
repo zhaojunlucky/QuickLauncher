@@ -277,10 +277,15 @@ namespace QuickLauncher.Model
                 settingsCommand ??= new SimpleCommand(x =>
                 {
                     Settings settings = new Settings(MainWindow, dialogSettings);
-                    _ = ShowDialogAsync(settings, false);
+                    _ = ShowDialogAsyncCallback(settings, ()=> onSettingChanged());
                 });
                 return settingsCommand;
             }
+        }
+
+        private void onSettingChanged()
+        {
+            reminderModel.EnabledReiminder();
         }
 
         public ICommand RefreshAllCommand
@@ -366,6 +371,18 @@ namespace QuickLauncher.Model
                 dialog.Unloaded += (sender, args) =>
                 {
                     SelectedTab.Reload(CommandSearchKey);
+                };
+            }
+            await DialogCoordinator.Instance.ShowMetroDialogAsync(this, dialog, dialogSettings);
+        }
+
+        private async Task ShowDialogAsyncCallback(BaseMetroDialog dialog, Action callback)
+        {
+            if (callback != null)
+            {
+                dialog.Unloaded += (sender, args) =>
+                {
+                    callback();
                 };
             }
             await DialogCoordinator.Instance.ShowMetroDialogAsync(this, dialog, dialogSettings);

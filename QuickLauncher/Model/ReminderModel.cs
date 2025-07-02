@@ -52,7 +52,13 @@ namespace QuickLauncher.Model
         {
             MainWindow = mainWindow;
 #if DEBUG
-            MainWindow.BeginInvoke(() => ShowReminder());
+            var enabledReminder = SettingItemUtils.GetEnableReminder().Value;
+            bool isEnabled = enabledReminder == "1" || enabledReminder.ToLower() == "true";
+            if (isEnabled)
+            {
+                MainWindow.BeginInvoke(() => ShowReminder());
+            }
+            
 #endif
 
             pauseItems = new ObservableCollection<ReminderPauseItem>

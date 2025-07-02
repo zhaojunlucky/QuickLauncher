@@ -70,6 +70,10 @@ namespace QuickLauncher
                 dbItem.Value = item.Value;
             }
             dbContext.SaveChanges();
+            if (Cache.ContainsKey(item.Key))
+            {
+                Cache[item.Key] = item;
+            }
         }
 
         private static SettingItem GetSettingItem(string key)
