@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Interop;
 
 namespace Utility.Win32.Api
 {
@@ -29,6 +31,33 @@ namespace Utility.Win32.Api
 
         [DllImport("user32.dll", SetLastError = true)]
         public static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
+
+        public static void FlashWindow(Window window, FlashWindowFlags flags, uint count = 0, uint timeout = 0)
+        {
+            // Get the native window handle (HWND) from the WPF window
+            WindowInteropHelper helper = new WindowInteropHelper(window);
+            IntPtr hWnd = helper.Handle;
+
+            if (hWnd == IntPtr.Zero)
+            {
+                // Window handle not yet available (e.g., window not loaded/shown)
+                // You might want to handle this or defer the call.
+                return;
+            }
+
+            FLASHWINFO fInfo = new FLASHWINFO();
+            fInfo.cbSize = Convert.ToUInt32(Marshal.SizeOf(fInfo));
+            fInfo.hwnd = hWnd;
+            fInfo.dwFlags = flags;
+            fInfo.uCount = count;
+            fInfo.dwTimeout = timeout;
+
+            FlashWindowEx(ref fInfo);
+        }
 
         [DllImport("Netapi32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
         public extern static int NetStatisticsGet(
@@ -101,6 +130,36 @@ namespace Utility.Win32.Api
         public const Int32 MF_BYPOSITION = 0x400;
 
         public const int WM_HOTKEY = 0x0312;
+
+        // FlashWindowEx flags
+        [Flags]
+        public enum FlashWindowFlags : uint
+        {
+            /// <summary>Stop flashing. The system restores the window to its original state.</summary>
+            FLASHW_STOP = 0,
+            /// <summary>Flash the window caption.</summary>
+            FLASHW_CAPTION = 1,
+            /// <summary>Flash the taskbar button.</summary>
+            FLASHW_TRAY = 2,
+            /// <summary>Flash both the window caption and taskbar button.</summary>
+            FLASHW_ALL = (FLASHW_CAPTION | FLASHW_TRAY),
+            /// <summary>Flash continuously, until the FLASHW_STOP flag is set.</summary>
+            FLASHW_TIMER = 4,
+            /// <summary>Flash continuously until the window comes to the foreground.</summary>
+            FLASHW_TIMERNOFG = 12
+        }
+
+        // Structure for FlashWindowEx
+        [StructLayout(LayoutKind.Sequential)]
+        public struct FLASHWINFO
+        {
+            public uint cbSize;    // The size of the structure in bytes.
+            public IntPtr hwnd;    // A Handle to the window to be flashed.
+            public FlashWindowFlags dwFlags; // The flash status.
+            public uint uCount;    // The number of times to flash the window.
+            public uint dwTimeout; // The rate in milliseconds at which the window is to be flashed.
+        }
+
     }
 
 }

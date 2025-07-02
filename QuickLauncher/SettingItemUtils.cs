@@ -42,6 +42,21 @@ namespace QuickLauncher
             return GetByKey("auto.detect.commands", "0", true);
         }
 
+        internal static SettingItem GetEnableReminder()
+        {
+            return GetByKey("reminder.enable", "0", true);
+        }
+
+        internal static SettingItem GetReminderInterval()
+        {
+            return GetByKey("reminder.interval", "40", true);
+        }
+
+        internal static SettingItem GetReminderNote()
+        {
+            return GetByKey("reminder.note", "", true);
+        }
+
         public static void SaveSettingItem(SettingItem item)
         {
             var dbContext = QuickCommandContext.Instance;

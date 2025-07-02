@@ -114,6 +114,7 @@ namespace QuickLauncher
 
             RegisterHotKeys(false);
 
+            viewModel.Loaded();
         }
 
         public void RegisterHotKeys(bool reload)

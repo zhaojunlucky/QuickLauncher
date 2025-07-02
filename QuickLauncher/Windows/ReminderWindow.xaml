@@ -1,0 +1,40 @@
+﻿<Controls:MetroWindow x:Class="QuickLauncher.Windows.ReminderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:QuickLauncher.Windows"
+        mc:Ignorable="d"
+        xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+        Title="Reminder: Time to Break" Height="350" Width="300" ResizeMode="NoResize" Icon="/Resources/launcher.ico"
+                      Topmost="True" ShowInTaskbar="False" Closing="MetroWindow_Closing">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="0" Grid.Column="0" Name="desc" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" Margin="5,0,5,0"
+                   ></TextBlock>
+        <TextBlock Grid.Row="1" Grid.Column="0" Name="countDown" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap"></TextBlock>
+        <TextBlock Grid.Row="2" Grid.Column="0" Name="note" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap"></TextBlock>
+        <Controls:DropDownButton Grid.Row="3" Grid.Column="0" Width="80" Height="30"
+                                Content="Pause"
+                                DisplayMemberPath="Name"
+
+                                ItemsSource="{Binding PauseItems}">
+            <Controls:DropDownButton.ItemContainerStyle>
+                <Style BasedOn="{StaticResource {x:Type MenuItem}}" TargetType="{x:Type MenuItem}">
+                    <Setter Property="Command"
+                            Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=DataContext.PauseReminderCommand}" />
+                    <Setter Property="CommandParameter" Value="{Binding Name}" />
+                </Style>
+            </Controls:DropDownButton.ItemContainerStyle>
+        </Controls:DropDownButton>
+    </Grid>
+</Controls:MetroWindow>

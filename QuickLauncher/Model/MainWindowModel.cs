@@ -45,6 +45,7 @@ namespace QuickLauncher.Model
         private ICommand copyCmd;
         private int selectedTabIndex;
         private string statusLabel;
+        private ReminderModel reminderModel;
 
         public MainWindowModel(MetroWindow mainWindow)
         {
@@ -66,6 +67,8 @@ namespace QuickLauncher.Model
                 Tabs.Add(new AutoDetectTabItemModel(new MicrosoftDetector()));
             }
             SelectedTabIndex = 0;
+            reminderModel = new ReminderModel(mainWindow);
+
         }
         public override string this[string columnName] => throw new NotImplementedException();
 
@@ -302,6 +305,11 @@ namespace QuickLauncher.Model
                 });
                 return refreshCommand;
             }
+        }
+
+        public ReminderModel ReminderModel
+        {
+            get => reminderModel;
         }
 
         private bool IsSingleCommandEditable(object x)
@@ -566,6 +574,11 @@ namespace QuickLauncher.Model
             Trace.TraceInformation("handle drop {0}", file);
 
             await ShowDialogAsync(dialog, true);
+        }
+
+        internal void Loaded()
+        {
+            reminderModel.EnabledReiminder();
         }
     }
 }
