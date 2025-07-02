@@ -3,8 +3,8 @@
 
 #define MyAppName "QuickLauncher"
 #define MyAppVersion "$VERSION"
-#define MyAppPublisher "MagicWorldZ"
-#define MyAppURL "https://blog.magicworldz.de/quicklauncher/"
+#define MyAppPublisher "Jun"
+#define MyAppURL "https://gundamz.net/quicklauncher/"
 #define MyAppExeName "QuickLauncher.exe"
 #define Config "$CONFIG"
 
@@ -38,8 +38,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\QuickLauncher\bin\x64\{#Config}\netcoreapp3.1\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\QuickLauncher\bin\x64\{#Config}\netcoreapp3.1\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\QuickLauncher\bin\x64\{#Config}\net8.0-windows10.0.26100.0\win-x64\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\QuickLauncher\bin\x64\{#Config}\net8.0-windows10.0.26100.0\win-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

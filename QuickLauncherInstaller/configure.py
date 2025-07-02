@@ -19,7 +19,7 @@ def parse_config(argv):
 
 
 def find_version(config):
-	path = fr'..\QuickLauncher\bin\x64\{config}\net8.0-windows10.0.26100.0\QuickLauncher.exe'
+	path = fr'..\QuickLauncher\bin\x64\{config}\net8.0-windows10.0.26100.0\win-x64\QuickLauncher.exe'
 	abs_path = os.path.abspath(path)
 	cmd = f'(Get-Command "{abs_path}").FileVersionInfo.FileVersion'
 	print(f'cmd={cmd}')
