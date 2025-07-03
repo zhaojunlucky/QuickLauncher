@@ -75,6 +75,13 @@ namespace QuickLauncher.Model
         {
             var enabledReminder = SettingItemUtils.GetEnableReminder().Value;
             bool isEnabled = enabledReminder == "1" || enabledReminder.ToLower() == "true";
+            reminderInterval = SettingItemUtils.GetReminderInterval();
+            int interval = Int32.Parse(reminderInterval.Value) * 60 * 1000;
+
+            if (CheckCurStatus(isEnabled, interval))
+            {
+                return;
+            }
 
 
             if (isEnabled)
@@ -84,8 +91,7 @@ namespace QuickLauncher.Model
                     reminderTimer.Stop();
                     reminderTimer.Dispose();
                 }
-                reminderInterval = SettingItemUtils.GetReminderInterval();
-                reminderTimer = new Timer(Int32.Parse(reminderInterval.Value) * 60 * 1000);
+                reminderTimer = new Timer(interval);
                 reminderTimer.Elapsed += OnTimedEvent;
                 reminderTimer.Start();
                 Trace.TraceInformation($"Reminder enabled with interval {reminderTimer.Interval} milseconds");
@@ -100,6 +106,22 @@ namespace QuickLauncher.Model
                     Trace.TraceInformation("Reminder disabled");
                 }
             }
+        }
+
+        private bool CheckCurStatus(bool isEnabled, double interval)
+        {
+           if (!isEnabled && reminderTimer == null)
+            {
+                Trace.TraceInformation("Reminder is already disabled, no need to enable it again.");
+                return true;
+            }
+            if (isEnabled && reminderTimer != null && reminderTimer.Enabled && interval == reminderTimer.Interval)
+            {
+
+                Trace.TraceInformation("Reminder is already enabled, no need to enable it again.");
+                return true;
+            }
+            return false;
         }
 
         private void OnTimedEvent(object source, ElapsedEventArgs e)
