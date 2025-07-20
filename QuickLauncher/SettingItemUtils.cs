@@ -42,6 +42,21 @@ namespace QuickLauncher
             return GetByKey("auto.detect.commands", "0", true);
         }
 
+        internal static SettingItem GetEnableReminder()
+        {
+            return GetByKey("reminder.enable", "0", true);
+        }
+
+        internal static SettingItem GetReminderInterval()
+        {
+            return GetByKey("reminder.interval", "40", true);
+        }
+
+        internal static SettingItem GetReminderNote()
+        {
+            return GetByKey("reminder.note", "", true);
+        }
+
         public static void SaveSettingItem(SettingItem item)
         {
             var dbContext = QuickCommandContext.Instance;
@@ -55,6 +70,10 @@ namespace QuickLauncher
                 dbItem.Value = item.Value;
             }
             dbContext.SaveChanges();
+            if (Cache.ContainsKey(item.Key))
+            {
+                Cache[item.Key] = item;
+            }
         }
 
         private static SettingItem GetSettingItem(string key)

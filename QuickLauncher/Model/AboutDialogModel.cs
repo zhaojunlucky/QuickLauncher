@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
@@ -12,7 +13,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using Utility.Model;
-using Windows.Web.Http;
+
 
 namespace QuickLauncher.Model
 {
@@ -34,6 +35,7 @@ namespace QuickLauncher.Model
             newVersionResult = "(QuickLauncher is up to date)";
 
             var rAssembly = Assembly.GetEntryAssembly();
+            //Version = ParseVersion(rAssembly.GetName().Version?.ToString());
             Version = ParseVersion(rAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
 
 #if DEBUG

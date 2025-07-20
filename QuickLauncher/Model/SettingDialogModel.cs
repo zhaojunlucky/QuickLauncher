@@ -15,15 +15,25 @@ namespace QuickLauncher.Model
     {
         private readonly SettingItem mainWindowHotKey;
         private readonly SettingItem enableAutoDetect;
+        private readonly SettingItem reminderInterval;
+        private readonly SettingItem enableReminder;
         private HotKey hotKey;
         private readonly MetroWindow owningWindow;
         private readonly string currentHotKey;
         private RawHotKey rawHotKey;
+
+#if DEBUG
+        private static readonly int MIN_REMINDER_INTERVAL = 1; // For testing purposes, set minimum interval to 1 minute
+#else
+        private static readonly int MIN_REMINDER_INTERVAL = 10; // Minimum interval is 10 minutes
+#endif
         public SettingDialogModel(MetroWindow window)
         {
             owningWindow = window;
             mainWindowHotKey = SettingItemUtils.GetMainWindowOpenHotkey();
             enableAutoDetect = SettingItemUtils.GetEnableAutoDetect();
+            enableReminder = SettingItemUtils.GetEnableReminder();
+            reminderInterval = SettingItemUtils.GetReminderInterval();
             currentHotKey = mainWindowHotKey.Value;
             InitHotKey();
         }
@@ -106,6 +116,40 @@ namespace QuickLauncher.Model
                 RaisePropertyChanged("EnableAutoDetect");
                 SafeSave(enableAutoDetect);
                 PromptRestart();
+            }
+        }
+
+        public int ReminderInterval
+        {
+            get => Int32.Parse(reminderInterval.Value); 
+            set
+            {
+                int interval = value < MIN_REMINDER_INTERVAL? 10:value; // Ensure minimum interval is 10 minutes
+                reminderInterval.Value = interval.ToString();
+                RaisePropertyChanged("ReminderInterval");
+                SafeSave(reminderInterval);
+            }
+        }
+
+        public bool EnableReminder
+        {
+            get => enableReminder.Value == "1";
+            set
+            {
+                enableReminder.Value = value ? "1" : "0";
+                RaisePropertyChanged("EnableReminder");
+                SafeSave(enableReminder);
+            }
+        }
+
+        public string ReminderNote
+        {
+            get => SettingItemUtils.GetReminderNote().Value;
+            set
+            {
+                SettingItemUtils.GetReminderNote().Value = value;
+                RaisePropertyChanged("ReminderNote");
+                SafeSave(SettingItemUtils.GetReminderNote());
             }
         }
 

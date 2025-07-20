@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Reflection;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -66,20 +65,64 @@ namespace Utility.Singleton
             this.asyncCallback = asyncCallback;
             namedPipeServerStream = new NamedPipeServerStream(AppName + "IPC",
                PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
-            // it's easier to use the AsyncCallback than it is to use Tasks here:
-            // this can't block, so some form of async is a must
 
-            namedPipeServerStream.BeginWaitForConnection(asyncCallback, namedPipeServerStream);
-
+            try
+            {
+                namedPipeServerStream.BeginWaitForConnection(asyncCallback, namedPipeServerStream);
+            }
+            catch (ObjectDisposedException)
+            {
+                // Pipe was disposed before connection could be made, ignore or log as needed
+                Trace.TraceWarning("Pipe server disposed before connection.");
+            }
+            catch (IOException ioEx)
+            {
+                // Handle pipe broken or other IO errors
+                Trace.TraceError("Pipe server IO error: " + ioEx.Message);
+                // Optionally, recreate the pipe server and try again
+                namedPipeServerStream?.Dispose();
+                namedPipeServerStream = new NamedPipeServerStream(AppName + "IPC",
+                    PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+                namedPipeServerStream.BeginWaitForConnection(asyncCallback, namedPipeServerStream);
+            }
         }
 
         public void ReListen()
         {
-            if (namedPipeServerStream is {IsConnected: true})
+            // Dispose the old pipe if it exists
+            if (namedPipeServerStream != null)
             {
-                namedPipeServerStream.Disconnect();
+                try
+                {
+                    if (namedPipeServerStream.IsConnected)
+                    {
+                        namedPipeServerStream.Disconnect();
+                    }
+                }
+                catch (IOException ioEx)
+                {
+                    Trace.TraceWarning("Pipe disconnect failed: " + ioEx.Message);
+                }
+                namedPipeServerStream.Dispose();
+                namedPipeServerStream = null;
             }
-            namedPipeServerStream.BeginWaitForConnection(asyncCallback, namedPipeServerStream);
+
+            // Create a new pipe server instance
+            namedPipeServerStream = new NamedPipeServerStream(AppName + "IPC",
+                PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+
+            try
+            {
+                namedPipeServerStream.BeginWaitForConnection(asyncCallback, namedPipeServerStream);
+            }
+            catch (ObjectDisposedException)
+            {
+                Trace.TraceWarning("Pipe server disposed before connection.");
+            }
+            catch (IOException ioEx)
+            {
+                Trace.TraceError("Pipe server IO error: " + ioEx.Message);
+            }
         }
 
         public async Task StopPipeServerAsync()
@@ -98,16 +141,47 @@ namespace Utility.Singleton
             }
         }
 
+        // ...
         public void SendMsgToRunningServer(string message)
         {
             try
             {
-                var cli = new NamedPipeClientStream(".", AppName + "IPC", PipeDirection.InOut);
-                cli.Connect(2000);
-                var bf = new BinaryFormatter();
-                // serialize and send the command line
-                bf.Serialize(cli, message);
-                cli.Close();
+                using (var cli = new NamedPipeClientStream(".", AppName + "IPC", PipeDirection.InOut, PipeOptions.None))
+                {
+                    try
+                    {
+                        cli.Connect(2000);
+                    }
+                    catch (TimeoutException)
+                    {
+                        Trace.TraceError("Timeout: Could not connect to pipe server.");
+                        return;
+                    }
+                    catch (IOException ioEx)
+                    {
+                        Trace.TraceError("Pipe connection failed: " + ioEx.Message);
+                        return;
+                    }
+
+                    if (!cli.IsConnected)
+                    {
+                        Trace.TraceError("Pipe client is not connected.");
+                        return;
+                    }
+
+                    var bytes = Encoding.UTF8.GetBytes(message);
+
+                    try
+                    {
+                        cli.Write(bytes, 0, bytes.Length);
+                        cli.Flush();
+                        cli.WaitForPipeDrain();
+                    }
+                    catch (IOException ioEx)
+                    {
+                        Trace.TraceError("Pipe is broken during write: " + ioEx.Message);
+                    }
+                }
             }
             catch (Exception e)
             {

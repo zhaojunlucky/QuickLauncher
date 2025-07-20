@@ -45,6 +45,7 @@ namespace QuickLauncher.Model
         private ICommand copyCmd;
         private int selectedTabIndex;
         private string statusLabel;
+        private ReminderModel reminderModel;
 
         public MainWindowModel(MetroWindow mainWindow)
         {
@@ -66,6 +67,8 @@ namespace QuickLauncher.Model
                 Tabs.Add(new AutoDetectTabItemModel(new MicrosoftDetector()));
             }
             SelectedTabIndex = 0;
+            reminderModel = new ReminderModel(mainWindow);
+
         }
         public override string this[string columnName] => throw new NotImplementedException();
 
@@ -274,10 +277,15 @@ namespace QuickLauncher.Model
                 settingsCommand ??= new SimpleCommand(x =>
                 {
                     Settings settings = new Settings(MainWindow, dialogSettings);
-                    _ = ShowDialogAsync(settings, false);
+                    _ = ShowDialogAsyncCallback(settings, ()=> onSettingChanged());
                 });
                 return settingsCommand;
             }
+        }
+
+        private void onSettingChanged()
+        {
+            reminderModel.EnabledReiminder();
         }
 
         public ICommand RefreshAllCommand
@@ -302,6 +310,11 @@ namespace QuickLauncher.Model
                 });
                 return refreshCommand;
             }
+        }
+
+        public ReminderModel ReminderModel
+        {
+            get => reminderModel;
         }
 
         private bool IsSingleCommandEditable(object x)
@@ -358,6 +371,18 @@ namespace QuickLauncher.Model
                 dialog.Unloaded += (sender, args) =>
                 {
                     SelectedTab.Reload(CommandSearchKey);
+                };
+            }
+            await DialogCoordinator.Instance.ShowMetroDialogAsync(this, dialog, dialogSettings);
+        }
+
+        private async Task ShowDialogAsyncCallback(BaseMetroDialog dialog, Action callback)
+        {
+            if (callback != null)
+            {
+                dialog.Unloaded += (sender, args) =>
+                {
+                    callback();
                 };
             }
             await DialogCoordinator.Instance.ShowMetroDialogAsync(this, dialog, dialogSettings);
@@ -566,6 +591,11 @@ namespace QuickLauncher.Model
             Trace.TraceInformation("handle drop {0}", file);
 
             await ShowDialogAsync(dialog, true);
+        }
+
+        internal void Loaded()
+        {
+            reminderModel.EnabledReiminder();
         }
     }
 }

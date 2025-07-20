@@ -29,7 +29,7 @@ namespace QuickLauncher
             InitDb();
 #if !DEBUG
             nIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Windows.Forms.Application.ExecutablePath);
-            nIcon.Text = "QuickLancher By MagicWorldZ";
+            nIcon.Text = "QuickLancher By Jun";
 
             System.Windows.Forms.ToolStripMenuItem open = new System.Windows.Forms.ToolStripMenuItem("Open");
             open.Click += new EventHandler(NIcon_Click);
