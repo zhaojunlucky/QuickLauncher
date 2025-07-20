@@ -40,7 +40,7 @@ deploy:
   description: 'QuickLauncher'
   provider: GitHub
   auth_token:
-    secure: s452Wm4c83j4hgPCWEqehMm2yJwdIXfx24S++aICPh/OfTmaJIBeLiH45Y3K00e+VtDRWYcnrj9vkM+Z1ZeYwUiwTF4C1Jt5nrftJFh6/a6/lFbVJjir5uwnqkhuVTD0 # your encrypted token from GitHub
+    secure: s452Wm4c83j4hgPCWEqehCJlHsEhHFXp7fFvxP/O+wlK+2HbXaZ+J8RArjf4/TiolgKb5GU3Bs91a2fce9RCdvrMRrJr7AnMSmn8YiJo+KCteVYM44V8kNyhGiLpkb6i
   artifact: /QuickLauncherSetup-.+\.zip/ # upload all NuGet packages to release assets
   draft: true
   prerelease: false
