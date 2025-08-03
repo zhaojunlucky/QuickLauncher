@@ -27,6 +27,8 @@ namespace QuickLauncher.Model
         private string workDirectory = "";
         private byte[] customIcon;
         private bool isReadOnly;
+        private int useShellExecute = 1;
+        private int createNoWindow = 0;
         private static readonly System.Windows.Media.Brush ErrorBgBrush = (System.Windows.Media.Brush)Application.Current.FindResource("MahApps.Brushes.ValidationSummary4");
 
         public QuickCommand(bool isNew)
@@ -48,6 +50,8 @@ namespace QuickLauncher.Model
             workDirectory = quickCommand.workDirectory;
             customIcon = quickCommand.customIcon;
             img = quickCommand.Img;
+            createNoWindow = quickCommand.createNoWindow;
+            useShellExecute = quickCommand.useShellExecute;
         }
 
         public static QuickCommand Copy(QuickCommand quickCommand)
@@ -61,7 +65,9 @@ namespace QuickLauncher.Model
                 uuid = quickCommand.uuid,
                 workDirectory = quickCommand.workDirectory,
                 customIcon = quickCommand.customIcon,
-                img = quickCommand.Img
+                img = quickCommand.Img,
+                createNoWindow = quickCommand.createNoWindow,
+                useShellExecute = quickCommand.useShellExecute,
             };
             return cmd;
         }
@@ -125,6 +131,38 @@ namespace QuickLauncher.Model
                 RaisePropertyChanged("IsAutoStart");
             }
         }
+
+        [Column("USE_SHELL_EXECUTE")]
+        public bool UseShellExecute
+        {
+            get => useShellExecute > 0;
+            set
+            {
+                useShellExecute = value ? 1 : 0;
+                RaisePropertyChanged("UseShellExecute");
+                if (value && createNoWindow > 0)
+                {
+                    CreateNoWindow = false; // if use shell execute, then no need to create no window
+                }
+            }
+        }
+
+
+        [Column("CREATE_NO_WINDDOW")]
+        public bool CreateNoWindow
+        {
+            get => createNoWindow > 0;
+            set
+            {
+                createNoWindow = value ? 1 : 0;
+                RaisePropertyChanged("CreateNoWindow");
+                if (value && useShellExecute > 0)
+                {
+                    UseShellExecute = false; // if create no window, then no need to use shell execute
+                }
+            }
+        }
+
 
         [NotMapped]
         public string ExpandedPath => Environment.ExpandEnvironmentVariables(Path);

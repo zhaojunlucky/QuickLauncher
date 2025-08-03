@@ -219,6 +219,8 @@ namespace QuickLauncher.Model
                     qc.WorkDirectory = QCommand.WorkDirectory;
                     qc.CustomIcon = QCommand.CustomIcon;
                     qc.IsAutoStart = QCommand.IsAutoStart;
+                    qc.UseShellExecute = QCommand.UseShellExecute;
+                    qc.CreateNoWindow = QCommand.CreateNoWindow;
                     dbContext.SaveChanges();
                 }
                 else
@@ -242,6 +244,8 @@ namespace QuickLauncher.Model
                 QCommand.Path = defaultCmd.Path ?? "";
                 QCommand.Alias = defaultCmd.Alias ?? "";
                 QCommand.Command = defaultCmd.Command ?? "";
+                QCommand.UseShellExecute = defaultCmd.UseShellExecute;
+                QCommand.CreateNoWindow = defaultCmd.CreateNoWindow;
                 QCommand.WorkDirectory = FileUtil.GetDirectoryOfFile(QCommand.Path);
             }
         }

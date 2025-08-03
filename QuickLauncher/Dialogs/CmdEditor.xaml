@@ -97,14 +97,37 @@
                 <Image Source="{Binding QCommand.Img}"></Image>
             </Button.Content>
         </Button>
-        <Controls:ToggleSwitch Grid.Row="4" Grid.Column="0"
-                               IsOn="{Binding QCommand.IsAutoStart, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                               Margin="0 5, 0, 0"
-                               Foreground="{DynamicResource MahApps.Brushes.Control.Background}">
-            <Controls:ToggleSwitch.Header>
-                <Label Margin="-5, 0, 0, 0" Content="Auto Start" Foreground="{DynamicResource MahApps.Brushes.Control.Background}"/>
-            </Controls:ToggleSwitch.Header>
-        </Controls:ToggleSwitch>
+        <Grid Grid.Row="4" Grid.ColumnSpan="2" Margin="0 5 0 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Controls:ToggleSwitch Grid.Column="0"
+                       IsOn="{Binding QCommand.IsAutoStart, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                       Margin="0 5, 0, 0"
+                       Foreground="{DynamicResource MahApps.Brushes.Control.Background}">
+                <Controls:ToggleSwitch.Header>
+                    <Label Margin="-5, 0, 0, 0" Content="Auto Start" Foreground="{DynamicResource MahApps.Brushes.Control.Background}"/>
+                </Controls:ToggleSwitch.Header>
+            </Controls:ToggleSwitch>
+            <Controls:ToggleSwitch Grid.Column="1"
+           IsOn="{Binding QCommand.UseShellExecute, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+           Margin="0 5, 0, 0"
+           Foreground="{DynamicResource MahApps.Brushes.Control.Background}">
+                <Controls:ToggleSwitch.Header>
+                    <Label Margin="-5, 0, 0, 0" Content="Use Shell" Foreground="{DynamicResource MahApps.Brushes.Control.Background}"/>
+                </Controls:ToggleSwitch.Header>
+            </Controls:ToggleSwitch>
+            <Controls:ToggleSwitch Grid.Column="2"
+           IsOn="{Binding QCommand.CreateNoWindow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+           Margin="0 5, 0, 0"
+           Foreground="{DynamicResource MahApps.Brushes.Control.Background}">
+                <Controls:ToggleSwitch.Header>
+                    <Label Margin="-5, 0, 0, 0" Content="No Window" Foreground="{DynamicResource MahApps.Brushes.Control.Background}"/>
+                </Controls:ToggleSwitch.Header>
+            </Controls:ToggleSwitch>
+        </Grid>
         <Grid Grid.Row="5" Grid.ColumnSpan="2"  Margin="0 5 0 0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition></ColumnDefinition>
