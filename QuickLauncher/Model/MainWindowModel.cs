@@ -440,8 +440,11 @@ namespace QuickLauncher.Model
         {
             ProcessStartInfo startInfo = new ProcessStartInfo(qc.ExpandedPath, qc.Command)
             {
-                UseShellExecute = true
+                UseShellExecute = qc.UseShellExecute,
+                CreateNoWindow = qc.CreateNoWindow,
             };
+            Trace.TraceInformation("Start process path {0} cmd {1} admin {2}, use shell {3} no window {4}",
+                qc.ExpandedPath, qc.Command, asAdmin, qc.UseShellExecute, qc.CreateNoWindow);
             if (asAdmin)
             {
                 startInfo.Verb = "runas";
@@ -462,6 +465,7 @@ namespace QuickLauncher.Model
                 if (qc.QuickCommandEnvConfigs.Count > 0)
                 {
                     startInfo.UseShellExecute = false;
+                    Trace.TraceInformation("force use shell execute false for env config");
                 }
             }
             try
