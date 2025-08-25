@@ -289,3 +289,4 @@ __pycache__/
 
 QuickLauncherInstaller/output/
 QuickLauncherInstaller/installer.iss
+.DS_Store
