@@ -4,9 +4,8 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
     <UseWPF>true</UseWPF>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
     <UseWindowsForms>true</UseWindowsForms>
-	  <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <Platforms>x64</Platforms>
     <ApplicationIcon>Resources\launcher.ico</ApplicationIcon>
     <StartupObject>QuickLauncher.App</StartupObject>
@@ -20,6 +19,7 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
 	<DisableGitVersionTask>false</DisableGitVersionTask>
+	<ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
